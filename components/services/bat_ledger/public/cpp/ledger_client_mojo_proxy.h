@@ -104,6 +104,7 @@ class LedgerClientMojoProxy : public mojom::BatLedgerClient,
 
   void SaveNormalizedPublisherList(
     const std::string& normalized_list) override;
+  void OnGrantViaSafetynetCheck(const std::string& nonce) override;
 
  private:
   // workaround to pass base::OnceCallback into std::bind
