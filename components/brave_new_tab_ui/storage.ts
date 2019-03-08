@@ -8,10 +8,13 @@ import { images as backgrounds } from './constants/backgrounds'
 // Utils
 import { debounce } from '../common/debounce'
 
+// Default top sites
+import { defaultTopSites as topSites } from './data/defaultTopSites'
+
 const keyName = 'new-tab-data'
 
 const defaultState: NewTab.State = {
-  topSites: [],
+  topSites,
   ignoredTopSites: [],
   pinnedTopSites: [],
   gridSites: [],
