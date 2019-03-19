@@ -131,6 +131,14 @@ export interface ChangeAllNoScriptSettings {
   (shouldBlock: boolean): ChangeAllNoScriptSettingsReturn
 }
 
+interface ShieldsReadyReturn {
+  type: types.SHIELDS_READY
+}
+
+export interface ShieldsReady {
+  (): ShieldsReadyReturn
+}
+
 export type shieldPanelActions =
   ShieldsPanelDataUpdatedReturn |
   ShieldsToggledReturn |
@@ -143,4 +151,5 @@ export type shieldPanelActions =
   BlockCookiesReturn |
   AllowScriptOriginsOnceReturn |
   ChangeNoScriptSettingsReturn |
-  ChangeAllNoScriptSettingsReturn
+  ChangeAllNoScriptSettingsReturn |
+  ShieldsReadyReturn

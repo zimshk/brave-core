@@ -88,3 +88,9 @@ export const changeAllNoScriptSettings: actions.ChangeAllNoScriptSettings = (sho
     shouldBlock
   }
 }
+
+export const shieldsReady: actions.ShieldsReady = () => {
+  return {
+    type: types.SHIELDS_READY
+  }
+}

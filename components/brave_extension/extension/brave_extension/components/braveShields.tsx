@@ -28,7 +28,8 @@ import {
   BlockCookies,
   AllowScriptOriginsOnce,
   ChangeNoScriptSettings,
-  ChangeAllNoScriptSettings
+  ChangeAllNoScriptSettings,
+  ShieldsReady
 } from '../types/actions/shieldsPanelActions'
 
 interface Props {
@@ -42,6 +43,7 @@ interface Props {
     allowScriptOriginsOnce: AllowScriptOriginsOnce
     changeNoScriptSettings: ChangeNoScriptSettings
     changeAllNoScriptSettings: ChangeAllNoScriptSettings
+    shieldsReady: ShieldsReady
   }
   shieldsPanelTabData: Tab
 }
@@ -68,6 +70,10 @@ export default class Shields extends React.PureComponent<Props, State> {
 
   setBlockedListOpen = () => {
     this.setState({ isBlockedListOpen: !this.state.isBlockedListOpen })
+  }
+
+  componentDidMount () {
+    this.props.actions.shieldsReady()
   }
 
   render () {

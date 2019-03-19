@@ -308,6 +308,10 @@ export default function shieldsPanelReducer (state: State = { tabs: {}, windows:
       state = shieldsPanelState.changeAllNoScriptSettings(state, tabId, action.shouldBlock)
       break
     }
+    case shieldsPanelTypes.SHIELDS_READY: {
+      console.log('------------------------------------------------------------------------------------------------------------------------------ shields ready!')
+      break
+    }
   }
   return state
 }
