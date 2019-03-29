@@ -172,7 +172,13 @@ bool ShouldSetReferrer(bool allow_referrers, bool shields_up,
       SameDomainOrHost(target_url, original_referrer,
           INCLUDE_PRIVATE_REGISTRIES) ||
       // Whitelisted referrers shoud never set the referrer
+<<<<<<< HEAD
       brave::IsWhitelistedReferrer(tab_origin, target_url.GetOrigin())) {
+=======
+      (g_brave_browser_process &&
+       g_brave_browser_process->referrer_whitelist_service()->IsWhitelisted(
+         tab_origin, target_url.GetOrigin()))) {
+>>>>>>> 81a7088f3... fix crashing browser tests, add test to clear cache
     return false;
   }
   *output_referrer = Referrer::SanitizeForRequest(target_url,
