@@ -192,6 +192,8 @@ class RewardsServiceImpl : public RewardsService,
   void GetAddressesForPaymentId(const GetAddressesCallback& callback) override;
   std::pair<uint64_t, uint64_t> GetEarningsRange();
 
+  void ResetTheWholeState(const base::Callback<void(bool)>& callback) override;
+
   // Testing methods
   void SetLedgerEnvForTesting();
 
@@ -245,6 +247,8 @@ class RewardsServiceImpl : public RewardsService,
   void OnLoadedState(ledger::OnLoadCallback callback,
                                   const std::string& value);
   void OnResetState(ledger::OnResetCallback callback,
+                                 bool success);
+  void OnResetTheWholeState(base::Callback<void(bool)> callback,
                                  bool success);
   void OnDonate_PublisherInfoSaved(ledger::Result result,
                                    std::unique_ptr<ledger::PublisherInfo> info);
@@ -474,6 +478,7 @@ class RewardsServiceImpl : public RewardsService,
   std::unique_ptr<base::RepeatingTimer> notification_periodic_timer_;
 
   uint32_t next_timer_id_;
+  bool reset_states_;
 
   DISALLOW_COPY_AND_ASSIGN(RewardsServiceImpl);
 };
