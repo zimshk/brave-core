@@ -405,13 +405,13 @@ void RewardsServiceImpl::StartLedger() {
   bat_ledger_service_.set_connection_error_handler(
       base::Bind(&RewardsServiceImpl::ConnectionClosed, AsWeakPtr()));
 
-  bool isProduction = true;
+  //bool isProduction = true;
   // Environment
-  #if defined(OFFICIAL_BUILD)
-    isProduction = true;
-  #else
+  //#if defined(OFFICIAL_BUILD)
+  //  isProduction = true;
+  //#else
     isProduction = false;
-  #endif
+ // #endif
   SetProduction(isProduction);
 
   const base::CommandLine& command_line =
