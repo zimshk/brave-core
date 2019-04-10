@@ -410,7 +410,7 @@ void RewardsServiceImpl::StartLedger() {
   //#if defined(OFFICIAL_BUILD)
   //  isProduction = true;
   //#else
-    isProduction = false;
+    bool isProduction = false;
  // #endif
   SetProduction(isProduction);
 
