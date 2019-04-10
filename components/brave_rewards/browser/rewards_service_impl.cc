@@ -159,6 +159,7 @@ ContentSite PublisherInfoToContentSite(
   content_site.id = publisher_info.id;
   content_site.weight = publisher_info.weight;
   content_site.reconcile_stamp = publisher_info.reconcile_stamp;
+  content_site.met_min_duration = publisher_info.met_min_duration;
   return content_site;
 }
 

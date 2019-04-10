@@ -137,8 +137,9 @@ void ExtensionRewardsServiceObserver::OnPanelPublisherInfo(
     info.reset(new ledger::PublisherInfo());
     info->id = "";
   }
-
-  publisher.percentage = info->percent;
+  LOG(ERROR) << "=========MET MIN DURATION: " << info->met_min_duration;
+  publisher.percentage = info->met_min_duration ?
+      info->percent : 0;
   publisher.verified = info->verified;
   publisher.excluded = info->excluded == ledger::PUBLISHER_EXCLUDE::EXCLUDED;
   publisher.name = info->name;
@@ -286,7 +287,8 @@ void ExtensionRewardsServiceObserver::OnPublisherListNormalized(
     auto& publisher = publishers[publishers.size() -1];
 
     publisher.publisher_key = list[i].id;
-    publisher.percentage = list[i].percentage;
+    publisher.percentage = list[i].met_min_duration ?
+        list[i].percentage : 0;
     publisher.verified = list[i].verified;
   }
 

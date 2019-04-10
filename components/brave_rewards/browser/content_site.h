@@ -33,6 +33,7 @@ struct ContentSite {
   std::string provider;
   double weight;
   uint64_t reconcile_stamp;
+  bool met_min_duration;
 };
 
 typedef std::vector<ContentSite> ContentSiteList;

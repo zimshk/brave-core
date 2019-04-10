@@ -503,6 +503,11 @@ class LedgerImpl : public ledger::Ledger,
       ledger::Result result,
       std::unique_ptr<ledger::PublisherInfo> info);
 
+  void OnGetActivityInfo(
+    ledger::Result result,
+    std::unique_ptr<ledger::PublisherInfo> publisher_info,
+    ledger::PublisherInfoCallback callback);
+
   ledger::LedgerClient* ledger_client_;
   std::unique_ptr<braveledger_bat_client::BatClient> bat_client_;
   std::unique_ptr<braveledger_bat_publishers::BatPublishers> bat_publishers_;

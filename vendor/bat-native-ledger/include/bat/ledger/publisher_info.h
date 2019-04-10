@@ -133,6 +133,7 @@ LEDGER_EXPORT struct PublisherInfo {
   std::string url;
   std::string provider;
   std::string favicon_url;
+  bool met_min_duration;
 
   std::vector<ContributionInfo> contributions;
 };

@@ -435,9 +435,22 @@ void LedgerImpl::GetPublisherInfo(const std::string& publisher_key,
   ledger_client_->LoadPublisherInfo(publisher_key, callback);
 }
 
+void LedgerImpl::OnGetActivityInfo(
+    ledger::Result result,
+    std::unique_ptr<ledger::PublisherInfo> publisher_info,
+    ledger::PublisherInfoCallback callback) {
+  LOG(ERROR) << "=============DURATION: " << publisher_info->duration;
+  LOG(ERROR) << "=============MIN DURATION: " << bat_publishers_->getPublisherMinVisitTime();
+  publisher_info->met_min_duration =
+      publisher_info->duration >= bat_publishers_->getPublisherMinVisitTime();
+  callback(result, std::move(publisher_info));
+}
+
+
 void LedgerImpl::GetActivityInfo(const ledger::ActivityInfoFilter& filter,
                                  ledger::PublisherInfoCallback callback) {
-  ledger_client_->LoadActivityInfo(filter, callback);
+  ledger_client_->LoadActivityInfo(filter,
+      std::bind(&LedgerImpl::OnGetActivityInfo, this, _1, _2, callback));
 }
 
 void LedgerImpl::GetPanelPublisherInfo(
