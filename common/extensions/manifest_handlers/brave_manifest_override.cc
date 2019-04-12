@@ -44,7 +44,7 @@ bool BraveOverridesHandler::Parse(Extension* extension, base::string16* error) {
           }
         }
       )";
-      std::unique_ptr<base::Value> sockets = base::JSONReader::Read(json);
+      base::Optional<base::Value> sockets = base::JSONReader::Read(json);
       DCHECK(sockets);
       std::unique_ptr<SocketsManifestData> data =
           SocketsManifestData::FromValue(*sockets, error);
