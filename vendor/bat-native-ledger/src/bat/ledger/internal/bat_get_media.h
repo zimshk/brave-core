@@ -59,6 +59,7 @@ class BatGetMedia {
       const std::string& mediaURL,
       const ledger::VisitData& visit_data,
       const uint64_t window_id,
+      const std::string& user_id,
       int response_status_code,
       const std::string& response,
       const std::map<std::string, std::string>& headers);
@@ -101,6 +102,7 @@ class BatGetMedia {
       const ledger::TwitchEventInfo& twitchEventInfo,
       const ledger::VisitData& visit_data,
       const uint64_t window_id,
+      const std::string& user_id,
       ledger::Result result,
       std::unique_ptr<ledger::PublisherInfo> media_publisher_info);
 

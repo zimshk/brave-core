@@ -63,8 +63,9 @@ void BatGetMedia::processMedia(const std::map<std::string, std::string>& parts,
   if (parts.size() == 0 || !ledger_->GetRewardsMainEnabled()) {
     return;
   }
-
-  std::string mediaId = braveledger_bat_helper::getMediaId(parts, type);
+  std::string user_id;
+  std::string mediaId = braveledger_bat_helper::getMediaId(
+      parts, type, user_id);
   BLOG(ledger_, ledger::LogLevel::LOG_DEBUG) << "Media Id: " << mediaId;
   if (mediaId.empty()) {
     return;
@@ -98,6 +99,7 @@ void BatGetMedia::processMedia(const std::map<std::string, std::string>& parts,
                 twitchEventInfo,
                 visit_data,
                 0,
+                user_id,
                 _1,
                 _2));
 }
@@ -109,6 +111,7 @@ void BatGetMedia::getPublisherInfoDataCallback(const std::string& mediaId,
     const ledger::TwitchEventInfo& twitchEventInfo,
     const ledger::VisitData& visit_data,
     const uint64_t window_id,
+    const std::string& user_id,
     ledger::Result result,
     std::unique_ptr<ledger::PublisherInfo> publisher_info) {
   if (result != ledger::Result::LEDGER_OK &&
@@ -118,9 +121,10 @@ void BatGetMedia::getPublisherInfoDataCallback(const std::string& mediaId,
     // TODO(anyone) error handling
     return;
   }
-
+  LOG(ERROR) << "========MEDIA ID: " << mediaId;
   if (!publisher_info && !publisher_info.get()) {
     std::string mediaURL = getMediaURL(mediaId, providerName);
+    LOG(ERROR) << "========MEDIA URL: " << mediaURL;
     if (providerName == YOUTUBE_MEDIA_TYPE) {
       auto callback = std::bind(
           &BatGetMedia::getPublisherFromMediaPropsCallback,
@@ -131,6 +135,7 @@ void BatGetMedia::getPublisherInfoDataCallback(const std::string& mediaId,
           mediaURL,
           visit_data,
           window_id,
+          std::string(),
           _1,
           _2,
           _3);
@@ -161,8 +166,9 @@ void BatGetMedia::getPublisherInfoDataCallback(const std::string& mediaId,
       }
 
       std::string twitchMediaID = mediaId;
+      LOG(ERROR) << "========twitchMediaID: " << twitchMediaID;
       std::string mediaUrl = getMediaURL(twitchMediaID, providerName);
-
+      LOG(ERROR) << "========MEDIA URL: " << mediaUrl;
       ledger::VisitData updated_visit_data(visit_data);
       updated_visit_data.favicon_url = "";
       updated_visit_data.provider = TWITCH_MEDIA_TYPE;
@@ -174,9 +180,10 @@ void BatGetMedia::getPublisherInfoDataCallback(const std::string& mediaId,
         if (media_props.empty()) {
           return;
         }
-
+        LOG(ERROR) << "MEDIA ID BEFORE SPLIT: " << mediaId;
         twitchMediaID = media_props[0];
-        mediaUrl = getMediaURL(twitchMediaID, providerName);
+        LOG(ERROR) << "MEDIA ID AFTER SPLIT: " << twitchMediaID;
+        mediaUrl = getMediaURL(user_id, providerName);
         std::string oembed_url =
             (std::string)TWITCH_VOD_URL + media_props[media_props.size() - 1];
         updated_visit_data.name = twitchMediaID;
@@ -191,6 +198,7 @@ void BatGetMedia::getPublisherInfoDataCallback(const std::string& mediaId,
             mediaUrl,
             updated_visit_data,
             window_id,
+            user_id,
             _1,
             _2,
             _3);
@@ -203,7 +211,7 @@ void BatGetMedia::getPublisherInfoDataCallback(const std::string& mediaId,
       }
 
       // Live stream
-      std::string id = providerName + "#author:" + twitchMediaID;
+      std::string id = providerName + "#author:" + user_id;
       updated_visit_data.name = twitchMediaID;
       updated_visit_data.url = mediaUrl + "/videos";
 
@@ -340,6 +348,7 @@ void BatGetMedia::getPublisherFromMediaPropsCallback(
     const std::string& mediaURL,
     const ledger::VisitData& visit_data,
     const uint64_t window_id,
+    const std::string& user_id,
     int response_status_code,
     const std::string& response,
     const std::map<std::string, std::string>& headers) {
@@ -400,8 +409,7 @@ void BatGetMedia::getPublisherFromMediaPropsCallback(
     std::string author_name;
     braveledger_bat_helper::getJSONValue("author_name", response, &author_name);
 
-    std::string twitchMediaID = visit_data.name;
-    std::string id = providerName + "#author:" + twitchMediaID;
+    std::string id = providerName + "#author:" + user_id;
 
     ledger::VisitData updated_visit_data(visit_data);
     updated_visit_data.name = author_name;
@@ -1026,6 +1034,7 @@ void BatGetMedia::onMediaPublisherActivity(ledger::Result result,
                                    twitchEventInfo,
                                    visit_data,
                                    windowId,
+                                   std::string(),
                                    result,
                                    std::move(info));
     }

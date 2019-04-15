@@ -531,7 +531,8 @@ void getTwitchParts(
     std::vector<std::map<std::string, std::string>>* parts);
 
 std::string getMediaId(const std::map<std::string, std::string>& data,
-                       const std::string& type);
+                       const std::string& type,
+                       std::string& user_id);
 
 std::string getMediaKey(const std::string& mediaId, const std::string& type);
 

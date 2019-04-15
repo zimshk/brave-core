@@ -2511,7 +2511,8 @@ void getTwitchParts(
 }
 
 std::string getMediaId(const std::map<std::string, std::string>& data,
-                       const std::string& type) {
+                       const std::string& type,
+                       std::string& user_id) {
   if (YOUTUBE_MEDIA_TYPE == type) {
     std::map<std::string, std::string>::const_iterator iter =
         data.find("docid");
@@ -2528,11 +2529,12 @@ std::string getMediaId(const std::map<std::string, std::string>& data,
           iter = data.find("channel");
           std::string id("");
           if (iter != data.end()) {
-            id = iter->second;
+            id = user_id = iter->second;
           }
           iter = data.find("vod");
           if (iter != data.end()) {
             std::string idAddition(iter->second);
+            LOG(ERROR) << "ID ADDITION: " << iter->second;
             if (idAddition.find('v') != std::string::npos) {
               id += "_vod_" + braveledger_bat_helper::split(idAddition, 'v')[1];
             }
