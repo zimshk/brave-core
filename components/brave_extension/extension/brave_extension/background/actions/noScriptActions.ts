@@ -2,9 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-require('./api/browserActionAPI')
-require('./api/cosmeticFilterAPI')
-require('./api/localeAPI')
-require('./api/shieldsAPI')
-require('./api/tabsAPI')
-require('./api/noScriptAPI')
+import { bindActionCreators } from 'redux'
+import store from '../store'
+import * as noScriptActions from '../../actions/noScriptActions'
+export default bindActionCreators(noScriptActions, store.dispatch)

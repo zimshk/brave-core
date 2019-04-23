@@ -8,6 +8,7 @@ import * as tabTypes from '../../../../brave_extension/extension/brave_extension
 import * as webNavigationTypes from '../../../../brave_extension/extension/brave_extension/constants/webNavigationTypes'
 import shieldsPanelReducer from '../../../../brave_extension/extension/brave_extension/background/reducers/shieldsPanelReducer'
 import * as shieldsAPI from '../../../../brave_extension/extension/brave_extension/background/api/shieldsAPI'
+import * as noScriptAPI from '../../../../brave_extension/extension/brave_extension/background/api/noScriptAPI'
 import * as tabsAPI from '../../../../brave_extension/extension/brave_extension/background/api/tabsAPI'
 import * as browserActionAPI from '../../../../brave_extension/extension/brave_extension/background/api/browserActionAPI'
 import * as shieldsPanelState from '../../../../brave_extension/extension/brave_extension/state/shieldsPanelState'
@@ -385,7 +386,7 @@ describe('braveShieldsPanelReducer', () => {
     let setAllowJavaScriptSpy: jest.SpyInstance
     beforeEach(() => {
       reloadTabSpy = jest.spyOn(tabsAPI, 'reloadTab')
-      setAllowJavaScriptSpy = jest.spyOn(shieldsAPI, 'setAllowJavaScript')
+      setAllowJavaScriptSpy = jest.spyOn(noScriptAPI, 'setAllowJavaScript')
     })
     afterEach(() => {
       reloadTabSpy.mockRestore()

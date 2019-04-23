@@ -7,9 +7,11 @@ import { combineReducers } from 'redux'
 import shieldsPanelReducer from './reducers/shieldsPanelReducer'
 import cosmeticFilterReducer from './reducers/cosmeticFilterReducer'
 import runtimeReducer from './reducers/runtimeReducer'
+import noScriptReducer from './reducers/noScriptReducer'
 
 export default combineReducers({
   shieldsPanel: shieldsPanelReducer,
   cosmeticFilter: cosmeticFilterReducer,
-  runtime: runtimeReducer
+  runtime: runtimeReducer,
+  noScript: noScriptReducer
 })

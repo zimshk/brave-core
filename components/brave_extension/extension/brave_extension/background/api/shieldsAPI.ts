@@ -65,7 +65,7 @@ export const getShieldSettingsForTabData = (tabData?: chrome.tabs.Tab) => {
   })
 }
 
-const getScope = () =>
+export const getScope = () =>
   chrome.extension.inIncognitoContext ? 'incognito_session_only' : 'regular'
 
 /**
@@ -155,19 +155,6 @@ export const setAllowHTTPUpgradableResources = (origin: string, setting: BlockOp
     scope: getScope()
   })
 }
-
-/**
- * Changes the Javascript to be on (allow) or off (block)
- * @param {string} origin the origin of the site to change the setting for
- * @param {string} setting 'allow' or 'block'
- * @return a promise which resolves when the setting is set
- */
-export const setAllowJavaScript = (origin: string, setting: string) =>
-  chrome.braveShields.javascript.setAsync({
-    primaryPattern: origin + '/*',
-    setting,
-    scope: getScope()
-  })
 
 /**
  * Changes the fingerprinting at origin to be allowed or blocked.

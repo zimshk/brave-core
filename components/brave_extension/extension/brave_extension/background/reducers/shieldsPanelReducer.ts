@@ -11,13 +11,13 @@ import {
   setAllowAds,
   setAllowTrackers,
   setAllowHTTPUpgradableResources,
-  setAllowJavaScript,
   setAllowFingerprinting,
   setAllowCookies,
   toggleShieldsValue,
   requestShieldPanelData,
   setAllowScriptOriginsOnce
 } from '../api/shieldsAPI'
+import { setAllowJavaScript } from '../api/noScriptAPI'
 import { setBadgeText, setIcon } from '../api/browserActionAPI'
 import { reloadTab } from '../api/tabsAPI'
 import * as shieldsPanelState from '../../state/shieldsPanelState'
