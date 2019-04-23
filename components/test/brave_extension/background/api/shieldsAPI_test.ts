@@ -4,8 +4,8 @@
 
 import actions from '../../../../brave_extension/extension/brave_extension/background/actions/shieldsPanelActions'
 import * as shieldsAPI from '../../../../brave_extension/extension/brave_extension/background/api/shieldsAPI'
+import * as noScriptAPI from '../../../../brave_extension/extension/brave_extension/background/api/noScriptAPI'
 import { activeTabData } from '../../../testData'
-// import { Tab as TabType } from '../../../types/state/shieldsPannelState'
 import * as resourceIdentifiers from '../../../../brave_extension/extension/brave_extension/constants/resourceIdentifiers'
 
 describe('Shields API', () => {
@@ -315,7 +315,7 @@ describe('Shields API', () => {
     })
 
     it('calls chrome.braveShields.plugins with the correct args', () => {
-      shieldsAPI.setAllowJavaScript('https://www.brave.com', 'block')
+      noScriptAPI.setAllowJavaScript('https://www.brave.com', 'block')
         .catch(() => {
           expect(true).toBe(false)
         })
@@ -329,7 +329,7 @@ describe('Shields API', () => {
     })
 
     it('passes only 1 arg to chrome.braveShields.plugins', () => {
-      shieldsAPI.setAllowJavaScript('https://www.brave.com', 'block')
+      noScriptAPI.setAllowJavaScript('https://www.brave.com', 'block')
         .catch(() => {
           expect(true).toBe(false)
         })
@@ -338,7 +338,7 @@ describe('Shields API', () => {
     })
 
     it('resolves the returned promise', (cb) => {
-      shieldsAPI.setAllowJavaScript('https://www.brave.com', 'block')
+      noScriptAPI.setAllowJavaScript('https://www.brave.com', 'block')
         .then(cb)
         .catch((e: Error) => {
           console.error(e.toString())
