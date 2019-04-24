@@ -89,9 +89,9 @@ using net::registry_controlled_domains::INCLUDE_PRIVATE_REGISTRIES;
 using std::placeholders::_1;
 using std::placeholders::_2;
 
-#define RETRIES_COUNT_ON_NETWORK_CHANGE 1
-
 namespace brave_rewards {
+
+const static unsigned int kRetriesCountOnNetworkChange = 1;
 
 class LogStreamImpl : public ledger::LogStream {
  public:
@@ -1180,7 +1180,7 @@ void RewardsServiceImpl::LoadURL(
   net::URLFetcher* fetcher = net::URLFetcher::Create(
       GURL(url), request_type, this).release();
   fetcher->SetRequestContext(g_browser_process->system_request_context());
-  fetcher->SetAutomaticallyRetryOnNetworkChanges(RETRIES_COUNT_ON_NETWORK_CHANGE);
+  fetcher->SetAutomaticallyRetryOnNetworkChanges(kRetriesCountOnNetworkChange);
 
   for (size_t i = 0; i < headers.size(); i++)
     fetcher->AddExtraRequestHeader(headers[i]);
