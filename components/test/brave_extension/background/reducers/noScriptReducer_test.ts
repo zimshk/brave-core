@@ -8,7 +8,7 @@ import * as types from '../../../../brave_extension/extension/brave_extension/co
 import { State } from '../../../../brave_extension/extension/brave_extension/types/state/shieldsPannelState'
 import * as deepFreeze from 'deep-freeze-node'
 import noScriptReducer from '../../../../brave_extension/extension/brave_extension/background/reducers/noScriptReducer'
-import { getHostname } from '../../../../brave_extension/extension/brave_extension/helpers/noScriptUtils'
+import { getHostname } from '../../../../brave_extension/extension/brave_extension/helpers/urlUtils'
 import * as noScriptAPI from '../../../../brave_extension/extension/brave_extension/background/api/noScriptAPI'
 import * as tabsAPI from '../../../../brave_extension/extension/brave_extension/background/api/tabsAPI'
 // import * as shieldsPanelState from '../../../../brave_extension/extension/brave_extension/state/shieldsPanelState'

@@ -10,12 +10,8 @@ import { getActiveTabId, getActiveTabData } from '../../state/shieldsPanelState'
 import { setAllowJavaScript, setAllowScriptOriginsOnce } from '../../background/api/noScriptAPI'
 import { requestShieldPanelData, toggleShieldsValue } from '../../background/api/shieldsAPI'
 import { reloadTab } from '../../background/api/tabsAPI'
-import {
-  setNoScriptInfo,
-  filterNoScriptInfoByBlockedState,
-  getHostname,
-  getNoScriptInfo
-} from '../../helpers/noScriptUtils'
+import { setNoScriptInfo, filterNoScriptInfoByBlockedState, getNoScriptInfo } from '../../helpers/noScriptUtils'
+import { getHostname } from '../../helpers/urlUtils'
 
 export default function noScriptReducer (
   state: State = { tabs: {}, windows: {}, currentWindowId: -1 },

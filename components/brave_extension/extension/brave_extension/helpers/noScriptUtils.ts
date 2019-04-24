@@ -5,24 +5,7 @@
 import { NoScriptInfo } from '../types/other/noScriptInfo'
 import { State, Tabs, Tab } from '../types/state/shieldsPannelState'
 import { getActiveTabData } from '../state/shieldsPanelState'
-
-/**
- * Get the URL origin via Web API
- * @param {string} url - The URL to get the origin from
- */
-export const getOrigin = (url: string) => new window.URL(url).origin
-
-/**
- * Get the URL hostname via Web API
- * @param {string} url - The URL to get the origin from
- */
-export const getHostname = (url: string) => new window.URL(url).hostname
-
-/**
- * Strip http/https protocol
- * @param {string} url - The URL to strip the protocol from
- */
-export const stripProtocolFromUrl = (url: string) => url.replace(/(^\w+:|^)\/\//, '')
+import { getOrigin } from './urlUtils'
 
 /**
  * Filter resources by origin to be used for generating NoScriptInfo.
