@@ -5,7 +5,8 @@
 import * as React from 'react'
 import { shallow } from 'enzyme'
 import ScriptsControl, { Props } from '../../../../brave_extension/extension/brave_extension/components/controls/scriptsControl'
-import * as actionTypes from '../../../../brave_extension/extension/brave_extension/constants/shieldsPanelTypes'
+import * as shieldsTypes from '../../../../brave_extension/extension/brave_extension/constants/shieldsPanelTypes'
+import * as noScriptTypes from '../../../../brave_extension/extension/brave_extension/constants/noScriptTypes'
 import { BlockJSOptions } from '../../../../brave_extension/extension/brave_extension/types/other/blockTypes'
 
 const fakeProps: Props = {
@@ -16,10 +17,10 @@ const fakeProps: Props = {
   javascript: 'allow',
   javascriptBlocked: 0,
   noScriptInfo: {},
-  changeNoScriptSettings: (origin: string) => ({ type: actionTypes.CHANGE_NO_SCRIPT_SETTINGS, origin }),
-  blockJavaScript: (setting: BlockJSOptions) => ({ type: actionTypes.JAVASCRIPT_TOGGLED, setting }),
-  changeAllNoScriptSettings: (shouldBlock: boolean) => ({ type: actionTypes.CHANGE_ALL_NO_SCRIPT_SETTINGS, shouldBlock }),
-  allowScriptOriginsOnce: (origins: string[]) => ({ type: actionTypes.ALLOW_SCRIPT_ORIGINS_ONCE, origins })
+  changeNoScriptSettings: (origin: string) => ({ type: shieldsTypes.CHANGE_NO_SCRIPT_SETTINGS, origin }),
+  blockJavaScript: (setting: BlockJSOptions) => ({ type: noScriptTypes.JAVASCRIPT_TOGGLED, setting }),
+  changeAllNoScriptSettings: (shouldBlock: boolean) => ({ type: shieldsTypes.CHANGE_ALL_NO_SCRIPT_SETTINGS, shouldBlock }),
+  allowScriptOriginsOnce: (origins: string[]) => ({ type: noScriptTypes.ALLOW_SCRIPT_ORIGINS_ONCE, origins })
 }
 
 describe('ScriptsControl component', () => {
