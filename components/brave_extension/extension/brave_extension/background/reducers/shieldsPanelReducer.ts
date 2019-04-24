@@ -72,7 +72,6 @@ export default function shieldsPanelReducer (state: State = { tabs: {}, windows:
       if (action.isMainFrame) {
         state = shieldsPanelState.resetBlockingStats(state, action.tabId)
         state = shieldsPanelState.resetBlockingResources(state, action.tabId)
-        state = shieldsPanelState.resetNoScriptInfo(state, action.tabId, new window.URL(action.url).origin)
       }
       break
     }
@@ -260,16 +259,19 @@ export default function shieldsPanelReducer (state: State = { tabs: {}, windows:
         })
       break
     }
-    case shieldsPanelTypes.CHANGE_NO_SCRIPT_SETTINGS: {
-      const tabId: number = shieldsPanelState.getActiveTabId(state)
-      state = shieldsPanelState.changeNoScriptSettings(state, tabId, action.origin)
-      break
-    }
-    case shieldsPanelTypes.CHANGE_ALL_NO_SCRIPT_SETTINGS: {
-      const tabId: number = shieldsPanelState.getActiveTabId(state)
-      state = shieldsPanelState.changeAllNoScriptSettings(state, tabId, action.shouldBlock)
-      break
-    }
+
+    // TODO: cezaraugusto remove
+    // case shieldsPanelTypes.CHANGE_NO_SCRIPT_SETTINGS: {
+    //   const tabId: number = shieldsPanelState.getActiveTabId(state)
+    //   state = shieldsPanelState.changeNoScriptSettings(state, tabId, action.origin)
+    //   break
+    // }
+    // TODO: cezaraugusto remove
+    // case shieldsPanelTypes.CHANGE_ALL_NO_SCRIPT_SETTINGS: {
+    //   const tabId: number = shieldsPanelState.getActiveTabId(state)
+    //   state = shieldsPanelState.changeAllNoScriptSettings(state, tabId, action.shouldBlock)
+    //   break
+    // }
   }
   return state
 }

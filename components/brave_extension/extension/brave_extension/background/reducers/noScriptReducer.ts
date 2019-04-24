@@ -3,6 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as noScriptTypes from '../../constants/noScriptTypes'
+import * as webNavigationTypes from '../../constants/webNavigationTypes'
 import { State } from '../../types/state/shieldsPannelState'
 import { Actions } from '../../types/actions'
 import { getActiveTabId, getActiveTabData } from '../../state/shieldsPanelState'
@@ -22,8 +23,12 @@ export default function noScriptReducer (
 ) {
 
   switch (action.type) {
-    // cezaraugusto TODO
-    // case webNavigationTypes.ON_COMMITTED: {}
+    case webNavigationTypes.ON_COMMITTED: {
+      // if (action.isMainFrame) {
+      //   state = resetNoScriptInfo(state, action.tabId, new window.URL(action.url).origin)
+      // }
+      break
+    }
 
     case noScriptTypes.JAVASCRIPT_TOGGLED: {
       const tabData = getActiveTabData(state)
@@ -88,7 +93,6 @@ export default function noScriptReducer (
     // Used for standalone scripts i.e. not grouped by other scripts in the same hostname
     case noScriptTypes.SET_SCRIPT_BLOCKED_ONCE_CURRENT_STATE: {
       const noScriptInfo = getNoScriptInfo(state)
-      // TODO: cezaraugusto we likely dont need tabId
       const tabId: number = getActiveTabId(state)
       const scriptBlockedState = {
         userInteracted: true,
@@ -100,7 +104,6 @@ export default function noScriptReducer (
 
     case noScriptTypes.SET_GROUPED_SCRIPTS_BLOCKED_ONCE_CURRENT_STATE: {
       const noScriptInfo = getNoScriptInfo(state)
-      // TODO: cezaraugusto we likely dont need tabId
       const tabId: number = getActiveTabId(state)
       const groupedScripts = Object.entries(noScriptInfo)
       const maybeBlockGroup = action.maybeBlock
@@ -119,7 +122,6 @@ export default function noScriptReducer (
 
     case noScriptTypes.SET_ALL_SCRIPTS_BLOCKED_ONCE_CURRENT_STATE: {
       const noScriptInfo = getNoScriptInfo(state)
-      // TODO: cezaraugusto we likely dont need tabId
       const tabId: number = getActiveTabId(state)
       const allBlockedScripts = Object.entries(noScriptInfo)
       const maybeBlockAll = action.maybeBlock
@@ -136,7 +138,6 @@ export default function noScriptReducer (
 
     case noScriptTypes.SET_FINAL_SCRIPTS_BLOCKED_ONCE_STATE: {
       const noScriptInfo = getNoScriptInfo(state)
-      // TODO: cezaraugusto we likely dont need tabId
       const tabId: number = getActiveTabId(state)
       const allScripts = Object.entries(noScriptInfo)
       for (const [url] of allScripts) {

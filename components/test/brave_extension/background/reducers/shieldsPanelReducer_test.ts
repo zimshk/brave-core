@@ -25,17 +25,17 @@ describe('braveShieldsPanelReducer', () => {
 
   describe('ON_COMMITTED', () => {
     let spy: jest.SpyInstance
-    let resetNoScriptInfoSpy: jest.SpyInstance
+    // let resetNoScriptInfoSpy: jest.SpyInstance
     let resetBlockingResourcesSpy: jest.SpyInstance
     const tabId = 1
     beforeEach(() => {
       spy = jest.spyOn(shieldsPanelState, 'resetBlockingStats')
-      resetNoScriptInfoSpy = jest.spyOn(shieldsPanelState, 'resetNoScriptInfo')
+      // resetNoScriptInfoSpy = jest.spyOn(shieldsPanelState, 'resetNoScriptInfo')
       resetBlockingResourcesSpy = jest.spyOn(shieldsPanelState, 'resetBlockingResources')
     })
     afterEach(() => {
       spy.mockRestore()
-      resetNoScriptInfoSpy.mockRestore()
+      // resetNoScriptInfoSpy.mockRestore()
       resetBlockingResourcesSpy.mockRestore()
     })
     it('calls resetBlockingStats when isMainFrame is true', () => {
@@ -56,26 +56,6 @@ describe('braveShieldsPanelReducer', () => {
         isMainFrame: false
       })
       expect(spy).not.toBeCalled()
-    })
-    it('calls resetNoScriptInfo when isMainFrame is true', () => {
-      shieldsPanelReducer(initialState.shieldsPanel, {
-        type: webNavigationTypes.ON_COMMITTED,
-        tabId: tabId,
-        url: 'https://www.brave.com',
-        isMainFrame: true
-      })
-      expect(resetNoScriptInfoSpy).toBeCalledTimes(1)
-      expect(resetNoScriptInfoSpy.mock.calls[0][1]).toBe(tabId)
-      expect(resetNoScriptInfoSpy.mock.calls[0][2]).toBe('https://www.brave.com')
-    })
-    it('does not call resetNoScriptInfo when isMainFrame is false', () => {
-      shieldsPanelReducer(initialState.shieldsPanel, {
-        type: webNavigationTypes.ON_COMMITTED,
-        tabId: tabId,
-        url: 'https://www.brave.com',
-        isMainFrame: false
-      })
-      expect(resetNoScriptInfoSpy).not.toBeCalled()
     })
     it('calls resetBlockingResources when isMainFrame is true', () => {
       shieldsPanelReducer(initialState.shieldsPanel, {
@@ -1214,99 +1194,99 @@ describe('braveShieldsPanelReducer', () => {
     })
   })
 
-  describe('CHANGE_NO_SCRIPT_SETTINGS', () => {
-    let spy: jest.SpyInstance
-    beforeEach(() => {
-      spy = jest.spyOn(shieldsPanelState, 'changeNoScriptSettings')
-    })
-    afterEach(() => {
-      spy.mockRestore()
-    })
-    it('should call changeNoScriptSettings', () => {
-      const tabId = 2
-      const stateWithNoScriptInfo: State = {
-        tabs: {
-          2: {
-            origin,
-            hostname: 'brave.com',
-            adsBlocked: 0,
-            controlsOpen: true,
-            braveShields: 'allow',
-            trackersBlocked: 0,
-            httpsRedirected: 0,
-            javascriptBlocked: 0,
-            fingerprintingBlocked: 0,
-            id: 2,
-            httpUpgradableResources: 'block',
-            javascript: 'block',
-            trackers: 'block',
-            ads: 'block',
-            fingerprinting: 'block',
-            cookies: 'block',
-            url: 'https://brave.com',
-            noScriptInfo: {
-              'https://brave.com': {
-                actuallyBlocked: true,
-                willBlock: true,
-                userInteracted: false
-              }
-            },
-            adsBlockedResources: [],
-            trackersBlockedResources: [],
-            httpsRedirectedResources: [],
-            javascriptBlockedResources: [],
-            fingerprintingBlockedResources: []
-          }
-        },
-        windows: {
-          1: 2
-        },
-        currentWindowId: 1
-      }
-      let nextState = shieldsPanelReducer(stateWithNoScriptInfo, {
-        type: types.CHANGE_NO_SCRIPT_SETTINGS,
-        origin
-      })
-      expect(nextState).toEqual({
-        tabs: {
-          2: {
-            origin,
-            hostname: 'brave.com',
-            adsBlocked: 0,
-            controlsOpen: true,
-            braveShields: 'allow',
-            trackersBlocked: 0,
-            httpsRedirected: 0,
-            javascriptBlocked: 0,
-            fingerprintingBlocked: 0,
-            id: 2,
-            httpUpgradableResources: 'block',
-            javascript: 'block',
-            trackers: 'block',
-            ads: 'block',
-            fingerprinting: 'block',
-            cookies: 'block',
-            url: 'https://brave.com',
-            noScriptInfo: {
-              'https://brave.com': {
-                actuallyBlocked: true,
-                willBlock: false,
-                userInteracted: false
-              }
-            },
-            adsBlockedResources: [],
-            trackersBlockedResources: [],
-            httpsRedirectedResources: [],
-            javascriptBlockedResources: [],
-            fingerprintingBlockedResources: []
-          }
-        },
-        windows: {
-          1: 2
-        },
-        currentWindowId: 1
-      })
-      expect(spy).toBeCalledWith(stateWithNoScriptInfo, tabId, origin)
-    })
-  })
+  // describe('CHANGE_NO_SCRIPT_SETTINGS', () => {
+  //   let spy: jest.SpyInstance
+  //   beforeEach(() => {
+  //     spy = jest.spyOn(shieldsPanelState, 'changeNoScriptSettings')
+  //   })
+  //   afterEach(() => {
+  //     spy.mockRestore()
+  //   })
+  //   it('should call changeNoScriptSettings', () => {
+  //     const tabId = 2
+  //     const stateWithNoScriptInfo: State = {
+  //       tabs: {
+  //         2: {
+  //           origin,
+  //           hostname: 'brave.com',
+  //           adsBlocked: 0,
+  //           controlsOpen: true,
+  //           braveShields: 'allow',
+  //           trackersBlocked: 0,
+  //           httpsRedirected: 0,
+  //           javascriptBlocked: 0,
+  //           fingerprintingBlocked: 0,
+  //           id: 2,
+  //           httpUpgradableResources: 'block',
+  //           javascript: 'block',
+  //           trackers: 'block',
+  //           ads: 'block',
+  //           fingerprinting: 'block',
+  //           cookies: 'block',
+  //           url: 'https://brave.com',
+  //           noScriptInfo: {
+  //             'https://brave.com': {
+  //               actuallyBlocked: true,
+  //               willBlock: true,
+  //               userInteracted: false
+  //             }
+  //           },
+  //           adsBlockedResources: [],
+  //           trackersBlockedResources: [],
+  //           httpsRedirectedResources: [],
+  //           javascriptBlockedResources: [],
+  //           fingerprintingBlockedResources: []
+  //         }
+  //       },
+  //       windows: {
+  //         1: 2
+  //       },
+  //       currentWindowId: 1
+  //     }
+  //     let nextState = shieldsPanelReducer(stateWithNoScriptInfo, {
+  //       type: types.CHANGE_NO_SCRIPT_SETTINGS,
+  //       origin
+  //     })
+  //     expect(nextState).toEqual({
+  //       tabs: {
+  //         2: {
+  //           origin,
+  //           hostname: 'brave.com',
+  //           adsBlocked: 0,
+  //           controlsOpen: true,
+  //           braveShields: 'allow',
+  //           trackersBlocked: 0,
+  //           httpsRedirected: 0,
+  //           javascriptBlocked: 0,
+  //           fingerprintingBlocked: 0,
+  //           id: 2,
+  //           httpUpgradableResources: 'block',
+  //           javascript: 'block',
+  //           trackers: 'block',
+  //           ads: 'block',
+  //           fingerprinting: 'block',
+  //           cookies: 'block',
+  //           url: 'https://brave.com',
+  //           noScriptInfo: {
+  //             'https://brave.com': {
+  //               actuallyBlocked: true,
+  //               willBlock: false,
+  //               userInteracted: false
+  //             }
+  //           },
+  //           adsBlockedResources: [],
+  //           trackersBlockedResources: [],
+  //           httpsRedirectedResources: [],
+  //           javascriptBlockedResources: [],
+  //           fingerprintingBlockedResources: []
+  //         }
+  //       },
+  //       windows: {
+  //         1: 2
+  //       },
+  //       currentWindowId: 1
+  //     })
+  //     expect(spy).toBeCalledWith(stateWithNoScriptInfo, tabId, origin)
+  //   })
+  // })
 })

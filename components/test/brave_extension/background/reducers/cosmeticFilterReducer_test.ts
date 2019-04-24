@@ -31,12 +31,12 @@ describe('cosmeticFilterReducer', () => {
     let resetBlockingResourcesSpy: jest.SpyInstance
     beforeEach(() => {
       spy = jest.spyOn(shieldsPanelState, 'resetBlockingStats')
-      resetNoScriptInfoSpy = jest.spyOn(shieldsPanelState, 'resetNoScriptInfo')
+      // resetNoScriptInfoSpy = jest.spyOn(shieldsPanelState, 'resetNoScriptInfo')
       resetBlockingResourcesSpy = jest.spyOn(shieldsPanelState, 'resetBlockingResources')
     })
     afterEach(() => {
       spy.mockRestore()
-      resetNoScriptInfoSpy.mockRestore()
+      // resetNoScriptInfoSpy.mockRestore()
       resetBlockingResourcesSpy.mockRestore()
     })
     it('calls resetBlockingStats when isMainFrame is true', () => {
@@ -58,26 +58,26 @@ describe('cosmeticFilterReducer', () => {
       })
       expect(spy).not.toBeCalled()
     })
-    it('calls resetNoScriptInfo when isMainFrame is true', () => {
-      shieldsPanelReducer(initialState.shieldsPanel, {
-        type: webNavigationTypes.ON_COMMITTED,
-        tabId: tabId,
-        url: 'https://www.brave.com',
-        isMainFrame: true
-      })
-      expect(resetNoScriptInfoSpy).toBeCalledTimes(1)
-      expect(resetNoScriptInfoSpy.mock.calls[0][1]).toBe(tabId)
-      expect(resetNoScriptInfoSpy.mock.calls[0][2]).toBe('https://www.brave.com')
-    })
-    it('does not call resetNoScriptInfo when isMainFrame is false', () => {
-      shieldsPanelReducer(initialState.shieldsPanel, {
-        type: webNavigationTypes.ON_COMMITTED,
-        tabId: tabId,
-        url: 'https://www.brave.com',
-        isMainFrame: false
-      })
-      expect(resetNoScriptInfoSpy).not.toBeCalled()
-    })
+    // it('calls resetNoScriptInfo when isMainFrame is true', () => {
+    //   shieldsPanelReducer(initialState.shieldsPanel, {
+    //     type: webNavigationTypes.ON_COMMITTED,
+    //     tabId: tabId,
+    //     url: 'https://www.brave.com',
+    //     isMainFrame: true
+    //   })
+    //   expect(resetNoScriptInfoSpy).toBeCalledTimes(1)
+    //   expect(resetNoScriptInfoSpy.mock.calls[0][1]).toBe(tabId)
+    //   expect(resetNoScriptInfoSpy.mock.calls[0][2]).toBe('https://www.brave.com')
+    // })
+    // it('does not call resetNoScriptInfo when isMainFrame is false', () => {
+    //   shieldsPanelReducer(initialState.shieldsPanel, {
+    //     type: webNavigationTypes.ON_COMMITTED,
+    //     tabId: tabId,
+    //     url: 'https://www.brave.com',
+    //     isMainFrame: false
+    //   })
+    //   expect(resetNoScriptInfoSpy).not.toBeCalled()
+    // })
     it('calls resetBlockingResources when isMainFrame is true', () => {
       shieldsPanelReducer(initialState.shieldsPanel, {
         type: webNavigationTypes.ON_COMMITTED,

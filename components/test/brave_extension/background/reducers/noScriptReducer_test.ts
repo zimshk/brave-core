@@ -4,21 +4,23 @@
 
 // Types
 import * as types from '../../../../brave_extension/extension/brave_extension/constants/noScriptTypes'
+// import * as webNavigationTypes from '../../../../brave_extension/extension/brave_extension/constants/webNavigationTypes'
 import { State } from '../../../../brave_extension/extension/brave_extension/types/state/shieldsPannelState'
 import * as deepFreeze from 'deep-freeze-node'
 import noScriptReducer from '../../../../brave_extension/extension/brave_extension/background/reducers/noScriptReducer'
 import { getHostname } from '../../../../brave_extension/extension/brave_extension/helpers/noScriptUtils'
 import * as noScriptAPI from '../../../../brave_extension/extension/brave_extension/background/api/noScriptAPI'
 import * as tabsAPI from '../../../../brave_extension/extension/brave_extension/background/api/tabsAPI'
+// import * as shieldsPanelState from '../../../../brave_extension/extension/brave_extension/state/shieldsPanelState'
 
-const origin: string = 'https://brave.com'
+const url: string = 'https://brave.com'
 const scriptUrl1: string = 'http://super-malicious-tracker.com/malicious.js'
 const scriptUrl2: string = 'http://super-malicious-tracker.com/another-malicious-script.js'
 const tabId: number = 2
 const state: State = deepFreeze({
   tabs: {
     [tabId]: {
-      origin,
+      origin: url,
       id: tabId,
       noScriptInfo: {
         [scriptUrl1]: { actuallyBlocked: true, willBlock: true, userInteracted: false },
@@ -31,6 +33,36 @@ const state: State = deepFreeze({
 })
 
 describe('braveNoScriptReducer', () => {
+  // describe('ON_COMMITTED', () => {
+  //   let resetNoScriptInfoSpy: jest.SpyInstance
+  //   beforeEach(() => {
+  //     resetNoScriptInfoSpy = jest.spyOn(shieldsPanelState, 'resetNoScriptInfo')
+  //   })
+  //   afterEach(() => {
+  //     resetNoScriptInfoSpy.mockRestore()
+  //   })
+  //   it.skip('calls resetNoScriptInfo when isMainFrame is true', () => {
+  //     noScriptReducer(state, {
+  //       type: webNavigationTypes.ON_COMMITTED,
+  //       tabId,
+  //       url,
+  //       isMainFrame: true
+  //     })
+  //     expect(resetNoScriptInfoSpy).toBeCalledTimes(1)
+  //     expect(resetNoScriptInfoSpy.mock.calls[0][1]).toBe(tabId)
+  //     expect(resetNoScriptInfoSpy.mock.calls[0][2]).toBe('https://www.brave.com')
+  //   })
+  //   it.skip('does not call resetNoScriptInfo when isMainFrame is false', () => {
+  //     noScriptReducer(state, {
+  //       type: webNavigationTypes.ON_COMMITTED,
+  //       tabId,
+  //       url,
+  //       isMainFrame: false
+  //     })
+  //     expect(resetNoScriptInfoSpy).not.toBeCalled()
+  //   })
+  // })
+
   describe('ALLOW_SCRIPT_ORIGINS_ONCE', () => {
     let reloadTabSpy: jest.SpyInstance
     let setAllowScriptOriginsOnceSpy: jest.SpyInstance
@@ -71,9 +103,10 @@ describe('braveNoScriptReducer', () => {
           type: types.JAVASCRIPT_TOGGLED,
           setting: 'allow'
         })).toEqual(state)
-      expect(setAllowJavaScriptSpy).toBeCalledWith(origin, 'allow')
+      expect(setAllowJavaScriptSpy).toBeCalledWith(url, 'allow')
     })
   })
+
   describe('SET_SCRIPT_BLOCKED_ONCE_CURRENT_STATE', () => {
     it('set userInteracted to true', () => {
       const url = scriptUrl1
