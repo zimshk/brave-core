@@ -14,10 +14,8 @@ import {
   setAllowFingerprinting,
   setAllowCookies,
   toggleShieldsValue,
-  requestShieldPanelData,
-  setAllowScriptOriginsOnce
+  requestShieldPanelData
 } from '../api/shieldsAPI'
-import { setAllowJavaScript } from '../api/noScriptAPI'
 import { setBadgeText, setIcon } from '../api/browserActionAPI'
 import { reloadTab } from '../api/tabsAPI'
 import * as shieldsPanelState from '../../state/shieldsPanelState'
@@ -164,24 +162,6 @@ export default function shieldsPanelReducer (state: State = { tabs: {}, windows:
         })
       break
     }
-    case shieldsPanelTypes.JAVASCRIPT_TOGGLED: {
-      const tabData = shieldsPanelState.getActiveTabData(state)
-      if (!tabData) {
-        console.error('Active tab not found')
-        break
-      }
-      setAllowJavaScript(tabData.origin, toggleShieldsValue(tabData.javascript))
-        .then(() => {
-          requestShieldPanelData(shieldsPanelState.getActiveTabId(state))
-          reloadTab(tabData.id, true).catch(() => {
-            console.error('Tab reload was not successful')
-          })
-        })
-        .catch(() => {
-          console.error('Could not set JavaScript setting')
-        })
-      break
-    }
     case shieldsPanelTypes.RESOURCE_BLOCKED: {
       const tabId: number = action.details.tabId
       const currentTabId: number = shieldsPanelState.getActiveTabId(state)
@@ -277,24 +257,6 @@ export default function shieldsPanelReducer (state: State = { tabs: {}, windows:
         })
         .catch(() => {
           console.error('Could not set cookies setting')
-        })
-      break
-    }
-    case shieldsPanelTypes.ALLOW_SCRIPT_ORIGINS_ONCE: {
-      const tabData = shieldsPanelState.getActiveTabData(state)
-      if (!tabData) {
-        console.error('Active tab not found')
-        break
-      }
-      setAllowScriptOriginsOnce(action.origins, tabData.id)
-        .then(() => {
-          requestShieldPanelData(shieldsPanelState.getActiveTabId(state))
-          reloadTab(tabData.id, true).catch(() => {
-            console.error('Tab reload was not successful')
-          })
-        })
-        .catch(() => {
-          console.error('Could not set allow script origins once')
         })
       break
     }

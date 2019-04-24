@@ -8,13 +8,17 @@ import { State } from '../../../../brave_extension/extension/brave_extension/typ
 import * as deepFreeze from 'deep-freeze-node'
 import noScriptReducer from '../../../../brave_extension/extension/brave_extension/background/reducers/noScriptReducer'
 import { getHostname } from '../../../../brave_extension/extension/brave_extension/helpers/noScriptUtils'
+import * as noScriptAPI from '../../../../brave_extension/extension/brave_extension/background/api/noScriptAPI'
+import * as tabsAPI from '../../../../brave_extension/extension/brave_extension/background/api/tabsAPI'
 
+const origin: string = 'https://brave.com'
 const scriptUrl1: string = 'http://super-malicious-tracker.com/malicious.js'
 const scriptUrl2: string = 'http://super-malicious-tracker.com/another-malicious-script.js'
 const tabId: number = 2
 const state: State = deepFreeze({
   tabs: {
     [tabId]: {
+      origin,
       id: tabId,
       noScriptInfo: {
         [scriptUrl1]: { actuallyBlocked: true, willBlock: true, userInteracted: false },
@@ -27,6 +31,49 @@ const state: State = deepFreeze({
 })
 
 describe('braveNoScriptReducer', () => {
+  describe('ALLOW_SCRIPT_ORIGINS_ONCE', () => {
+    let reloadTabSpy: jest.SpyInstance
+    let setAllowScriptOriginsOnceSpy: jest.SpyInstance
+    beforeEach(() => {
+      reloadTabSpy = jest.spyOn(tabsAPI, 'reloadTab')
+      setAllowScriptOriginsOnceSpy = jest.spyOn(noScriptAPI, 'setAllowScriptOriginsOnce')
+    })
+    afterEach(() => {
+      reloadTabSpy.mockRestore()
+      setAllowScriptOriginsOnceSpy.mockRestore()
+    })
+    it('should call setAllowScriptOriginsOnce', () => {
+      const origins = ['https://a.com/', 'https://b.com/']
+      const tabId = 2
+      expect(
+        noScriptReducer(state, {
+          type: types.ALLOW_SCRIPT_ORIGINS_ONCE,
+          origins
+        })).toEqual(state)
+      expect(setAllowScriptOriginsOnceSpy).toBeCalledWith(origins, tabId)
+    })
+  })
+
+  describe('JAVASCRIPT_TOGGLED', () => {
+    let reloadTabSpy: jest.SpyInstance
+    let setAllowJavaScriptSpy: jest.SpyInstance
+    beforeEach(() => {
+      reloadTabSpy = jest.spyOn(tabsAPI, 'reloadTab')
+      setAllowJavaScriptSpy = jest.spyOn(noScriptAPI, 'setAllowJavaScript')
+    })
+    afterEach(() => {
+      reloadTabSpy.mockRestore()
+      setAllowJavaScriptSpy.mockRestore()
+    })
+    it('should call setAllowJavaScript', () => {
+      expect(
+        noScriptReducer(state, {
+          type: types.JAVASCRIPT_TOGGLED,
+          setting: 'allow'
+        })).toEqual(state)
+      expect(setAllowJavaScriptSpy).toBeCalledWith(origin, 'allow')
+    })
+  })
   describe('SET_SCRIPT_BLOCKED_ONCE_CURRENT_STATE', () => {
     it('set userInteracted to true', () => {
       const url = scriptUrl1

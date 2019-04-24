@@ -16,3 +16,16 @@ export const setAllowJavaScript = (origin: string, setting: string) =>
     setting,
     scope: getScope()
   })
+
+/**
+ * Temporary allow a set of script origins for a specific tab until reload.
+ * @param {Array<string>} origins a set of script origins to be allowed
+ * @param {number} tabId ID of the tab which these origins are allowed in
+ * @return a promise which resolves when the origins are set.
+ */
+export const setAllowScriptOriginsOnce = (origins: Array<string>, tabId: number) =>
+  new Promise<void>((resolve) => {
+    chrome.braveShields.allowScriptsOnce(origins, tabId, () => {
+      resolve()
+    })
+  })

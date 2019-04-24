@@ -8,7 +8,6 @@ import * as tabTypes from '../../../../brave_extension/extension/brave_extension
 import * as webNavigationTypes from '../../../../brave_extension/extension/brave_extension/constants/webNavigationTypes'
 import shieldsPanelReducer from '../../../../brave_extension/extension/brave_extension/background/reducers/shieldsPanelReducer'
 import * as shieldsAPI from '../../../../brave_extension/extension/brave_extension/background/api/shieldsAPI'
-import * as noScriptAPI from '../../../../brave_extension/extension/brave_extension/background/api/noScriptAPI'
 import * as tabsAPI from '../../../../brave_extension/extension/brave_extension/background/api/tabsAPI'
 import * as browserActionAPI from '../../../../brave_extension/extension/brave_extension/background/api/browserActionAPI'
 import * as shieldsPanelState from '../../../../brave_extension/extension/brave_extension/state/shieldsPanelState'
@@ -378,27 +377,6 @@ describe('braveShieldsPanelReducer', () => {
           setting: 'block'
         })).toEqual(state)
       expect(setAllowHTTPUpgradableResourcesSpy).toBeCalledWith(origin, 'allow')
-    })
-  })
-
-  describe('JAVASCRIPT_TOGGLED', () => {
-    let reloadTabSpy: jest.SpyInstance
-    let setAllowJavaScriptSpy: jest.SpyInstance
-    beforeEach(() => {
-      reloadTabSpy = jest.spyOn(tabsAPI, 'reloadTab')
-      setAllowJavaScriptSpy = jest.spyOn(noScriptAPI, 'setAllowJavaScript')
-    })
-    afterEach(() => {
-      reloadTabSpy.mockRestore()
-      setAllowJavaScriptSpy.mockRestore()
-    })
-    it('should call setAllowJavaScript', () => {
-      expect(
-        shieldsPanelReducer(state, {
-          type: types.JAVASCRIPT_TOGGLED,
-          setting: 'allow'
-        })).toEqual(state)
-      expect(setAllowJavaScriptSpy).toBeCalledWith(origin, 'allow')
     })
   })
 
@@ -1233,29 +1211,6 @@ describe('braveShieldsPanelReducer', () => {
         })).toEqual(state)
       expect(setAllowAdsSpy).toBeCalledWith(origin, 'block')
       expect(setAllowTrackersSpy).toBeCalledWith(origin, 'block')
-    })
-  })
-
-  describe('ALLOW_SCRIPT_ORIGINS_ONCE', () => {
-    let reloadTabSpy: jest.SpyInstance
-    let setAllowScriptOriginsOnceSpy: jest.SpyInstance
-    beforeEach(() => {
-      reloadTabSpy = jest.spyOn(tabsAPI, 'reloadTab')
-      setAllowScriptOriginsOnceSpy = jest.spyOn(shieldsAPI, 'setAllowScriptOriginsOnce')
-    })
-    afterEach(() => {
-      reloadTabSpy.mockRestore()
-      setAllowScriptOriginsOnceSpy.mockRestore()
-    })
-    it('should call setAllowScriptOriginsOnce', () => {
-      const origins = ['https://a.com/', 'https://b.com/']
-      const tabId = 2
-      expect(
-        shieldsPanelReducer(state, {
-          type: types.ALLOW_SCRIPT_ORIGINS_ONCE,
-          origins
-        })).toEqual(state)
-      expect(setAllowScriptOriginsOnceSpy).toBeCalledWith(origins, tabId)
     })
   })
 
