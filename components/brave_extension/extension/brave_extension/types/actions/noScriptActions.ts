@@ -29,7 +29,7 @@ interface SetScriptBlockedCurrentStateReturn {
 }
 
 export interface SetScriptBlockedCurrentState {
-  (url: string, maybeBlock: boolean): SetScriptBlockedCurrentStateReturn
+  (url: string): SetScriptBlockedCurrentStateReturn
 }
 
 interface SetGroupedScriptsBlockedCurrentStateReturn {

@@ -7,6 +7,28 @@ import * as types from '../constants/noScriptTypes'
 import * as actions from '../types/actions/noScriptActions'
 
 /**
+ * Toggle all scripts blocked to be either allowed or blocked
+ * @param {'allow' | 'block'} setting - whether or not the scripts are allowed or blocked
+ */
+export const blockJavaScript: actions.BlockJavaScript = (setting: 'allow' | 'block') => {
+  return {
+    type: types.JAVASCRIPT_TOGGLED,
+    setting
+  }
+}
+
+/**
+ * Set all scripts in an array to be allowed while the session is open
+ * @param {Array<string>} origins - an array of origins to be set as allowed for one time
+ */
+export const allowScriptOriginsOnce: actions.AllowScriptOriginsOnce = (origins: Array<string>) => {
+  return {
+    type: types.ALLOW_SCRIPT_ORIGINS_ONCE,
+    origins
+  }
+}
+
+/**
  * Set a given script resource state to be in the allowed/blocked list
  * @param {string} url - The resource URL
  * @param {boolean} maybeBlock - Whether or not the resource should be blocked
@@ -55,27 +77,5 @@ export const setAllScriptsBlockedCurrentState: actions.SetAllScriptsBlockedCurre
 export const setFinalScriptsBlockedState: actions.SetFinalScriptsBlockedState = () => {
   return {
     type: types.SET_FINAL_SCRIPTS_BLOCKED_ONCE_STATE
-  }
-}
-
-/**
- * Set all scripts in an array to be allowed while the session is open
- * @param {Array<string>} origins - an array of origins to be set as allowed for one time
- */
-export const allowScriptOriginsOnce: actions.AllowScriptOriginsOnce = (origins: Array<string>) => {
-  return {
-    type: types.ALLOW_SCRIPT_ORIGINS_ONCE,
-    origins
-  }
-}
-
-/**
- * Toggle all scripts blocked to be either allowed or blocked
- * @param {'allow' | 'block'} setting - whether or not the scripts are allowed or blocked
- */
-export const blockJavaScript: actions.BlockJavaScript = (setting: 'allow' | 'block') => {
-  return {
-    type: types.JAVASCRIPT_TOGGLED,
-    setting
   }
 }

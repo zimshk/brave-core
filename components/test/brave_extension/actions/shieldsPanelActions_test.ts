@@ -9,7 +9,7 @@ import {
   BlockOptions,
   BlockFPOptions,
   BlockCookiesOptions
-} from '../../types/other/blockTypes'
+} from '../../../brave_extension/extension/brave_extension/types/other/blockTypes'
 
 describe('shieldsPanelActions', () => {
   it('shieldsPanelDataUpdated', () => {
@@ -45,14 +45,6 @@ describe('shieldsPanelActions', () => {
       setting
     })
   })
-
-  // it('javascriptToggled action', () => {
-  //   const setting: BlockOptions = 'allow'
-  //   expect(actions.blockJavaScript(setting)).toEqual({
-  //     type: types.JAVASCRIPT_TOGGLED,
-  //     setting
-  //   })
-  // })
 
   it('resourceBlocked action', () => {
     const details: BlockDetails = {
@@ -97,14 +89,6 @@ describe('shieldsPanelActions', () => {
       setting
     })
   })
-
-  // it('allowScriptOriginsOnce action', () => {
-  //   const origins = ['https://a.com', 'https://b.com']
-  //   expect(actions.allowScriptOriginsOnce(origins)).toEqual({
-  //     type: types.ALLOW_SCRIPT_ORIGINS_ONCE,
-  //     origins
-  //   })
-  // })
 
   it('changeNoScriptSettings action', () => {
     const origin = 'https://a.com'
