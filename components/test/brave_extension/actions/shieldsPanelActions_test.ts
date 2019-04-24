@@ -46,13 +46,13 @@ describe('shieldsPanelActions', () => {
     })
   })
 
-  it('javascriptToggled action', () => {
-    const setting: BlockOptions = 'allow'
-    expect(actions.blockJavaScript(setting)).toEqual({
-      type: types.JAVASCRIPT_TOGGLED,
-      setting
-    })
-  })
+  // it('javascriptToggled action', () => {
+  //   const setting: BlockOptions = 'allow'
+  //   expect(actions.blockJavaScript(setting)).toEqual({
+  //     type: types.JAVASCRIPT_TOGGLED,
+  //     setting
+  //   })
+  // })
 
   it('resourceBlocked action', () => {
     const details: BlockDetails = {
@@ -98,13 +98,13 @@ describe('shieldsPanelActions', () => {
     })
   })
 
-  it('allowScriptOriginsOnce action', () => {
-    const origins = ['https://a.com', 'https://b.com']
-    expect(actions.allowScriptOriginsOnce(origins)).toEqual({
-      type: types.ALLOW_SCRIPT_ORIGINS_ONCE,
-      origins
-    })
-  })
+  // it('allowScriptOriginsOnce action', () => {
+  //   const origins = ['https://a.com', 'https://b.com']
+  //   expect(actions.allowScriptOriginsOnce(origins)).toEqual({
+  //     type: types.ALLOW_SCRIPT_ORIGINS_ONCE,
+  //     origins
+  //   })
+  // })
 
   it('changeNoScriptSettings action', () => {
     const origin = 'https://a.com'

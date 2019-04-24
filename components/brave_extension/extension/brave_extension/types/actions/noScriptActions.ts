@@ -3,6 +3,25 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as types from '../constants/noScriptTypes'
+import { BlockJSOptions } from '../other/blockTypes'
+
+interface BlockJavaScriptReturn {
+  type: types.JAVASCRIPT_TOGGLED,
+  setting: BlockJSOptions
+}
+
+export interface BlockJavaScript {
+  (setting: BlockJSOptions): BlockJavaScriptReturn
+}
+
+interface AllowScriptOriginsOnceReturn {
+  type: types.ALLOW_SCRIPT_ORIGINS_ONCE,
+  origins: Array<string>
+}
+
+export interface AllowScriptOriginsOnce {
+  (origins: Array<string>): AllowScriptOriginsOnceReturn
+}
 
 interface SetScriptBlockedCurrentStateReturn {
   type: types.SET_SCRIPT_BLOCKED_ONCE_CURRENT_STATE,
@@ -41,6 +60,8 @@ export interface SetFinalScriptsBlockedState {
 }
 
 export type noScriptActions =
+  BlockJavaScriptReturn |
+  AllowScriptOriginsOnceReturn |
   SetScriptBlockedCurrentStateReturn |
   SetGroupedScriptsBlockedCurrentStateReturn |
   SetAllScriptsBlockedCurrentStateReturn |

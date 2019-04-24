@@ -47,13 +47,6 @@ export const httpsEverywhereToggled: actions.HttpsEverywhereToggled = (setting) 
   }
 }
 
-export const blockJavaScript: actions.BlockJavaScript = (setting) => {
-  return {
-    type: types.JAVASCRIPT_TOGGLED,
-    setting
-  }
-}
-
 export const blockFingerprinting: actions.BlockFingerprinting = (setting) => {
   return {
     type: types.BLOCK_FINGERPRINTING,
@@ -65,13 +58,6 @@ export const blockCookies: actions.BlockCookies = (setting) => {
   return {
     type: types.BLOCK_COOKIES,
     setting
-  }
-}
-
-export const allowScriptOriginsOnce: actions.AllowScriptOriginsOnce = (origins) => {
-  return {
-    type: types.ALLOW_SCRIPT_ORIGINS_ONCE,
-    origins
   }
 }
 
