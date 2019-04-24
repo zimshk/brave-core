@@ -9,7 +9,7 @@ import { getOrigin } from './urlUtils'
 
 /**
  * Filter resources by origin to be used for generating NoScriptInfo.
- * @param {[key: string]: NoScriptEntry} noScriptInfo - The NoScriptInfo state
+ * @param {NoScriptInfo} noScriptInfo - The NoScriptInfo state
  * @param {string} url - The URL to compare origins against each other
  */
 export const filterResourceByOrigin = (noScriptInfo: NoScriptInfo, url: string) => {
@@ -22,7 +22,7 @@ export const filterResourceByOrigin = (noScriptInfo: NoScriptInfo, url: string) 
  * Generate data structure for the NoScript object.
  * This is useful to group scripts by origin and is used for presentational
  * purposes only, as data is stored same way as it comes from the back-end.
- * @param {[key: string]: NoScriptEntry} noScriptInfo - The NoScriptInfo state
+ * @param {NoScriptInfo} noScriptInfo - The NoScriptInfo state
  */
 export const generateNoScriptInfoDataStructure = (noScriptInfo: NoScriptInfo) => {
   let newData = []
@@ -37,19 +37,19 @@ export const generateNoScriptInfoDataStructure = (noScriptInfo: NoScriptInfo) =>
 
 /**
  * Filter NoScriptInfo by `willBlock` state
- * @param {[key: string]: NoScriptEntry} noScriptInfo - The NoScriptInfo state
+ * @param {Array<any>} modifiedNoScriptInfo - The NoScriptInfo state
  * @param {boolean} maybeBlock - Whether or not the resource should be blocked
  * @param {boolean} filterByDifference - Whether or not `willBlock` should be filtered by difference
  */
 export const filterNoScriptInfoByBlockedState = (
-  noScriptInfo: Array<any>,
+  modifiedNoScriptInfo: Array<any>,
   maybeBlock: boolean,
   filterByDifference?: boolean
 ) => {
   if (filterByDifference) {
-    return noScriptInfo.filter(script => script[1].willBlock !== maybeBlock)
+    return modifiedNoScriptInfo.filter(script => script[1].willBlock !== maybeBlock)
   }
-  return noScriptInfo.filter(script => script[1].willBlock === maybeBlock)
+  return modifiedNoScriptInfo.filter(script => script[1].willBlock === maybeBlock)
 }
 
 /**
@@ -63,7 +63,7 @@ export const getNoScriptInfo = (state: State) => {
 
 /**
  * Set NoScriptInfo modified state
- * @param {Feature.State} state - The Application state
+ * @param {State} state - The Application state
  * @param {string} url - The current script URL
  * @param {object} modifiedInfo - The current script URL object data to be modified
  */
@@ -87,20 +87,14 @@ export const setNoScriptInfo = (state: State, tabId: number, url: string, modifi
 
 /**
  * Check if all scripts in NoScriptInfo are either allowed or blocked by the user
- * @param {[key: string]: NoScriptEntry} noScriptInfo - The NoScriptInfo state
+ * @param {Array<any>} modifiedNoScriptInfo - The modifiedNoScriptInfo state
  * @param {boolean} isBlocked - Whether or not all scripts are blocked
  */
 export const checkEveryItemIsBlockedOrAllowed = (
-  noScriptInfo: Array<any>,
-  isBlocked: boolean,
-  shouldParseData?: boolean
+  modifiedNoScriptInfo: Array<any>,
+  isBlocked: boolean
 ) => {
-  if (shouldParseData) {
-    return Object.entries(noScriptInfo)
-      .filter(script => script[1].willBlock === isBlocked)
-      .every(script => script[1].userInteracted)
-  }
-  return noScriptInfo
+  return modifiedNoScriptInfo
     .filter(script => script[1].willBlock === isBlocked)
     .every(script => script[1].userInteracted)
 }
@@ -110,7 +104,7 @@ export const checkEveryItemIsBlockedOrAllowed = (
  * Scripts are divided between blocked/allowed and we have an option to block/allow all.
  * If all scripts in a list are set to blocked/allowed, state should change
  * to "allowed once" or "blocked once"
- * @param {[key: string]: NoScriptEntry} noScriptInfo - The NoScriptInfo state
+ * @param {NoScriptInfo} noScriptInfo - The NoScriptInfo state
  * @param {boolean} isBlocked - Whether or not all scripts are blocked
  */
 export const getBlockAllText = (

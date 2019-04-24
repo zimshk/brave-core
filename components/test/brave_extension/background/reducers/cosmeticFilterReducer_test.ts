@@ -27,7 +27,7 @@ describe('cosmeticFilterReducer', () => {
   describe('ON_COMMITTED', () => {
     const tabId = 1
     let spy: jest.SpyInstance
-    let resetNoScriptInfoSpy: jest.SpyInstance
+    // let resetNoScriptInfoSpy: jest.SpyInstance
     let resetBlockingResourcesSpy: jest.SpyInstance
     beforeEach(() => {
       spy = jest.spyOn(shieldsPanelState, 'resetBlockingStats')
