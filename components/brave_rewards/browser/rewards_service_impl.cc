@@ -407,13 +407,13 @@ void RewardsServiceImpl::StartLedger() {
   bat_ledger_service_.set_connection_error_handler(
       base::Bind(&RewardsServiceImpl::ConnectionClosed, AsWeakPtr()));
 
-  bool isProduction = true;
+  //bool isProduction = true;
   // Environment
-  #if defined(OFFICIAL_BUILD)
-    isProduction = true;
-  #else
-    isProduction = false;
-  #endif
+  //#if defined(OFFICIAL_BUILD)
+  //  isProduction = true;
+  //#else
+  bool isProduction = false;
+  //#endif
   SetProduction(isProduction);
 
   const base::CommandLine& command_line =
@@ -2497,11 +2497,11 @@ void RewardsServiceImpl::HandleFlags(const std::string& options) {
       bool is_production;
       std::string lower = base::ToLowerASCII(value);
 
-      if (lower == "true" || lower == "1") {
+      //if (lower == "true" || lower == "1") {
         is_production = false;
-      } else {
-        is_production = true;
-      }
+      //} else {
+      //  is_production = true;
+      //}
 
       SetProduction(is_production);
       continue;
@@ -2579,11 +2579,11 @@ void RewardsServiceImpl::SetLedgerEnvForTesting() {
 
   // this is needed because we are using braveledger_bat_helper::buildURL
   // directly in BraveRewardsBrowserTest
-  #if defined(OFFICIAL_BUILD)
-  ledger::is_production = true;
-  #else
+  //#if defined(OFFICIAL_BUILD)
+  //ledger::is_production = true;
+  //#else
   ledger::is_production = false;
-  #endif
+  //#endif
 }
 
 void RewardsServiceImpl::GetProduction(const GetProductionCallback& callback) {
