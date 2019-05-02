@@ -5,6 +5,7 @@
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as shieldsPanelActions from '../actions/shieldsPanelActions'
+import * as noScriptActions from '../actions/noScriptActions'
 import * as shieldsPanelState from '../state/shieldsPanelState'
 import BraveShields from '../components/braveShields'
 import { State } from '../types/state/mainState'
@@ -14,7 +15,10 @@ const mapStateToProps = (state: State) => ({
 })
 
 const mapDispatchToProps = (dispatch: any) => ({
-  actions: bindActionCreators(shieldsPanelActions, dispatch)
+  actions: bindActionCreators(
+    Object.assign({}, shieldsPanelActions, noScriptActions),
+    dispatch
+  )
 })
 
 export default connect(

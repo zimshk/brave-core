@@ -11,14 +11,11 @@ import DeviceRecognitionControl from './controls/deviceRecognitionControl'
 
 // Types
 import {
-  ChangeNoScriptSettings,
-  BlockJavaScript,
-  ChangeAllNoScriptSettings,
-  AllowScriptOriginsOnce,
   BlockCookies,
   BlockFingerprinting
 } from '../types/actions/shieldsPanelActions'
 import { BlockCookiesOptions, BlockJSOptions, BlockFPOptions } from '../types/other/blockTypes'
+import * as noScriptActions from '../actions/noScriptActions'
 import { NoScriptInfo } from '../types/other/noScriptInfo'
 
 interface CommonProps {
@@ -32,10 +29,7 @@ interface JavaScriptProps {
   javascript: BlockJSOptions
   javascriptBlocked: number
   noScriptInfo: NoScriptInfo
-  changeNoScriptSettings: ChangeNoScriptSettings
-  blockJavaScript: BlockJavaScript
-  changeAllNoScriptSettings: ChangeAllNoScriptSettings
-  allowScriptOriginsOnce: AllowScriptOriginsOnce
+  actions: typeof noScriptActions
 }
 
 interface CookiesProps {
@@ -66,10 +60,7 @@ export default class PrivacyControls extends React.PureComponent<Props, {}> {
           javascript={this.props.javascript}
           javascriptBlocked={this.props.javascriptBlocked}
           noScriptInfo={this.props.noScriptInfo}
-          changeNoScriptSettings={this.props.changeNoScriptSettings}
-          blockJavaScript={this.props.blockJavaScript}
-          changeAllNoScriptSettings={this.props.changeAllNoScriptSettings}
-          allowScriptOriginsOnce={this.props.allowScriptOriginsOnce}
+          actions={this.props.actions}
         />
         <CookiesControl
           isBlockedListOpen={this.props.isBlockedListOpen}
@@ -87,3 +78,6 @@ export default class PrivacyControls extends React.PureComponent<Props, {}> {
     )
   }
 }
+
+
+

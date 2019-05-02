@@ -234,7 +234,7 @@
     },
     "resetMocks": true,
     "resetModules": true,
-    "collectCoverage": true,
+    "collectCoverage": false,
     "collectCoverageFrom": [
       "<rootDir>/components/**/**/*.ts",
       "<rootDir>/components/**/**/*.tsx",
@@ -277,7 +277,7 @@
     "@types/react-redux": "6.0.4",
     "@types/redux-logger": "^3.0.7",
     "awesome-typescript-loader": "^5.2.1",
-    "brave-ui": "github:brave/brave-ui#f2762fd62577aa5e177b462ead9c3c32ef8d915a",
+    "brave-ui": "github:brave/brave-ui#fb317c0972fe6161a71d59c887b9c2f0765fb50c",
     "css-loader": "^2.1.1",
     "csstype": "^2.5.5",
     "deep-freeze-node": "^1.1.3",

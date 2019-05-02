@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { NoScriptInfo } from '../types/other/noScriptInfo'
-import { State, Tabs, Tab } from '../types/state/shieldsPannelState'
+import { State, Tabs /*, Tab */ } from '../types/state/shieldsPannelState'
 import { getActiveTabData } from '../state/shieldsPanelState'
 import { getOrigin } from './urlUtils'
 
@@ -57,8 +57,7 @@ export const filterNoScriptInfoByBlockedState = (
  * @param {State} state - The initial NoScriptState
  */
 export const getNoScriptInfo = (state: State) => {
-  const tabData: Tab = getActiveTabData(state)
-  return tabData.noScriptInfo
+  return getActiveTabData(state)!.noScriptInfo
 }
 
 /**

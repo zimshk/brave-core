@@ -13,9 +13,10 @@ import {
   BlockedInfoRowText,
   Toggle
 } from 'brave-ui/features/shields'
-
+  
 // Group Components
-import DynamicList from '../list/dynamic'
+// import DynamicList from '../list/dynamic'
+import NoScript from '../list/noScript'
 
 // Locale
 import { getLocale } from '../../background/api/localeAPI'
@@ -32,15 +33,9 @@ import {
 // Types
 import { BlockJSOptions } from '../../types/other/blockTypes'
 import { NoScriptInfo } from '../../types/other/noScriptInfo'
-import {
-  ChangeNoScriptSettings,
-  BlockJavaScript,
-  ChangeAllNoScriptSettings,
-  AllowScriptOriginsOnce
-} from '../../types/actions/shieldsPanelActions'
+import * as noScriptActions from '../../actions/noScriptActions'
 
 interface CommonProps {
-  // Global props
   isBlockedListOpen: boolean
   setBlockedListOpen: () => void
   hostname: string
@@ -51,10 +46,7 @@ interface JavaScriptProps {
   javascript: BlockJSOptions
   javascriptBlocked: number
   noScriptInfo: NoScriptInfo
-  changeNoScriptSettings: ChangeNoScriptSettings
-  blockJavaScript: BlockJavaScript
-  changeAllNoScriptSettings: ChangeAllNoScriptSettings
-  allowScriptOriginsOnce: AllowScriptOriginsOnce
+  actions: typeof noScriptActions
 }
 
 export type Props = CommonProps & JavaScriptProps
@@ -111,7 +103,8 @@ export default class ScriptsControls extends React.PureComponent<Props, State> {
 
   onChangeScriptsBlockedEnabled = (event: React.ChangeEvent<HTMLInputElement>) => {
     const shouldBlockJavaScript = getToggleStateViaEventTarget(event)
-    this.props.blockJavaScript(shouldBlockJavaScript)
+    console.log('im fired')
+    this.props.actions.blockJavaScript(shouldBlockJavaScript)
   }
 
   render () {
@@ -119,9 +112,7 @@ export default class ScriptsControls extends React.PureComponent<Props, State> {
       favicon,
       hostname,
       isBlockedListOpen,
-      allowScriptOriginsOnce,
-      changeNoScriptSettings,
-      changeAllNoScriptSettings,
+      actions,
       noScriptInfo
     } = this.props
     const { scriptsBlockedOpen } = this.state
@@ -148,16 +139,12 @@ export default class ScriptsControls extends React.PureComponent<Props, State> {
         </BlockedInfoRow>
         {
           scriptsBlockedOpen &&
-            <DynamicList
+            <NoScript
               favicon={favicon}
               hostname={hostname}
-              origin={origin}
-              name={getLocale('scriptsOnThisSite')}
-              list={noScriptInfo}
+              noScriptInfo={noScriptInfo}
               onClose={this.onOpenScriptsBlocked}
-              allowScriptOriginsOnce={allowScriptOriginsOnce}
-              changeNoScriptSettings={changeNoScriptSettings}
-              changeAllNoScriptSettings={changeAllNoScriptSettings}
+              actions={actions}
             />
         }
       </>

@@ -5,9 +5,15 @@
 import * as shieldState from '../types/state/shieldsPannelState'
 import { unique } from '../helpers/arrayUtils'
 
-export const getActiveTabId: shieldState.GetActiveTabId = (state) => state.windows[state.currentWindowId]
+export const getActiveTabId: shieldState.GetActiveTabId = (state) => {
+  console.log('are there hope????', state)
+  console.log('much much what', state.currentWindowId)
+  return state.windows[state.currentWindowId]
+}
 
-export const getActiveTabData: shieldState.GetActiveTabData = (state) => state.tabs[getActiveTabId(state)]
+export const getActiveTabData: shieldState.GetActiveTabData = (state) => {
+  return state.tabs[getActiveTabId(state)]
+}
 
 export const updateActiveTab: shieldState.UpdateActiveTab = (state, windowId, tabId) => {
   let windows: shieldState.Windows = { ...state.windows } || {}

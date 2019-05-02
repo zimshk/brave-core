@@ -19,30 +19,11 @@ import Footer from './footer'
 // Types
 import { Tab } from '../types/state/shieldsPannelState'
 import { isShieldsEnabled, getFavicon } from '../helpers/shieldsUtils'
-import {
-  ShieldsToggled,
-  BlockAdsTrackers,
-  HttpsEverywhereToggled,
-  BlockJavaScript,
-  BlockFingerprinting,
-  BlockCookies,
-  AllowScriptOriginsOnce,
-  ChangeNoScriptSettings,
-  ChangeAllNoScriptSettings
-} from '../types/actions/shieldsPanelActions'
+import * as shieldsPanelActions from '../actions/shieldsPanelActions'
+import * as noScriptActions from '../actions/noScriptActions'
 
 interface Props {
-  actions: {
-    shieldsToggled: ShieldsToggled
-    blockAdsTrackers: BlockAdsTrackers
-    httpsEverywhereToggled: HttpsEverywhereToggled
-    blockJavaScript: BlockJavaScript
-    blockFingerprinting: BlockFingerprinting
-    blockCookies: BlockCookies
-    allowScriptOriginsOnce: AllowScriptOriginsOnce
-    changeNoScriptSettings: ChangeNoScriptSettings
-    changeAllNoScriptSettings: ChangeAllNoScriptSettings
-  }
+  actions: typeof shieldsPanelActions & typeof noScriptActions
   shieldsPanelTabData: Tab
 }
 
@@ -124,12 +105,11 @@ export default class Shields extends React.PureComponent<Props, State> {
                 favicon={this.favicon}
                 // JavaScript
                 javascript={shieldsPanelTabData.javascript}
+                // TODO: cezaraugusto is javascriptBlocked necessary or
+                // with a good name for what it does?
                 javascriptBlocked={shieldsPanelTabData.javascriptBlocked}
                 noScriptInfo={shieldsPanelTabData.noScriptInfo}
-                changeNoScriptSettings={actions.changeNoScriptSettings}
-                blockJavaScript={actions.blockJavaScript}
-                changeAllNoScriptSettings={actions.changeAllNoScriptSettings}
-                allowScriptOriginsOnce={actions.allowScriptOriginsOnce}
+                actions={actions}
                 // Cookies
                 blockCookies={actions.blockCookies}
                 cookies={shieldsPanelTabData.cookies}
