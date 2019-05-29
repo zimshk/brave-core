@@ -11,6 +11,7 @@
 #include "base/bind.h"
 #include "base/strings/utf_string_conversions.h"
 #include "brave/components/brave_sync/values_conv.h"
+#include "brave/components/brave_sync/brave_sync_pref_names.h"
 #include "brave/components/brave_sync/brave_sync_prefs.h"
 #include "brave/components/brave_sync/brave_sync_service_observer.h"
 #include "brave/components/brave_sync/jslib_const.h"

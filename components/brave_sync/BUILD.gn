@@ -50,18 +50,41 @@ source_set("jslib_messages") {
   ]
 }
 
-source_set("core") {
+source_set("pref_registration") {
   sources = [
-    "bookmark_order_util.cc",
-    "bookmark_order_util.h",
+    "brave_sync_pref_names.cc",
+    "brave_sync_pref_names.h",
+    "brave_sync_pref_registration.h",
+    "brave_sync_pref_registration.cc",
+  ]
+
+  deps = [
+    "//base",
+  ]
+}
+
+source_set("prefs") {
+  sources = [
     "brave_sync_prefs.cc",
     "brave_sync_prefs.h",
-    "brave_sync_service.cc",
-    "brave_sync_service.h",
     "settings.cc",
     "settings.h",
     "sync_devices.cc",
     "sync_devices.h",
+  ]
+
+  deps = [
+    "//base",
+    ":pref_registration",
+  ]
+}
+
+source_set("core") {
+  sources = [
+    "bookmark_order_util.cc",
+    "bookmark_order_util.h",
+    "brave_sync_service.cc",
+    "brave_sync_service.h",
     "syncer_helper.cc",
     "syncer_helper.h",
     "tools.cc",
@@ -72,6 +95,7 @@ source_set("core") {
 
   deps = [
     ":jslib_messages",
+    ":prefs",
     "//base",
     "//components/prefs",
     "//crypto",

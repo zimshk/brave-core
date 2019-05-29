@@ -5,6 +5,7 @@
 
 #include "brave/components/brave_sync/brave_sync_prefs.h"
 
+#include "brave/components/brave_sync/brave_sync_pref_names.h"
 #include "brave/components/brave_sync/brave_sync_service.h"
 #include "brave/components/brave_sync/settings.h"
 #include "brave/components/brave_sync/sync_devices.h"
@@ -14,44 +15,7 @@
 namespace brave_sync {
 namespace prefs {
 
-const char kSyncDeviceId[] = "brave_sync.device_id";
-const char kSyncSeed[] = "brave_sync.seed";
-const char kSyncPrevSeed[] = "brave_sync.previous_seed";
-const char kSyncDeviceName[] = "brave_sync.device_name";
-const char kSyncBookmarksBaseOrder[] = "brave_sync.bookmarks_base_order";
-const char kSyncEnabled[] = "brave_sync.enabled";
-const char kSyncBookmarksEnabled[] = "brave_sync.bookmarks_enabled";
-const char kSyncSiteSettingsEnabled[] = "brave_sync.site_settings_enabled";
-const char kSyncHistoryEnabled[] = "brave_sync.history_enabled";
-const char kSyncLatestRecordTime[] = "brave_sync.latest_record_time";
-const char kSyncLastFetchTime[] = "brave_sync.last_fetch_time";
-const char kSyncDeviceList[] = "brave_sync.device_list";
-const char kSyncApiVersion[] = "brave_sync.api_version";
-const char kSyncMigrateBookmarksVersion[]
-                                       = "brave_sync.migrate_bookmarks_version";
-
 Prefs::Prefs(PrefService* pref_service) : pref_service_(pref_service) {}
-
-void Prefs::RegisterProfilePrefs(
-    user_prefs::PrefRegistrySyncable* registry) {
-  registry->RegisterStringPref(prefs::kSyncDeviceId, std::string());
-  registry->RegisterStringPref(prefs::kSyncSeed, std::string());
-  registry->RegisterStringPref(prefs::kSyncPrevSeed, std::string());
-  registry->RegisterStringPref(prefs::kSyncDeviceName, std::string());
-  registry->RegisterStringPref(prefs::kSyncBookmarksBaseOrder, std::string());
-
-  registry->RegisterBooleanPref(prefs::kSyncEnabled, false);
-  registry->RegisterBooleanPref(prefs::kSyncBookmarksEnabled, false);
-  registry->RegisterBooleanPref(prefs::kSyncSiteSettingsEnabled, false);
-  registry->RegisterBooleanPref(prefs::kSyncHistoryEnabled, false);
-
-  registry->RegisterTimePref(prefs::kSyncLatestRecordTime, base::Time());
-  registry->RegisterTimePref(prefs::kSyncLastFetchTime, base::Time());
-
-  registry->RegisterStringPref(prefs::kSyncDeviceList, std::string());
-  registry->RegisterStringPref(prefs::kSyncApiVersion, std::string("0"));
-  registry->RegisterIntegerPref(prefs::kSyncMigrateBookmarksVersion, 0);
-}
 
 std::string Prefs::GetSeed() const {
   return pref_service_->GetString(kSyncSeed);
