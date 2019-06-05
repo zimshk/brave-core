@@ -657,6 +657,17 @@ TEST_F(BraveSyncServiceTest, StartSyncNonDeviceRecords) {
       "2", "device2"));
   EXPECT_CALL(*observer(), OnSyncStateChanged(sync_service())).Times(1);
   sync_service()->OnResolvedPreferences(records);
+  EXPECT_FALSE(profile()->GetPrefs()->GetBoolean(syncer::prefs::kSyncBookmarks));
+
+  base::subtle::ScopedTimeClockOverrides time_override(
+      []() {
+        return base::subtle::TimeNowIgnoringOverride() +
+            base::TimeDelta::FromSeconds(31);
+      },
+      nullptr,
+      nullptr);
+
+  sync_service()->OnResolvedPreferences(RecordsList());
   EXPECT_TRUE(profile()->GetPrefs()->GetBoolean(syncer::prefs::kSyncBookmarks));
 }
 
