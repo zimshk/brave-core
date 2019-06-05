@@ -231,6 +231,12 @@ TEST_F(SyncerHelperTest, AddBraveMetaInfoNodeMovedReordered) {
   AddBraveMetaInfo(node_b, model(), false);
   AddBraveMetaInfo(node_c, model(), false);
 
+  // Order is not broken
+  // i=0 A.com - title order=1.0.1.1.1
+  // i=1 B.com - title order=1.0.1.2.1
+  // i=2 C.com - title order=1.0.1.2.2
+  // But does not match with indexes
+
   order_a.clear();
   order_b.clear();
   order_c.clear();
@@ -239,9 +245,9 @@ TEST_F(SyncerHelperTest, AddBraveMetaInfoNodeMovedReordered) {
   node_a->GetMetaInfo("order", &order_a);
   EXPECT_EQ(order_a, "1.0.1.1.1");
   node_b->GetMetaInfo("order", &order_b);
-  EXPECT_EQ(order_b, "1.0.1.1.2");
+  EXPECT_EQ(order_b, "1.0.1.2.1");
   node_c->GetMetaInfo("order", &order_c);
-  EXPECT_EQ(order_c, "1.0.1.1.3");
+  EXPECT_EQ(order_c, "1.0.1.2.2");
   folder1->GetMetaInfo("order", &order_folder1);
   EXPECT_EQ(order_folder1, "1.0.1.1");
 }
