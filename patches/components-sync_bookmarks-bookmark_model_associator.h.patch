@@ -1,0 +1,17 @@
+diff --git a/components/sync_bookmarks/bookmark_model_associator.h b/components/sync_bookmarks/bookmark_model_associator.h
+index 1f4388a815bb0b0579fbf4a20f6e4959fa3a5a3a..4cd6039e8618ac6e1d6ea4becedbfb21bab11f09 100644
+--- a/components/sync_bookmarks/bookmark_model_associator.h
++++ b/components/sync_bookmarks/bookmark_model_associator.h
+@@ -291,6 +291,12 @@ class BookmarkModelAssociator : public syncer::AssociatorInterface {
+   // the native model has a newer transaction verison.
+   syncer::SyncError CheckModelSyncState(Context* context) const;
+ 
++  syncer::SyncError ReorderChildrenAndUpdateSyncEntities(
++      const bookmarks::BookmarkNode* parent,
++      const int index_begin,
++      const int index_end,
++      syncer::WriteTransaction* trans);
++
+   base::ThreadChecker thread_checker_;
+   bookmarks::BookmarkModel* const bookmark_model_;
+   BookmarkUndoService* const bookmark_undo_service_;

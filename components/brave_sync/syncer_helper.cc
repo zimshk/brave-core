@@ -43,6 +43,7 @@ void ReCalculateOrder(bookmarks::BookmarkModel* model,
   SetOrder(model, node, parent_order);
 }
 
+// Used only in test
 uint64_t GetIndexByOrder(const std::string& record_order) {
   uint64_t index = 0;
   size_t last_dot_index = record_order.rfind(".");
@@ -55,6 +56,78 @@ uint64_t GetIndexByOrder(const std::string& record_order) {
   return index;
 }
 
+bool IsOrderConsistent(const bookmarks::BookmarkNode* node) {
+  DCHECK(node);
+  DCHECK(node->parent());
+
+  std::string node_order;
+  node->GetMetaInfo("order", &node_order);
+
+  if (node_order.empty()) {
+    return false;
+  }
+
+  const auto* parent = node->parent();
+  if (parent->child_count() == 1) {
+    return true;
+  }
+
+  const auto node_index = parent->GetIndexOf(node);
+
+  std::string prev_node_order;
+  if (node_index > 0) {
+    parent->GetChild(node_index - 1)->GetMetaInfo("order", &prev_node_order);
+  }
+
+  std::string next_node_order;
+  if (node_index < parent->child_count() - 1) {
+    parent->GetChild(node_index + 1)->GetMetaInfo("order", &next_node_order);
+  }
+
+  bool is_consistent = (prev_node_order.empty() ||
+      CompareOrder(prev_node_order, node_order)) &&
+      (next_node_order.empty() ||
+      CompareOrder(node_order, next_node_order));
+
+  return is_consistent;
+}
+
+uint64_t GetIndexByCompareOrderStartFrom(
+    const bookmarks::BookmarkNode* parent,
+    const bookmarks::BookmarkNode* src,
+    int index) {
+
+  std::string src_order;
+  src->GetMetaInfo("order", &src_order);
+
+  DCHECK(!src_order.empty());
+  DCHECK(index >= 0);
+
+  while (index < parent->child_count()) {
+    const bookmarks::BookmarkNode* node = parent->GetChild(index);
+    std::string node_order;
+    node->GetMetaInfo("order", &node_order);
+
+    if (!node_order.empty() &&
+        brave_sync::CompareOrder(src_order, node_order)) {
+      return index;
+    }
+
+    ++index;
+  }
+
+  return index;
+}
+
+// |node| is near the end in parent
+void RepositionRespectOrder(
+    bookmarks::BookmarkModel* bookmark_model,
+    const bookmarks::BookmarkNode* node) {
+  const bookmarks::BookmarkNode* parent = node->parent();
+  int index = GetIndexByCompareOrderStartFrom(parent, node, 0);
+  bookmark_model->Move(node, parent, index);
+}
+
 }   // namespace
 
 void AddBraveMetaInfo(
@@ -64,7 +137,7 @@ void AddBraveMetaInfo(
   if (has_new_parent) {
     ClearOrder(node);
     ReCalculateOrder(model, node);
-  } else {
+  } else if (!IsOrderConsistent(node)) {
     std::string parent_order;
     node->parent()->GetMetaInfo("order", &parent_order);
     SetOrder(model, node, parent_order);
@@ -91,6 +164,7 @@ void AddBraveMetaInfo(
   DCHECK(!sync_timestamp.empty());
 }
 
+// Used only in test
 uint64_t GetIndex(const bookmarks::BookmarkNode* parent,
                   const bookmarks::BookmarkNode* src) {
   DCHECK(parent);
@@ -112,6 +186,43 @@ uint64_t GetIndex(const bookmarks::BookmarkNode* parent,
     }
   }
   return index;
+}
+
+uint64_t GetIndexByCompareOrder(
+    const bookmarks::BookmarkNode* parent,
+    const bookmarks::BookmarkNode* src) {
+  return GetIndexByCompareOrderStartFrom(parent, src, 0);
+}
+
+void ReorderChildern(bookmarks::BookmarkModel* bookmark_model,
+                     const bookmarks::BookmarkNode* parent,
+                     const int index_begin,
+                     const int index_end) {
+
+  DCHECK(index_end < parent->child_count());
+
+  // assume [index_begin, index_end] - unsorted
+  //        (index_end, child_count()) - sorted
+  // as we arrived
+  // from BookmarkModelAssociator::ReorderChildrenAndUpdateSyncEntities
+
+  int num_nodes = index_end - index_begin + 1;
+
+  while (num_nodes > 0) {
+    const bookmarks::BookmarkNode* node_to_move = parent->GetChild(index_begin);
+    int new_position = GetIndexByCompareOrderStartFrom(parent, node_to_move,
+        index_begin + num_nodes);
+    bookmark_model->Move(node_to_move, parent, new_position);
+    --num_nodes;
+  }
+}
+
+void RepositionOnApplyChangesFromSyncModel(
+    bookmarks::BookmarkModel* bookmark_model,
+    const std::multimap<int, const bookmarks::BookmarkNode*>& to_reposition) {
+  for (auto it = to_reposition.begin(); it != to_reposition.end(); ++it) {
+    brave_sync::RepositionRespectOrder(bookmark_model, it->second);
+  }
 }
 
 }   // namespace brave_sync

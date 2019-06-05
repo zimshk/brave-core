@@ -1,5 +1,5 @@
 diff --git a/components/sync_bookmarks/bookmark_change_processor.cc b/components/sync_bookmarks/bookmark_change_processor.cc
-index acb064faac3ee975ec07be4977fc0970309dfb15..81744cb05711149192d93d0a2e688cf706720248 100644
+index acb064faac3ee975ec07be4977fc0970309dfb15..53b515be7ddf79d87c3c9cff3c96cf6323cde3db 100644
 --- a/components/sync_bookmarks/bookmark_change_processor.cc
 +++ b/components/sync_bookmarks/bookmark_change_processor.cc
 @@ -87,6 +87,7 @@ void BookmarkChangeProcessor::UpdateSyncNodeProperties(
@@ -79,8 +79,17 @@ index acb064faac3ee975ec07be4977fc0970309dfb15..81744cb05711149192d93d0a2e688cf7
      }
  
 -    to_reposition.insert(std::make_pair(src.GetPositionIndex(), dst));
-+    uint64_t index = brave_sync::GetIndex(dst->parent(), dst);
++    uint64_t index = brave_sync::GetIndexByCompareOrder(dst->parent(), dst);
 +    to_reposition.insert(std::make_pair(index, dst));
      bookmark_model_->SetNodeSyncTransactionVersion(dst, model_version);
    }
  
+@@ -733,6 +752,8 @@ void BookmarkChangeProcessor::ApplyChangesFromSyncModel(
+     model->Move(it->second, parent, it->first);
+   }
+ 
++  brave_sync::RepositionOnApplyChangesFromSyncModel(model, to_reposition);
++
+   // Clean up the temporary node.
+   if (foster_parent) {
+     // There should be no nodes left under the foster parent.

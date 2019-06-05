@@ -1,0 +1,13 @@
+diff --git a/components/sync_bookmarks/bookmark_model_associator.cc b/components/sync_bookmarks/bookmark_model_associator.cc
+index 8c09407a95d65915d75db1ac1b1c23974aea98fd..3dea46160bf75d73414eba94f6fe1bc8ef4dbeb3 100644
+--- a/components/sync_bookmarks/bookmark_model_associator.cc
++++ b/components/sync_bookmarks/bookmark_model_associator.cc
+@@ -742,6 +742,8 @@ syncer::SyncError BookmarkModelAssociator::BuildAssociations(
+       context->PushNode(sync_child_id);
+   }
+ 
++  ReorderChildrenAndUpdateSyncEntities(parent_node, 0, index - 1, trans);
++
+   return syncer::SyncError();
+ }
+ 
