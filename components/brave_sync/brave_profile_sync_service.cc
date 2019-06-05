@@ -729,9 +729,17 @@ void BraveProfileSyncService::OnResolvedPreferences(
   brave_sync_prefs_->SetSyncDevices(*sync_devices);
 
   if (old_devices_size < 2 && sync_devices->size() >= 2) {
-    // Re-enable sync of bookmarks
+    // Re-enable sync of bookmarks a bit later, 30sec, to guarantee the data
+    // will be put into all chain participants SQS
+    chain_created_time_ = base::Time::Now();
+  }
+
+  // Re-enable sync of bookmarks 30 sec after chain creation
+  if (!tools::IsTimeEmpty(chain_created_time_) &&
+      (base::Time::Now() - chain_created_time_).InSeconds() > 30u) {
     bool sync_bookmarks = brave_sync_prefs_->GetSyncBookmarksEnabled();
     OnSetSyncBookmarks(sync_bookmarks);
+    chain_created_time_ = base::Time();
   }
 
   if (this_device_deleted) {

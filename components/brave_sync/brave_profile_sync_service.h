@@ -168,6 +168,8 @@ class BraveProfileSyncService : public syncer::ProfileSyncService,
 
   std::unique_ptr<BraveSyncClient> brave_sync_client_;
 
+  base::Time chain_created_time_;
+
   // Used to ensure that certain operations are performed on the sequence that
   // this object was created on.
   SEQUENCE_CHECKER(sequence_checker_);
