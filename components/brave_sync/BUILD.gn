@@ -121,6 +121,7 @@ source_set("brave_sync") {
 
   deps = [
     ":core",
+    "aws",
     "buildflags",
     "//base",
   ]

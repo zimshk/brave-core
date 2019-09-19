@@ -1,0 +1,48 @@
+diff --git a/components/sync/engine/net/http_bridge.cc b/components/sync/engine/net/http_bridge.cc
+index 5e50d432e716e5d852709dca3ef041dd14a49979..38474dbace03266e78e4b9755419273356216f06 100644
+--- a/components/sync/engine/net/http_bridge.cc
++++ b/components/sync/engine/net/http_bridge.cc
+@@ -186,7 +186,7 @@ bool HttpBridge::MakeSynchronousPost(int* net_error_code,
+     DCHECK(!fetch_state_.request_completed);
+   }
+   DCHECK(url_for_request_.is_valid()) << "Invalid URL for request";
+-  DCHECK(!content_type_.empty()) << "Payload not set";
++  // DCHECK(!content_type_.empty()) << "Payload not set";
+ #endif
+ 
+   if (!network_task_runner_->PostTask(
+@@ -265,25 +265,31 @@ void HttpBridge::MakeAsynchronousPost() {
+         })");
+   auto resource_request = std::make_unique<network::ResourceRequest>();
+   resource_request->url = url_for_request_;
++  if (!request_method_.empty())
++    resource_request->method = request_method_.c_str();
++  else
+   resource_request->method = "POST";
+   resource_request->load_flags =
+       net::LOAD_BYPASS_CACHE | net::LOAD_DISABLE_CACHE |
+       net::LOAD_DO_NOT_SAVE_COOKIES | net::LOAD_DO_NOT_SEND_COOKIES;
+ 
+-  if (!extra_headers_.empty())
++  if (!extra_headers_.empty()) {
+     resource_request->headers.AddHeadersFromString(extra_headers_);
++  }
+ 
+   resource_request->headers.SetHeader("Content-Encoding", "gzip");
+-  resource_request->headers.SetHeader(net::HttpRequestHeaders::kUserAgent,
+-                                      user_agent_);
++  // resource_request->headers.SetHeader(net::HttpRequestHeaders::kUserAgent,
++  //                                     user_agent_);
+ 
+   fetch_state_.url_loader = network::SimpleURLLoader::Create(
+       std::move(resource_request), traffic_annotation);
+   network::SimpleURLLoader* url_loader = fetch_state_.url_loader.get();
+ 
+   std::string request_to_send;
++  if (!request_content_.empty()) {
+   compression::GzipCompress(request_content_, &request_to_send);
+   url_loader->AttachStringForUpload(request_to_send, content_type_);
++  }
+ 
+   // Sync relies on HTTP errors being detectable (and distinct from
+   // net/connection errors).

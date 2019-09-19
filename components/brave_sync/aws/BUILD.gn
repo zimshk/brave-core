@@ -1,0 +1,38 @@
+config("aws_config") {
+  include_dirs = [ "/Users/darkdh/Projects/aws-sdk-cpp/install_s/include" ]
+  libs = [
+    "/Users/darkdh/Projects/aws-sdk-cpp/install_s/lib/Release/libaws-cpp-sdk-core.a",
+    "/Users/darkdh/Projects/aws-sdk-cpp/install_s/lib/Release/libaws-cpp-sdk-s3.a",
+    "/Users/darkdh/Projects/aws-sdk-cpp/install_s/lib/Release/libaws-cpp-sdk-sqs.a",
+    "/Users/darkdh/Projects/aws-sdk-cpp/install_s/lib/Release/libaws-cpp-sdk-access-management.a",
+    "/Users/darkdh/Projects/aws-sdk-cpp/install_s/lib/Release/libaws-cpp-sdk-cognito-identity.a",
+    "/Users/darkdh/Projects/aws-sdk-cpp/install_s/lib/Release/libaws-cpp-sdk-iam.a",
+    "/Users/darkdh/Projects/aws-sdk-cpp/install_s/lib/libaws-c-common.a",
+    "/Users/darkdh/Projects/aws-sdk-cpp/install_s/lib/libaws-c-event-stream.a",
+    "/Users/darkdh/Projects/aws-sdk-cpp/install_s/lib/libaws-checksums.a",
+    "/usr/lib/libcurl.dylib",
+  ]
+  lib_dirs = [ "/usr/lib" ]
+}
+
+source_set("aws") {
+  sources = [
+    "aws_helper.cc",
+    "aws_helper.h",
+    "aws_http_client.cc",
+    "aws_http_client.h",
+    "aws_http_client_factory.cc",
+    "aws_http_client_factory.h",
+  ]
+
+  configs -= [ "//build/config/compiler:chromium_code" ]
+  configs -= [ "//build/config/clang:extra_warnings" ]
+  configs -= [ "//build/config/clang:find_bad_constructs" ]
+  configs += [ "//build/config/compiler:no_chromium_code" ]
+
+  deps = [
+    "//components/sync",
+  ]
+
+  public_configs = [ ":aws_config" ]
+}

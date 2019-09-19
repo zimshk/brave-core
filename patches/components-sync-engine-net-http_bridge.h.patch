@@ -1,0 +1,21 @@
+diff --git a/components/sync/engine/net/http_bridge.h b/components/sync/engine/net/http_bridge.h
+index b88c644f96349ae7b6ee57dc872d88855a9dd005..aab3c90754805abd1aa1ab40e1b450b4180b8e23 100644
+--- a/components/sync/engine/net/http_bridge.h
++++ b/components/sync/engine/net/http_bridge.h
+@@ -60,6 +60,7 @@ class HttpBridge : public base::RefCountedThreadSafe<HttpBridge>,
+                       const char* content) override;
+   bool MakeSynchronousPost(int* net_error_code, int* http_status_code) override;
+   void Abort() override;
++  void SetMethod(const char* method) override;
+ 
+   // WARNING: these response content methods are used to extract plain old data
+   // and not null terminated strings, so you should make sure you have read
+@@ -139,6 +140,8 @@ class HttpBridge : public base::RefCountedThreadSafe<HttpBridge>,
+   std::string request_content_;
+   std::string extra_headers_;
+ 
++  std::string request_method_;
++
+   // A waitable event we use to provide blocking semantics to
+   // MakeSynchronousPost. We block created_on_loop_ while the IO loop fetches
+   // network request.

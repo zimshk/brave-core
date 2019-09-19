@@ -1,0 +1,13 @@
+diff --git a/components/sync/engine/net/http_post_provider_interface.h b/components/sync/engine/net/http_post_provider_interface.h
+index 16d404ec1c536cdd844d535b54573458f57d3457..aef108b5a4c49d868b6b80ede14e12ea6de767d8 100644
+--- a/components/sync/engine/net/http_post_provider_interface.h
++++ b/components/sync/engine/net/http_post_provider_interface.h
+@@ -54,6 +54,8 @@ class HttpPostProviderInterface {
+   // This must be safe to call from any thread.
+   virtual void Abort() = 0;
+ 
++  virtual void SetMethod(const char* method) = 0;
++
+  protected:
+   virtual ~HttpPostProviderInterface() {}
+ };

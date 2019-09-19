@@ -1,0 +1,20 @@
+diff --git a/components/sync/engine_impl/net/sync_server_connection_manager.cc b/components/sync/engine_impl/net/sync_server_connection_manager.cc
+index 38a8ae37898b282409d81d154587b296303a25c7..335be3f13f216c1de02cc96ddc49fd21375833ba 100644
+--- a/components/sync/engine_impl/net/sync_server_connection_manager.cc
++++ b/components/sync/engine_impl/net/sync_server_connection_manager.cc
+@@ -10,6 +10,7 @@
+ 
+ #include "base/bind.h"
+ #include "base/callback_helpers.h"
++#include "brave/components/brave_sync/aws/aws_helper.h"
+ #include "components/sync/base/cancelation_signal.h"
+ #include "components/sync/engine/net/http_post_provider_factory.h"
+ #include "components/sync/engine/net/http_post_provider_interface.h"
+@@ -114,6 +115,7 @@ SyncServerConnectionManager::SyncServerConnectionManager(
+       cancelation_signal_(cancelation_signal) {
+   DCHECK(post_provider_factory_);
+   DCHECK(cancelation_signal_);
++  brave_sync::aws::AWSHelper(post_provider_factory_.get());
+ }
+ 
+ SyncServerConnectionManager::~SyncServerConnectionManager() = default;
