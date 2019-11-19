@@ -1,11 +1,13 @@
 import("//brave/components/brave_shields/browser/buildflags/buildflags.gni")
 import("//extensions/buildflags/buildflags.gni")
 import("//brave/vendor/adblock_rust_ffi/config.gni")
+import("//brave/vendor/https-everywhere-lib-cpp/config.gni")
 
 source_set("browser") {
   public_deps = [
     "buildflags",
-    ":adblock_libs"
+    ":adblock_libs",
+    ":httpse_libs"
   ]
 
   sources = [
@@ -59,6 +61,7 @@ source_set("browser") {
     "//brave/components/content_settings/core/browser",
     "//brave/content:common",
     "//brave/vendor/adblock_rust_ffi:adblock_ffi",
+    "//brave/vendor/https-everywhere-lib-cpp:https-everywhere-lib-cpp",
     "//brave/vendor/autoplay-whitelist/brave:autoplay-whitelist",
     "//chrome/common",
     "//components/content_settings/core/common",
@@ -86,4 +89,20 @@ if (is_mac) {
   }
 } else {
   group("adblock_libs") {}
+}
+
+if (is_mac) {
+  bundle_data("httpse_libs") {
+    sources = [
+      httpse_lib_path,
+    ]
+    outputs = [
+      "{{bundle_contents_dir}}/Libraries/{{source_file_part}}",
+    ]
+    public_deps = [
+      "//brave/vendor/https-everywhere-lib-cpp:httpse",
+    ]
+  }
+} else {
+  group("httpse_libs") {}
 }
