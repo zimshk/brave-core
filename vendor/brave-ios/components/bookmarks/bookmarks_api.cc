@@ -57,4 +57,87 @@ void BookmarksAPI::Create(const int64_t& parent_id,
   DCHECK(node);
 }
 
+void BookmarksAPI::Move(int64_t id,
+                   int64_t parent_id,
+                   size_t index)
+{
+    DCHECK_CURRENTLY_ON(BrowserThread::UI);
+    DCHECK(model_->loaded());
+    
+    const BookmarkNode* node =
+        bookmarks::GetBookmarkNodeByID(model_.get(), id);
+    DCHECK(IsEditable(node));
+    
+    const BookmarkNode* new_parent_node =
+        bookmarks::GetBookmarkNodeByID(model_.get(), parent_id);
+    
+    if (node->parent() != new_parent_node) {
+      model_->Move(node, new_parent_node, index);
+    }
+}
+
+void BookmarksAPI::Update(int64_t id,
+                          const base::string16& title,
+                          const GURL& url)
+{
+    DCHECK(IsEditable(node));
+    
+    const BookmarkNode* node =
+        bookmarks::GetBOokmarkNodeByID(model_.get(), id);
+    model_->SetTitle(node, title);
+    model_->SetURL(node, url);
+}
+
+void BookmarksAPI::Remove(int64_t id)
+{
+    DCHECK_CURRENTLY_ON(BrowserThread::UI);
+    DCHECK(model_->loaded());
+    
+    const BookmarkNode* node =
+        bookmarks::GetBOokmarkNodeByID(model_.get(), id);
+    
+    if (!IsEditable(node)) {
+        NOTREACHED();
+        return;
+    }
+    
+    model_->Remove(node);
+}
+
+void BookmarksAPI::RemoveAll()
+{
+    DCHECK_CURRENTLY_ON(BrowserThread::UI);
+    DCHECK(model_->loaded());
+    model_->RemoveAllUserBookmarks();
+}
+
+void BookmarksAPI::Search(const base::string16& search_query,
+                          size_t max_count,
+                          std::vector<const BookmarkNode*>* nodes)
+{
+    DCHECK(model_->loaded());
+    bookmarks::QueryFields query;
+    query.word_phrase_query.reset(new base::string16(search_query));
+    GetBookmarksMatchingProperties(model_, query, max_count, &nodes);
+    DCHECK((int)nodes.size() <= max_count);
+}
+
+void BookmarksAPI::Undo()
+{
+    DCHECK_CURRENTLY_ON(BrowserThread::UI);
+    DCHECK(model_->loaded());
+    UndoManager* undo_manager = bookmark_undo_service_->undo_manager();
+    undo_manager->Undo();
+}
+
+bool BookmarksAPI::IsEditable(const BookmarkNode* node) const
+{
+    if (!node || (node->type() != BookmarkNode::FOLDER &&
+        node->type() != BookmarkNode::URL)) {
+      return false;
+    }
+    
+    return true; //TODO: Check Prefs
+}
+
 }  // namespace bookmarks
