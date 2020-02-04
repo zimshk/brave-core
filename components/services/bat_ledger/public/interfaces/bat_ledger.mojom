@@ -9,8 +9,8 @@ import "brave/vendor/bat-native-ledger/include/bat/ledger/public/interfaces/ledg
 const string kServiceName = "bat_ledger";
 
 interface BatLedgerService {
-  Create(associated BatLedgerClient bat_ledger_client,
-         associated BatLedger& bat_ledger);
+  Create(pending_associated_remote<BatLedgerClient> bat_ledger_client,
+         pending_associated_receiver<BatLedger> bat_ledger);
   SetEnvironment(ledger.mojom.Environment environment);
   SetDebug(bool isDebug);
   SetReconcileTime(int32 time);

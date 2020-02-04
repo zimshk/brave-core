@@ -8,7 +8,6 @@
 #include <utility>
 
 #include "brave/components/services/bat_ledger/bat_ledger_impl.h"
-#include "mojo/public/cpp/bindings/strong_associated_binding.h"
 
 namespace {
 
@@ -30,11 +29,10 @@ BatLedgerServiceImpl::~BatLedgerServiceImpl() {
 }
 
 void BatLedgerServiceImpl::Create(
-    mojom::BatLedgerClientAssociatedPtrInfo client_info,
-    mojom::BatLedgerAssociatedRequest bat_ledger) {
-  mojo::MakeStrongAssociatedBinding(
-      std::make_unique<BatLedgerImpl>(std::move(client_info)),
-                                      std::move(bat_ledger));
+    mojo::PendingAssociatedRemote<mojom::BatLedgerClient> client_info,
+    mojo::PendingAssociatedReceiver<mojom::BatLedger> bat_ledger) {
+  receivers_.Add(std::make_unique<BatLedgerImpl>(std::move(client_info)),
+                 std::move(bat_ledger));
   initialized_ = true;
 }
 

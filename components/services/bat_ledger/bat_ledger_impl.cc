@@ -23,7 +23,7 @@ using std::placeholders::_3;
 namespace bat_ledger {
 
 BatLedgerImpl::BatLedgerImpl(
-    mojom::BatLedgerClientAssociatedPtrInfo client_info)
+    mojo::PendingAssociatedRemote<mojom::BatLedgerClient> client_info)
   : bat_ledger_client_mojo_proxy_(
       new BatLedgerClientMojoProxy(std::move(client_info))),
     ledger_(

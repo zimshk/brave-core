@@ -17,6 +17,7 @@
 #include "base/memory/weak_ptr.h"
 #include "bat/ledger/ledger.h"
 #include "brave/components/services/bat_ledger/public/interfaces/bat_ledger.mojom.h"
+#include "mojo/public/cpp/bindings/pending_associated_remote.h"
 
 namespace bat_ledger {
 
@@ -25,7 +26,8 @@ class BatLedgerClientMojoProxy;
 class BatLedgerImpl : public mojom::BatLedger,
     public base::SupportsWeakPtr<BatLedgerImpl> {
  public:
-  explicit BatLedgerImpl(mojom::BatLedgerClientAssociatedPtrInfo client_info);
+  explicit BatLedgerImpl(
+      mojo::PendingAssociatedRemote<mojom::BatLedgerClient> client_info);
   ~BatLedgerImpl() override;
 
   // bat_ledger::mojom::BatLedger
