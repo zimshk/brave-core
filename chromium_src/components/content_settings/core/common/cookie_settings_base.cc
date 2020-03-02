@@ -16,5 +16,5 @@
       IsThirdPartyRequest(url, site_for_cookies), nullptr, &content_setting); \
   return IsAllowed(content_setting);
 
-#include "../../../../../components/content_settings/core/common/cookie_settings_base.cc"  // NOLINT
+#include "../../../../../../components/content_settings/core/common/cookie_settings_base.cc"  // NOLINT
 #undef BRAVE_IS_COOKIE_ACCESS_ALLOWED
