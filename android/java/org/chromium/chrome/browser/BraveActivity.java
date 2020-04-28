@@ -26,7 +26,7 @@ import org.chromium.base.ContextUtils;
 import org.chromium.base.annotations.JNINamespace;
 import org.chromium.chrome.R;
 import org.chromium.chrome.browser.BraveHelper;
-//import org.chromium.chrome.browser.BraveSyncWorker;
+import org.chromium.chrome.browser.BraveSyncWorker;
 import org.chromium.chrome.browser.bookmarks.BookmarkBridge;
 import org.chromium.chrome.browser.bookmarks.BookmarkModel;
 import org.chromium.chrome.browser.notifications.BraveSetDefaultBrowserNotificationService;
@@ -71,7 +71,7 @@ public abstract class BraveActivity extends ChromeActivity {
     public static final String BRAVE_BLOG_URL = "http://www.brave.com/blog";
 
     // Sync worker
-    //public BraveSyncWorker mBraveSyncWorker;
+    public BraveSyncWorker mBraveSyncWorker;
 
     @Override
     public void onResumeWithNative() {
@@ -182,9 +182,9 @@ public abstract class BraveActivity extends ChromeActivity {
         BackgroundImagesPreferences.setOnPreferenceValue(BackgroundImagesPreferences.PREF_APP_OPEN_COUNT , appOpenCount + 1);
 
         Context app = ContextUtils.getApplicationContext();
-        // if (null != app && (this instanceof ChromeTabbedActivity)) {
-        //     mBraveSyncWorker = new BraveSyncWorker(app);
-        // }
+        if (null != app && (this instanceof ChromeTabbedActivity)) {
+            mBraveSyncWorker = new BraveSyncWorker(app);
+        }
 
         OnboardingActivity onboardingActivity = null;
         for (Activity ref : ApplicationStatus.getRunningActivities()) {
