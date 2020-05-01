@@ -71,6 +71,9 @@ using RecoverWalletCallback = std::function<void(
     const ledger::Result,
     const double balance)>;
 
+using GetMediaPublisherInfoCallback =
+    std::function<void(const ledger::Result, ledger::PublisherInfoPtr)>;
+
 class LEDGER_EXPORT Ledger {
  public:
   static bool IsMediaLink(const std::string& url,
@@ -286,6 +289,37 @@ class LEDGER_EXPORT Ledger {
   virtual void SaveMediaInfo(const std::string& type,
                              const std::map<std::string, std::string>& data,
                              ledger::PublisherInfoCallback callback) = 0;
+
+  virtual void UpdateMediaDuration(
+      const std::string& media_type,
+      const std::string& media_id,
+      const std::string& media_key,
+      const std::string& url,
+      uint64_t duration) = 0;
+
+  virtual void GetMediaPublisherInfo(
+      const std::string& media_key,
+      GetMediaPublisherInfoCallback callback) = 0;
+
+  virtual void SaveMediaVisitYoutubeChannel(
+      const uint64_t window_id,
+      const std::string& url,
+      const std::string& channel_id,
+      const std::string& publisher_key,
+      const std::string& favicon_url,
+      const std::string& title) = 0;
+
+  virtual void SaveMediaVisitYoutubeUser(
+      const uint64_t window_id,
+      const std::string& url,
+      const std::string& channel_id,
+      const std::string& publisher_key,
+      const std::string& media_key,
+      const std::string& title) = 0;
+
+  virtual void SaveMediaVisitYoutubeWatch(
+      const uint64_t window_id,
+      const std::string& url) = 0;
 
   virtual void SetInlineTippingPlatformEnabled(
       const ledger::InlineTipsPlatforms platform,

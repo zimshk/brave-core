@@ -159,6 +159,37 @@ class BatLedgerImpl :
       const base::flat_map<std::string, std::string>& args,
       SaveMediaInfoCallback callback) override;
 
+  void UpdateMediaDuration(
+      const std::string& media_type,
+      const std::string& media_id,
+      const std::string& media_key,
+      const std::string& url,
+      uint64_t duration) override;
+
+  void GetMediaPublisherInfo(
+      const std::string& media_key,
+      GetMediaPublisherInfoCallback callback) override;
+
+  void SaveMediaVisitYoutubeChannel(
+      const uint64_t window_id,
+      const std::string& url,
+      const std::string& channel_id,
+      const std::string& publisher_key,
+      const std::string& favicon_url,
+      const std::string& title) override;
+
+  void SaveMediaVisitYoutubeUser(
+      const uint64_t window_id,
+      const std::string& url,
+      const std::string& channel_id,
+      const std::string& publisher_key,
+      const std::string& media_key,
+      const std::string& title) override;
+
+  void SaveMediaVisitYoutubeWatch(
+      const uint64_t window_id,
+      const std::string& url) override;
+
   void SetInlineTippingPlatformEnabled(
       const ledger::InlineTipsPlatforms platform,
       bool enabled) override;
@@ -257,6 +288,11 @@ class BatLedgerImpl :
       base::WeakPtr<BatLedgerImpl> client_;
       Callback callback_;
     };
+
+  static void OnMediaPublisherInfo(
+      CallbackHolder<GetMediaPublisherInfoCallback>* holder,
+      const ledger::Result result,
+      ledger::PublisherInfoPtr info);
 
   static void OnGetBalanceReport(
       CallbackHolder<GetBalanceReportCallback>* holder,

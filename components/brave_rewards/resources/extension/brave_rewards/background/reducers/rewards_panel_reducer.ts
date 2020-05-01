@@ -95,12 +95,14 @@ export const rewardsPanelReducer: Reducer<RewardsExtension.State | undefined> = 
       const validKey = publisher && publisher.publisher_key && publisher.publisher_key.length > 0
 
       if (!publisher || (publisher.tabUrl !== tab.url || !validKey)) {
+        /*
         // Invalid publisher for tab, re-fetch publisher.
         chrome.braveRewards.getPublisherData(
           tab.windowId,
           tab.url,
           tab.favIconUrl || '',
           payload.publisherBlob || '')
+        */
 
         if (publisher) {
           delete publishers[id]

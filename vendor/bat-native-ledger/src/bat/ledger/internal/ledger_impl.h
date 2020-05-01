@@ -116,7 +116,7 @@ class LedgerImpl : public ledger::Ledger {
 
   void GetMediaPublisherInfo(
       const std::string& media_key,
-      ledger::PublisherInfoCallback callback);
+      ledger::PublisherInfoCallback callback) override;
 
   void SaveMediaPublisherInfo(
       const std::string& media_key,
@@ -356,6 +356,33 @@ class LedgerImpl : public ledger::Ledger {
   void SaveMediaInfo(const std::string& type,
                      const std::map<std::string, std::string>& data,
                      ledger::PublisherInfoCallback callback) override;
+
+  void UpdateMediaDuration(
+      const std::string& media_type,
+      const std::string& media_id,
+      const std::string& media_key,
+      const std::string& url,
+      uint64_t duration) override;
+
+  void SaveMediaVisitYoutubeChannel(
+      const uint64_t window_id,
+      const std::string& url,
+      const std::string& channel_id,
+      const std::string& publisher_key,
+      const std::string& favicon_url,
+      const std::string& title) override;
+
+  void SaveMediaVisitYoutubeUser(
+      const uint64_t window_id,
+      const std::string& url,
+      const std::string& channel_id,
+      const std::string& publisher_key,
+      const std::string& media_key,
+      const std::string& title) override;
+
+  void SaveMediaVisitYoutubeWatch(
+      const uint64_t window_id,
+      const std::string& url) override;
 
   void SetInlineTippingPlatformEnabled(
       const ledger::InlineTipsPlatforms platform,

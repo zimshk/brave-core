@@ -155,6 +155,32 @@ class MockRewardsService : public RewardsService {
              void(const std::string&,
                   const std::map<std::string, std::string>&,
                   brave_rewards::SaveMediaInfoCallback));
+  MOCK_METHOD5(UpdateMediaDuration, void(
+      const std::string&,
+      const std::string&,
+      const std::string&,
+      const std::string&,
+      uint64_t duration));
+  MOCK_METHOD2(GetMediaPublisherInfo, void(
+      const std::string&,
+      brave_rewards::GetMediaPublisherInfoCallback callback));
+  MOCK_METHOD6(SaveMediaVisitYoutubeChannel, void(
+      const uint64_t,
+      const std::string&,
+      const std::string&,
+      const std::string&,
+      const std::string&,
+      const std::string&));
+  MOCK_METHOD6(SaveMediaVisitYoutubeUser, void(
+      const uint64_t,
+      const std::string&,
+      const std::string&,
+      const std::string&,
+      const std::string&,
+      const std::string&));
+  MOCK_METHOD2(SaveMediaVisitYoutubeWatch, void(
+      const uint64_t,
+      const std::string&));
   MOCK_METHOD2(SetInlineTippingPlatformEnabled,
              void(const std::string& key, bool enabled));
   MOCK_METHOD2(GetInlineTippingPlatformEnabled,
