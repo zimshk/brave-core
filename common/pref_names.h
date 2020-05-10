@@ -64,6 +64,7 @@ extern const char kBraveWalletEnabledDeprecated[];
 extern const char kBraveWalletPrefVersion[];
 extern const char kBraveWalletWeb3Provider[];
 extern const char kAlwaysShowBookmarkBarOnNTP[];
+extern const char kMRUCyclingEnabled[];
 extern const char kRemoteDebuggingEnabled[];
 extern const char kAutocompleteEnabled[];
 extern const char kTopSiteSuggestionsEnabled[];
@@ -77,7 +78,6 @@ extern const char kBinanceRefreshToken[];
 extern const char kBraveGCMChannelStatus[];
 #endif
 extern const char kImportDialogExtensions[];
-extern const char kMRUCyclingEnabled[];
 
 #if defined(OS_ANDROID)
 extern const char kDesktopModeEnabled[];
