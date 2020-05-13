@@ -1,17 +1,16 @@
 diff --git a/components/sync/android/java/src/org/chromium/components/sync/AndroidSyncSettings.java b/components/sync/android/java/src/org/chromium/components/sync/AndroidSyncSettings.java
-index 84a8b66912a2f6847771486e62556b772c192fd2..b66f68589fb11cda455a86d8400feb3ac2a0f083 100644
+index 84a8b66912a2f6847771486e62556b772c192fd2..e46ec14d76d990ebe85420cad4d44d55c78fa154 100644
 --- a/components/sync/android/java/src/org/chromium/components/sync/AndroidSyncSettings.java
 +++ b/components/sync/android/java/src/org/chromium/components/sync/AndroidSyncSettings.java
-@@ -77,7 +77,7 @@ public class AndroidSyncSettings {
+@@ -77,6 +77,7 @@ public class AndroidSyncSettings {
              if (sInstance == null) {
                  SyncContentResolverDelegate contentResolver =
                          new SystemSyncContentResolverDelegate();
--                sInstance = new AndroidSyncSettings(contentResolver);
-+                sInstance = new BraveAndroidSyncSettings(contentResolver);
++                //sInstance = new BraveAndroidSyncSettings(contentResolver);
+                 sInstance = new AndroidSyncSettings(contentResolver);
              }
              return sInstance;
-         }
-@@ -103,7 +103,7 @@ public class AndroidSyncSettings {
+@@ -103,7 +104,7 @@ public class AndroidSyncSettings {
       * @param callback Callback that will be called after updating account is finished. Boolean
       *                 passed to the callback indicates whether syncability was changed.
       */
