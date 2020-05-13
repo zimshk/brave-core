@@ -57,7 +57,8 @@ namespace {
 const char kBraveSyncServiceURL[] = "https://sync-v2.brave.com/v2";
 #else
 // dev
-const char kBraveSyncServiceURL[] = "http://localhost:8295/v2";
+//const char kBraveSyncServiceURL[] = "http://localhost:8295/v2";
+const char kBraveSyncServiceURL[] = "http://192.168.0.175:8295/v2";
 // const char kBraveSyncServiceURL[] = "https://sync-v2.brave.software/v2";
 #endif
 }  // namespace
