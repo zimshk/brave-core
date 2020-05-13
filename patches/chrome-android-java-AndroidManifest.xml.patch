@@ -1,5 +1,5 @@
 diff --git a/chrome/android/java/AndroidManifest.xml b/chrome/android/java/AndroidManifest.xml
-index 8cd1fb84e55c6fb971db3441fa41bd7460ed738e..369cd188698f05263ce2cbe20971049a5812afcc 100644
+index 8cd1fb84e55c6fb971db3441fa41bd7460ed738e..23f902993e2a3c8ff4476a3111cf908a3a08e3f1 100644
 --- a/chrome/android/java/AndroidManifest.xml
 +++ b/chrome/android/java/AndroidManifest.xml
 @@ -34,7 +34,9 @@ by a child template that "extends" this file.
@@ -26,10 +26,10 @@ index 8cd1fb84e55c6fb971db3441fa41bd7460ed738e..369cd188698f05263ce2cbe20971049a
      <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
      <uses-permission android:name="android.permission.NFC"/>
      <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-+<!--
++<!-- -->
      <uses-permission android:name="android.permission.READ_SYNC_SETTINGS"/>
      <uses-permission android:name="android.permission.READ_SYNC_STATS"/>
-+-->
++<!-- -->
      <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
      <uses-permission android:name="android.permission.RECORD_AUDIO"/>
 +<!--
@@ -39,9 +39,9 @@ index 8cd1fb84e55c6fb971db3441fa41bd7460ed738e..369cd188698f05263ce2cbe20971049a
      <uses-permission android:name="android.permission.VIBRATE"/>
      <uses-permission android:name="android.permission.WAKE_LOCK"/>
      <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-+<!--
++<!-- -->
      <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS"/>
-+-->
++<!-- -->
      {% set enable_vr = enable_vr|default(0) %}
      {% if enable_vr == "true" %}
      <!-- Indicates use of Android's VR-mode, available only on Android N+. -->
