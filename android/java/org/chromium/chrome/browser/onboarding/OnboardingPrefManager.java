@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Provides information regarding onboarding enabled states.
+ * Provides information regarding onboarding.
  */
 public class OnboardingPrefManager {
     private static final String PREF_ONBOARDING = "onboarding";
@@ -43,6 +43,13 @@ public class OnboardingPrefManager {
     public static final int NEW_USER_ONBOARDING = 0;
     public static final int EXISTING_USER_REWARDS_OFF_ONBOARDING = 1;
     public static final int EXISTING_USER_REWARDS_ON_ONBOARDING = 2;
+
+    public static final String ONBOARDING_TYPE = "onboarding_type";
+
+    public static final int ONBOARDING_INVALID_OPTION = -1;
+    public static final int ONBOARDING_ADS = 1;
+    public static final int ONBOARDING_DATA_SAVED = 2;
+    public static final int ONBOARDING_TIME = 3;
 
     private static boolean isOnboardingNotificationShown;
 
