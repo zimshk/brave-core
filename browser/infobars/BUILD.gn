@@ -2,6 +2,7 @@ import("//build/config/features.gni")
 import("//brave/components/brave_wayback_machine/buildflags/buildflags.gni")
 import("//brave/components/brave_wallet/browser/buildflags/buildflags.gni")
 import("//brave/components/brave_sync/buildflags/buildflags.gni")
+import("//brave/components/ipfs/browser/buildflags/buildflags.gni")
 
 source_set("infobars") {
   sources = [
@@ -13,6 +14,13 @@ source_set("infobars") {
     sources += [
       "crypto_wallets_infobar_delegate.cc",
       "crypto_wallets_infobar_delegate.h",
+    ]
+  }
+
+  if (ipfs_enabled) {
+    sources += [
+      "ipfs_infobar_delegate.cc",
+      "ipfs_infobar_delegate.h",
     ]
   }
 
