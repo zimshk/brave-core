@@ -1067,7 +1067,7 @@ Log.e(TAG, "[BraveSync] GetCodephrase 000 mCodephrase="+mCodephrase);
     if (mCodephrase == null || mCodephrase.isEmpty()) {
       BraveActivity mainActivity = BraveActivity.getBraveActivity();
 Log.e(TAG, "[BraveSync] GetCodephrase - ask mainActivity.mBraveSyncWorker");
-      mCodephrase = mainActivity.mBraveSyncWorker.GetCodephrase2();
+      mCodephrase = mainActivity.mBraveSyncWorker.GetCodephrase();
 Log.e(TAG, "[BraveSync] GetCodephrase 003");
     }
 Log.e(TAG, "[BraveSync] GetCodephrase mCodephrase="+mCodephrase);

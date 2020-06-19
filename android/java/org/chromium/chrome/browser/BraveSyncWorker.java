@@ -164,7 +164,7 @@ Log.e(TAG, "[BraveSync] BraveSyncWorker.CTOR");
         }
     };
 
-    public String GetCodephrase2() {
+    public String GetCodephrase() {
       String codephrase = nativeGetSyncCodeWords(mNativeBraveSyncWorker);
 Log.e(TAG, "[BraveSync] GetCodephrase codephrase="+codephrase);
       return codephrase;
