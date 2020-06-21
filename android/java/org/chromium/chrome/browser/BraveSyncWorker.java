@@ -145,6 +145,7 @@ Log.e(TAG, "[BraveSync] BraveSyncWorker.CTOR");
                   .remove(PREF_LAST_ORDER)
                   .remove(PREF_SYNC_DEVICE_NAME)
                   .apply();
+            // old Keep PREF_SEED just in case
         }
 
         private void DeleteSyncV1LevelDb() {
@@ -159,6 +160,14 @@ Log.e(TAG, "[BraveSync] BraveSyncWorker.CTOR");
                 if (HaveSyncV1Prefs()) {
                     DeleteSyncV1Prefs();
                     DeleteSyncV1LevelDb();
+                    // Mark sync v1 was enabled to trigger informers
+                    ThreadUtils.runOnUiThreadBlocking(
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                nativeMarkSyncV1WasEnabledAndMigrated();
+                            }
+                    });
                 }
             });
         }
@@ -216,7 +225,7 @@ Log.e(TAG, "[BraveSync] HandleReset 000");
     private native void nativeDestroy(long nativeBraveSyncWorker);
 
     private native void nativeDestroyV1LevelDb();
-
+    private native void nativeMarkSyncV1WasEnabledAndMigrated();
 
     private native String nativeGetSyncCodeWords(long nativeBraveSyncWorker);
     private native void nativeHandleShowSetupUI(long nativeBraveSyncWorker);

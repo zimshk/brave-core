@@ -26,6 +26,8 @@
 #include "components/sync/driver/sync_user_settings.h"
 #include "components/unified_consent/unified_consent_metrics.h"
 
+#include "content/public/browser/browser_thread.h"
+
 #include "third_party/leveldatabase/src/include/leveldb/db.h"
 
 namespace {
@@ -70,6 +72,16 @@ static void JNI_BraveSyncWorker_DestroyV1LevelDb(JNIEnv* env,
   leveldb::Status status = leveldb::DestroyDB(dbFilePath.value().c_str(),
     leveldb::Options());
   DLOG(INFO) << "[BraveSync] " << __func__ << " destroy DB status is "<<status.ToString();
+}
+
+static void JNI_BraveSyncWorker_MarkSyncV1WasEnabledAndMigrated(JNIEnv* env,
+        const base::android::JavaParamRef<jobject>& obj) {
+  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
+  Profile* profile =
+      ProfileManager::GetActiveUserProfile()->GetOriginalProfile();
+  brave_sync::Prefs brave_sync_prefs(profile->GetPrefs());
+  brave_sync_prefs.SetSyncV1WasEnabled();
+  brave_sync_prefs.SetSyncV1Migrated(true);
 }
 
 base::android::ScopedJavaLocalRef<jstring> BraveSyncWorker::GetSyncCodeWords
