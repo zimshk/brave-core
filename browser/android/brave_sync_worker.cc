@@ -30,6 +30,14 @@
 
 #include "third_party/leveldatabase/src/include/leveldb/db.h"
 
+// TODO(alexeybarabash): consider use of java ProfileSyncService methods:
+//    addSyncStateChangedListener
+//    removeSyncStateChangedListener
+//    requestStart
+//    requestStop
+//    setFirstSetupComplete
+//    isFirstSetupComplete
+
 namespace {
   static const size_t SEED_BIP39_WORD_COUNT = 24u;
   static const size_t SEED_BYTES_COUNT = 32u;
@@ -120,68 +128,23 @@ DLOG(ERROR) << "[BraveSync] " << __func__ << " 000 str_passphrase="<<str_passphr
   brave_sync_prefs.SetSeed(str_passphrase);
 }
 
-// See PeopleHandler::GetSyncService()
 syncer::SyncService* BraveSyncWorker::GetSyncService() const {
-DLOG(ERROR) << "[BraveSync] " << __func__ << " ProfileSyncServiceFactory::IsSyncAllowed(profile_)="<<ProfileSyncServiceFactory::IsSyncAllowed(profile_);
-if (ProfileSyncServiceFactory::IsSyncAllowed(profile_)) {
-DLOG(ERROR) << "[BraveSync] " << __func__ << " ProfileSyncServiceFactory::GetForProfile(profile_)="<<ProfileSyncServiceFactory::GetForProfile(profile_);
-}
   return ProfileSyncServiceFactory::IsSyncAllowed(profile_)
              ? ProfileSyncServiceFactory::GetForProfile(profile_)
              : nullptr;
 }
 
-// See PeopleHandler::HandleShowSetupUI
-void BraveSyncWorker::HandleShowSetupUI(JNIEnv* env,
+// Most of methods below were taken from by PeopleHandler class to
+// bring logic of enablind / disabling sync from deskop to Android
+
+void BraveSyncWorker::RequestSync(JNIEnv* env,
   const base::android::JavaParamRef<jobject>& jcaller) {
-DLOG(ERROR) << "[BraveSync] " << __func__ << " 000";
   syncer::SyncService* service =
         ProfileSyncServiceFactory::GetForProfile(profile_);
 
   if (service && !sync_service_observer_.IsObserving(service)) {
     sync_service_observer_.Add(service);
   }
-/*
-sync state observer
-
-src/chrome/android/java/src/org/chromium/chrome/browser/sync/ProfileSyncService.java
-
-bool ProfileSyncServiceAndroid::Init() {
-  if (sync_service_) {
-    sync_service_->AddObserver(this);
-    return true;
-
-<=
-
-public void addSyncStateChangedListener(SyncStateChangedListener listener) {
-    ThreadUtils.assertOnUiThread();
-    mListeners.add(listener);
-}
-
-public void removeSyncStateChangedListener(SyncStateChangedListener listener) {
-    ThreadUtils.assertOnUiThread();
-    mListeners.remove(listener);
-}
-
-<=
-
-
-ProfileSyncService.get().addSyncStateChangedListener(this);
-@Override
-public void syncStateChanged() {
-    if (mType != getSyncErrorInfoBarType()) {
-        onCloseButtonClicked();
-    }
-}
-
-
-
-*/
-
-
-
-  // TODO, AB: call SetSyncRequested(true) and sync_service_observer_ must be set and only if sync is not enabled
-  // The point when it is invoked when sync is enabled is above on the stack
 
   // Mark Sync as requested by the user. It might already be requested, but
   // it's not if this is either the first time the user is setting up Sync, or
@@ -190,111 +153,55 @@ public void syncStateChanged() {
   if (service) {
     service->GetUserSettings()->SetSyncRequested(true);
   }
-
-  /* TODO: look on
-  void ProfileSyncServiceAndroid::RequestStart(JNIEnv* env,
-                                               const JavaParamRef<jobject>&) {
-    DCHECK_CURRENTLY_ON(BrowserThread::UI);
-    sync_service_->GetUserSettings()->SetSyncRequested(true);
-  }
-  <=
-  public void requestStart()
-  <=
-  src/chrome/android/java/src/org/chromium/chrome/browser/sync/settings/SyncSettingsUtils.java
-  public static void enableSync(boolean enable) {
-      ProfileSyncService profileSyncService = ProfileSyncService.get();
-      if (enable == profileSyncService.isSyncRequested()) return;
-
-      if (enable) {
-          profileSyncService.requestStart();
-      } else {
-          RecordHistogram.recordEnumeratedHistogram("Sync.StopSource",
-                  StopSource.CHROME_SYNC_SETTINGS, StopSource.STOP_SOURCE_LIMIT);
-          profileSyncService.requestStop();
-      }
-  }
-  or
-
-
-
-  */
 }
 
-// See PeopleHandler::MarkFirstSetupComplete
 void BraveSyncWorker::MarkFirstSetupComplete() {
-DLOG(ERROR) << "[BraveSync] " << __func__ << " 000";
   syncer::SyncService* service = GetSyncService();
-DLOG(ERROR) << "[BraveSync] " << __func__ << " service="<<service;
+
   // The sync service may be nullptr if it has been just disabled by policy.
   if (!service)
     return;
-DLOG(ERROR) << "[BraveSync] " << __func__ << " 001";
+
   service->GetUserSettings()->SetSyncRequested(true);
 
   // If the first-time setup is already complete, there's nothing else to do.
   if (service->GetUserSettings()->IsFirstSetupComplete())
     return;
-DLOG(ERROR) << "[BraveSync] " << __func__ << " 002";
+
   unified_consent::metrics::RecordSyncSetupDataTypesHistrogam(
       service->GetUserSettings(), profile_->GetPrefs());
-DLOG(ERROR) << "[BraveSync] " << __func__ << " 003";
+
   // We're done configuring, so notify SyncService that it is OK to start
   // syncing.
   service->GetUserSettings()->SetFirstSetupComplete(
       syncer::SyncFirstSetupCompleteSource::ADVANCED_FLOW_CONFIRM);
-  //FireWebUIListener("sync-settings-saved");
-DLOG(ERROR) << "[BraveSync] " << __func__ << " 004";
 }
 
-// PeopleHandler::OnDidClosePage // TODO, AB: rename
-void BraveSyncWorker::OnDidClosePage(JNIEnv* env,
+void BraveSyncWorker::FinalizeSyncSetup(JNIEnv* env,
   const base::android::JavaParamRef<jobject>& jcaller) {
-DLOG(ERROR) << "[BraveSync] " << __func__ << " 000";
   MarkFirstSetupComplete();
 }
 
 bool BraveSyncWorker::IsFirstSetupComplete(JNIEnv* env,
   const base::android::JavaParamRef<jobject>& jcaller) {
-/* TODO: look on
-jboolean ProfileSyncServiceAndroid::IsFirstSetupComplete(
-    JNIEnv* env,
-    const JavaParamRef<jobject>& obj) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
-  return sync_service_->GetUserSettings()->IsFirstSetupComplete();
-}
-*/
   syncer::SyncService* sync_service = GetSyncService();
-  DLOG(ERROR) << "[BraveSync] " << __func__ << " will ret " <<
-      (sync_service && sync_service->GetUserSettings()->IsFirstSetupComplete());
   return sync_service &&
       sync_service->GetUserSettings()->IsFirstSetupComplete();
 }
 
-void BraveSyncWorker::HandleReset(JNIEnv* env,
+void BraveSyncWorker::ResetSync(JNIEnv* env,
   const base::android::JavaParamRef<jobject>& jcaller) {
-  // PeopleHandler::HandleReset
-DLOG(ERROR) << "[BraveSync] " << __func__ << " 000";
   syncer::SyncService* sync_service = GetSyncService();
-DLOG(ERROR) << "[BraveSync] " << __func__ << " sync_service=" << sync_service;
   if (sync_service) {
     if (sync_service_observer_.IsObserving(sync_service)) {
       sync_service_observer_.Remove(sync_service);
     }
 
-/* TODO: look on
-void ProfileSyncServiceAndroid::RequestStop(JNIEnv* env,
-                                            const JavaParamRef<jobject>&) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
-  sync_service_->GetUserSettings()->SetSyncRequested(false);
-}
-*/
     sync_service->GetUserSettings()->SetSyncRequested(false);
     sync_service->StopAndClear();
   }
   brave_sync::Prefs brave_sync_prefs(profile_->GetPrefs());
-DLOG(ERROR) << "[BraveSync] " << __func__ << " invoke brave_sync_prefs.Clear()";
   brave_sync_prefs.Clear();
-
   // Sync prefs will be clear in ProfileSyncService::StopImpl
 }
 
@@ -316,55 +223,53 @@ SyncConfigInfo::SyncConfigInfo()
 
 SyncConfigInfo::~SyncConfigInfo() {}
 
+// Return false if we are not interested configure encryption
+bool FillSyncConfigInfo(syncer::SyncService* service,
+    SyncConfigInfo* configuration,
+    const std::string& passphrase) {
+  bool first_setup_in_progress = service &&
+          !service->GetUserSettings()->IsFirstSetupComplete();
+
+  configuration->encrypt_all =
+      service->GetUserSettings()->IsEncryptEverythingEnabled();
+
+  bool sync_prefs_passphrase_required =
+      service->GetUserSettings()->IsPassphraseRequired();
+
+  if (!first_setup_in_progress) {
+    if (!configuration->encrypt_all) {
+      configuration->encrypt_all = true;
+      configuration->set_new_passphrase = true;
+      DCHECK_NE(passphrase.size(), 0u);
+      configuration->passphrase = passphrase;
+    } else if (sync_prefs_passphrase_required) {
+      configuration->set_new_passphrase = false;
+      DCHECK_NE(passphrase.size(), 0u);
+      configuration->passphrase = passphrase;
+    } else {
+      return false;
+    }
+  }
+  return true;
+}
+
 }
 
 void BraveSyncWorker::OnStateChanged(syncer::SyncService* sync) {
+  // Fill SyncConfigInfo as it is done in brave_sync_subpage.js:handleSyncPrefsChanged_
+  // And then configure encryption as in  PeopleHandler::HandleSetEncryption
+
   SyncConfigInfo configuration;
 
-  // Inspired by PeopleHandler::HandleSetEncryption
-  // Start configuring the SyncService using the configuration passed to us from
-  // the JS layer.
   syncer::SyncService* service = GetSyncService();
 
-  // If the sync engine has shutdown for some reason, just close the sync
-  // dialog.
+  // If the sync engine has shutdown for some reason, just give up
   if (!service || !service->IsEngineInitialized()) {
-    // CloseSyncSetup();
-    // ResolveJavascriptCallback(*callback_id, base::Value(kDonePageStatus));
     return;
   }
 
-  // syncStatus.firstSetupInProgress
-  // BRAVE_GET_SYNC_STATUS_DICTIONARY:
-  bool firstSetupInProgress = service &&
-          !service->GetUserSettings()->IsFirstSetupComplete();
-
-  // this.syncPrefs.encryptAllData
-  // PeopleHandler::PushSyncPrefs
-  // sync_user_settings->IsEncryptEverythingEnabled()
-  configuration.encrypt_all =
-      service->GetUserSettings()->IsEncryptEverythingEnabled();
-
-  // this.syncPrefs.passphraseRequired
-  // PeopleHandler::PushSyncPrefs
-  // sync_user_settings->IsPassphraseRequired()
-  bool syncPrefs_passphraseRequired =
-      service->GetUserSettings()->IsPassphraseRequired();
-
-  // Inspired by brave_sync_subpage.js:handleSyncPrefsChanged_
-  if (!firstSetupInProgress) {
-    if (!configuration.encrypt_all) {
-      configuration.encrypt_all = true;
-      configuration.set_new_passphrase = true;
-      DCHECK_NE(this->passphrase_.size(), 0u);
-      configuration.passphrase = this->passphrase_;
-    } else if (syncPrefs_passphraseRequired) {
-      configuration.set_new_passphrase = false;
-      DCHECK_NE(this->passphrase_.size(), 0u);
-      configuration.passphrase = this->passphrase_;
-    } else {
-      return;
-    }
+  if (!FillSyncConfigInfo(service, &configuration, this->passphrase_)) {
+    return;
   }
 
   // Don't allow "encrypt all" if the SyncService doesn't allow it.
@@ -414,17 +319,7 @@ void BraveSyncWorker::OnStateChanged(syncer::SyncService* sync) {
 
   if (passphrase_failed ||
       service->GetUserSettings()->IsPassphraseRequiredForPreferredDataTypes()) {
-    // If the user doesn't enter any passphrase, we won't call
-    // SetDecryptionPassphrase() (passphrase_failed == false), but we still
-    // want to display an error message to let the user know that their blank
-    // passphrase entry is not acceptable.
-
-    // TODO(tommycli): Switch this to RejectJavascriptCallback once the
-    // Sync page JavaScript has been further refactored.
-//    ResolveJavascriptCallback(*callback_id,
-//                              base::Value(kPassphraseFailedPageStatus));
-  } else {
-//    ResolveJavascriptCallback(*callback_id, base::Value(kConfigurePageStatus));
+    LOG(WARNING) << __func__ << " setup passphrase failed";
   }
 
   if (configuration.encrypt_all)
@@ -436,7 +331,6 @@ void BraveSyncWorker::OnStateChanged(syncer::SyncService* sync) {
 static void JNI_BraveSyncWorker_Init(
     JNIEnv* env,
     const base::android::JavaParamRef<jobject>& jcaller) {
-DLOG(ERROR) << "[BraveSync] " << __func__ << " 000";
   new BraveSyncWorker(env, jcaller);
 }
 
@@ -444,21 +338,20 @@ base::android::ScopedJavaLocalRef<jstring> JNI_BraveSyncWorker_GetSeedHexFromWor
   JNIEnv* env,
   const base::android::JavaParamRef<jobject>& jcaller,
   const base::android::JavaParamRef<jstring>& seed_words) {
-DLOG(ERROR) << "[BraveSync] " << __func__ << " 000";
   std::string str_seed_words = base::android::ConvertJavaStringToUTF8(
         seed_words);
   DCHECK(!str_seed_words.empty());
-DLOG(ERROR) << "[BraveSync] " << __func__ << " str_seed_words="<<str_seed_words;
+
   std::string sync_code_hex;
   std::vector<uint8_t> bytes;
   if (brave_sync::crypto::PassphraseToBytes32(str_seed_words, &bytes)) {
     DCHECK_EQ(bytes.size(), SEED_BYTES_COUNT);
     sync_code_hex = base::HexEncode(&bytes.at(0), bytes.size());
   } else {
-    DLOG(WARNING) << "[BraveSync] " << __func__ <<
+    LOG(WARNING) << __func__ <<
         " PassphraseToBytes32 failed for " << str_seed_words;
   }
-DLOG(ERROR) << "[BraveSync] " << __func__ << " sync_code_hex="<<sync_code_hex;
+
   return base::android::ConvertUTF8ToJavaString(env, sync_code_hex);
 }
 
@@ -466,11 +359,11 @@ base::android::ScopedJavaLocalRef<jstring> JNI_BraveSyncWorker_GetWordsFromSeedH
   JNIEnv* env,
   const base::android::JavaParamRef<jobject>& jcaller,
   const base::android::JavaParamRef<jstring>& seed_hex) {
-DLOG(ERROR) << "[BraveSync] " << __func__ << " 000";
+
   std::string str_seed_hex = base::android::ConvertJavaStringToUTF8(
         seed_hex);
   DCHECK(!str_seed_hex.empty());
-DLOG(ERROR) << "[BraveSync] " << __func__ << " str_seed_hex="<<str_seed_hex;
+
   std::vector<uint8_t> bytes;
   std::string sync_code_words;
   if (base::HexStringToBytes(str_seed_hex, &bytes)) {
@@ -490,10 +383,10 @@ DLOG(ERROR) << "[BraveSync] " << __func__ << " str_seed_hex="<<str_seed_hex;
     }
     DCHECK_NE(sync_code_words, "");
   } else {
-    DLOG(WARNING) << "[BraveSync] " << __func__ <<
+    LOG(WARNING) << __func__ <<
         " HexStringToBytes failed for " << str_seed_hex;
   }
-DLOG(ERROR) << "[BraveSync] " << __func__ << " sync_code_words="<<sync_code_words;
+
   return base::android::ConvertUTF8ToJavaString(env, sync_code_words);
 }
 

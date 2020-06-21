@@ -36,16 +36,16 @@ class BraveSyncWorker : public syncer::SyncServiceObserver {
     const base::android::JavaParamRef<jobject>& jcaller,
     const base::android::JavaParamRef<jstring>& passphrase);
 
-  void HandleShowSetupUI(JNIEnv* env,
+  void RequestSync(JNIEnv* env,
     const base::android::JavaParamRef<jobject>& jcaller);
 
-  void OnDidClosePage(JNIEnv* env,
+  void FinalizeSyncSetup(JNIEnv* env,
     const base::android::JavaParamRef<jobject>& jcaller);
 
   bool IsFirstSetupComplete(JNIEnv* env,
     const base::android::JavaParamRef<jobject>& jcaller);
 
-  void HandleReset(JNIEnv* env,
+  void ResetSync(JNIEnv* env,
     const base::android::JavaParamRef<jobject>& jcaller);
 
  private:

@@ -200,25 +200,20 @@ Log.e(TAG, "[BraveSync] GetWordsFromSeedHex words="+words);
       return words;
     }
 
-    public void HandleShowSetupUI() {
-Log.e(TAG, "[BraveSync] HandleShowSetupUI 000");
-      nativeHandleShowSetupUI(mNativeBraveSyncWorker);
+    public void RequestSync() {
+      nativeRequestSync(mNativeBraveSyncWorker);
     }
 
     public boolean IsFirstSetupComplete() {
-Log.e(TAG, "[BraveSync] IsFirstSetupComplete 000");
       return nativeIsFirstSetupComplete(mNativeBraveSyncWorker);
     }
 
-    // TODO(alexeybarabash): rename
-    public void OnDidClosePage() {
-Log.e(TAG, "[BraveSync] OnDidClosePage 000");
-      nativeOnDidClosePage(mNativeBraveSyncWorker);
+    public void FinalizeSyncSetup() {
+      nativeFinalizeSyncSetup(mNativeBraveSyncWorker);
     }
 
-    public void HandleReset() {
-Log.e(TAG, "[BraveSync] HandleReset 000");
-      nativeHandleReset(mNativeBraveSyncWorker);
+    public void ResetSync() {
+      nativeResetSync(mNativeBraveSyncWorker);
     }
 
     private native void nativeInit();
@@ -228,15 +223,15 @@ Log.e(TAG, "[BraveSync] HandleReset 000");
     private native void nativeMarkSyncV1WasEnabledAndMigrated();
 
     private native String nativeGetSyncCodeWords(long nativeBraveSyncWorker);
-    private native void nativeHandleShowSetupUI(long nativeBraveSyncWorker);
+    private native void nativeRequestSync(long nativeBraveSyncWorker);
 
     private native String nativeGetSeedHexFromWords(String passphrase);
     private native String nativeGetWordsFromSeedHex(String seedHex);
     private native void nativeSaveCodeWords(long nativeBraveSyncWorker, String passphrase);
 
-    private native void nativeOnDidClosePage(long nativeBraveSyncWorker);
+    private native void nativeFinalizeSyncSetup(long nativeBraveSyncWorker);
 
     private native boolean nativeIsFirstSetupComplete(long nativeBraveSyncWorker);
 
-    private native void nativeHandleReset(long nativeBraveSyncWorker);
+    private native void nativeResetSync(long nativeBraveSyncWorker);
 }

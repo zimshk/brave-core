@@ -329,8 +329,7 @@ Log.e(TAG, "[BraveSync] onDevicesAvailable device.mName="+device.mName);
 
       BraveActivity mainActivity = BraveActivity.getBraveActivity();
       if (null != mainActivity && null != mainActivity.mBraveSyncWorker) {
-          // TODO(alexeybarabash): need to split sync state observer
-          mainActivity.mBraveSyncWorker.HandleShowSetupUI();
+          mainActivity.mBraveSyncWorker.RequestSync();
       }
 
       mScrollViewSyncInitial = (ScrollView) getView().findViewById(R.id.view_sync_initial);
@@ -721,7 +720,7 @@ Log.e(TAG, "seedWordsReceived seedWords="+seedWords);
       BraveActivity mainActivity = BraveActivity.getBraveActivity();
       if (null != mainActivity && null != mainActivity.mBraveSyncWorker) {
           mainActivity.mBraveSyncWorker.SaveCodephrase(seedWords);
-          mainActivity.mBraveSyncWorker.OnDidClosePage();
+          mainActivity.mBraveSyncWorker.FinalizeSyncSetup();
       }
   }
 
@@ -961,7 +960,7 @@ Log.e(TAG, "[BraveSync] deleteDeviceDialog.onClick BUTTON_POSITIVE");
                     BraveActivity mainActivity = BraveActivity.getBraveActivity();
                     if (null != mainActivity && null != mainActivity.mBraveSyncWorker) {
                         if (deviceToDelete.mIsCurrentDevice) {
-                            mainActivity.mBraveSyncWorker.HandleReset();
+                            mainActivity.mBraveSyncWorker.ResetSync();
                             InvalidateCodephrase();
 
                             try {
@@ -1223,7 +1222,7 @@ Log.e(TAG, "[BraveSync] setSyncDoneLayout 000");
       BraveActivity mainActivity = BraveActivity.getBraveActivity();
       assert (null != mainActivity && null != mainActivity.mBraveSyncWorker);
       mainActivity.mBraveSyncWorker.SaveCodephrase(GetCodephrase());
-      mainActivity.mBraveSyncWorker.OnDidClosePage();
+      mainActivity.mBraveSyncWorker.FinalizeSyncSetup();
 
 Log.e(TAG, "[BraveSync] BraveSyncScreensPreference.setSyncDoneLayout deviceInfoObserverSet="+deviceInfoObserverSet);
       if (!deviceInfoObserverSet) {
