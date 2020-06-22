@@ -52,14 +52,12 @@ namespace android {
 BraveSyncWorker::BraveSyncWorker(JNIEnv* env,
   const base::android::JavaRef<jobject>& obj) :
   weak_java_brave_sync_worker_(env, obj) {
-  DLOG(ERROR) << "[BraveSync] " << __func__ << " CTOR 000";
 
   Java_BraveSyncWorker_setNativePtr(env, obj,
     reinterpret_cast<intptr_t>(this));
-  DLOG(ERROR) << "[BraveSync] " << __func__ << " CTOR done setNativePtr";
+
   profile_ =
       ProfileManager::GetActiveUserProfile()->GetOriginalProfile();
-  DLOG(ERROR) << "[BraveSync] " << __func__ << " profile_="<<profile_;
   DCHECK_NE(profile_, nullptr);
 }
 
@@ -79,7 +77,7 @@ static void JNI_BraveSyncWorker_DestroyV1LevelDb(JNIEnv* env,
 
   leveldb::Status status = leveldb::DestroyDB(dbFilePath.value().c_str(),
     leveldb::Options());
-  DLOG(INFO) << "[BraveSync] " << __func__ << " destroy DB status is "<<status.ToString();
+  VLOG(3) << "[BraveSync] " << __func__ << " destroy DB status is "<<status.ToString();
 }
 
 static void JNI_BraveSyncWorker_MarkSyncV1WasEnabledAndMigrated(JNIEnv* env,
@@ -90,20 +88,19 @@ static void JNI_BraveSyncWorker_MarkSyncV1WasEnabledAndMigrated(JNIEnv* env,
   brave_sync::Prefs brave_sync_prefs(profile->GetPrefs());
   brave_sync_prefs.SetSyncV1WasEnabled();
   brave_sync_prefs.SetSyncV1Migrated(true);
+  VLOG(3) << "[BraveSync] " << __func__ << " done";
 }
 
 base::android::ScopedJavaLocalRef<jstring> BraveSyncWorker::GetSyncCodeWords
       (JNIEnv* env,
       const base::android::JavaParamRef<jobject>& jcaller) {
-DLOG(ERROR) << "[BraveSync] " << __func__ << " 000 profile_="<<profile_;
-
   brave_sync::Prefs brave_sync_prefs(profile_->GetPrefs());
   std::string sync_code = brave_sync_prefs.GetSeed();
-DLOG(ERROR) << "[BraveSync] " << __func__ << " sync_code=" << sync_code;
+
   if (sync_code.empty()) {
     std::vector<uint8_t> seed = brave_sync::crypto::GetSeed();
     sync_code = brave_sync::crypto::PassphraseFromBytes32(seed);
-DLOG(ERROR) << "[BraveSync] " << __func__ << " sync_code=" << sync_code;
+    VLOG(3) << "[BraveSync] " << __func__ << " generated new sync code";
   }
 
   return base::android::ConvertUTF8ToJavaString(env, sync_code);
@@ -113,7 +110,6 @@ void BraveSyncWorker::SaveCodeWords(JNIEnv* env,
   const base::android::JavaParamRef<jobject>& jcaller,
   const base::android::JavaParamRef<jstring>& passphrase) {
   std::string str_passphrase = base::android::ConvertJavaStringToUTF8(passphrase);
-DLOG(ERROR) << "[BraveSync] " << __func__ << " 000 str_passphrase="<<str_passphrase;
 
   std::vector<uint8_t> seed;
   if (!brave_sync::crypto::PassphraseToBytes32(str_passphrase, &seed)) {
@@ -265,10 +261,12 @@ void BraveSyncWorker::OnStateChanged(syncer::SyncService* sync) {
 
   // If the sync engine has shutdown for some reason, just give up
   if (!service || !service->IsEngineInitialized()) {
+    VLOG(3) << "[BraveSync] " << __func__ << " sync engine is not initialized";
     return;
   }
 
   if (!FillSyncConfigInfo(service, &configuration, this->passphrase_)) {
+    VLOG(3) << "[BraveSync] " << __func__ << " opertations with passphrase are not required";
     return;
   }
 
@@ -319,7 +317,7 @@ void BraveSyncWorker::OnStateChanged(syncer::SyncService* sync) {
 
   if (passphrase_failed ||
       service->GetUserSettings()->IsPassphraseRequiredForPreferredDataTypes()) {
-    LOG(WARNING) << __func__ << " setup passphrase failed";
+    VLOG(1) << __func__ << " setup passphrase failed";
   }
 
   if (configuration.encrypt_all)
@@ -348,7 +346,7 @@ base::android::ScopedJavaLocalRef<jstring> JNI_BraveSyncWorker_GetSeedHexFromWor
     DCHECK_EQ(bytes.size(), SEED_BYTES_COUNT);
     sync_code_hex = base::HexEncode(&bytes.at(0), bytes.size());
   } else {
-    LOG(WARNING) << __func__ <<
+    VLOG(1) << __func__ <<
         " PassphraseToBytes32 failed for " << str_seed_words;
   }
 
@@ -383,7 +381,7 @@ base::android::ScopedJavaLocalRef<jstring> JNI_BraveSyncWorker_GetWordsFromSeedH
     }
     DCHECK_NE(sync_code_words, "");
   } else {
-    LOG(WARNING) << __func__ <<
+    VLOG(1) << __func__ <<
         " HexStringToBytes failed for " << str_seed_hex;
   }
 

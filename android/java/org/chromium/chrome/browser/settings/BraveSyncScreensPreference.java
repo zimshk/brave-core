@@ -28,11 +28,11 @@ import android.support.v7.widget.AppCompatImageView;
 import android.text.Editable;
 import android.text.SpannableString;
 import android.text.TextWatcher;
+import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -252,7 +252,6 @@ public class BraveSyncScreensPreference extends BravePreferenceFragment
 
   public void onDevicesAvailable() {
      try {
-Log.e(TAG, "onDevicesAvailable 000");
          if (null == getActivity()) {
              return;
          }
@@ -264,7 +263,7 @@ Log.e(TAG, "onDevicesAvailable 000");
                      return;
                  }
                  ArrayList<BraveSyncDevices.SyncDeviceInfo> deviceInfos = BraveSyncDevices.get().GetSyncDeviceList();
-Log.e(TAG, "[BraveSync] onDevicesAvailable deviceInfos.size()="+deviceInfos.size());
+                 Log.i(TAG, "Got " + deviceInfos.size() + " devices");
                  ViewGroup insertPoint = (ViewGroup) getView().findViewById(R.id.brave_sync_devices);
                  insertPoint.removeAllViews();
                  int index = 0;
@@ -275,7 +274,6 @@ Log.e(TAG, "[BraveSync] onDevicesAvailable deviceInfos.size()="+deviceInfos.size
                          TextView textView = (TextView) listItemView.findViewById(R.id.brave_sync_device_text);
                          if (null != textView) {
                            textView.setText(device.mName);
-Log.e(TAG, "[BraveSync] onDevicesAvailable device.mName="+device.mName);
                          }
 
                          // With the PR https://github.com/brave/brave-core/pull/5871
@@ -458,13 +456,12 @@ Log.e(TAG, "[BraveSync] onDevicesAvailable device.mName="+device.mName);
   }
 
   private void setAppropriateView() {
-Log.e(TAG, "[BraveSync] BraveSyncScreensPreference.setAppropriateView 000");
       getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
       getActivity().setTitle(R.string.sync_category_title);
       BraveActivity mainActivity = BraveActivity.getBraveActivity();
       assert (mainActivity != null);
       boolean firstSetupComplete = mainActivity.mBraveSyncWorker.IsFirstSetupComplete();
-Log.e(TAG, "[BraveSync] setAppropriateView firstSetupComplete="+firstSetupComplete);
+      Log.i(TAG, "setAppropriateView first setup complete " + firstSetupComplete);
       if (!firstSetupComplete) {
           if (null != mCameraSourcePreview) {
               mCameraSourcePreview.stop();
@@ -500,12 +497,15 @@ Log.e(TAG, "[BraveSync] setAppropriateView firstSetupComplete="+firstSetupComple
   }
 
   private void setMainSyncText() {
-      setSyncText(getResources().getString(R.string.brave_sync_official), getResources().getString(R.string.brave_sync_description_page_1_part_1) + "\n\n" +
-                    getResources().getString(R.string.brave_sync_description_page_1_part_2), mBraveSyncTextViewInitial);
+      setSyncText(getResources().getString(R.string.brave_sync_official),
+                  getResources().getString(R.string.brave_sync_description_page_1_part_1) + "\n\n" +
+                          getResources().getString(R.string.brave_sync_description_page_1_part_2),
+                  mBraveSyncTextViewInitial);
   }
 
   private void setQRCodeText() {
-      setSyncText("", getResources().getString(R.string.brave_sync_qrcode_message_v2), mBraveSyncTextViewSyncChainCode);
+      setSyncText("", getResources().getString(R.string.brave_sync_qrcode_message_v2),
+              mBraveSyncTextViewSyncChainCode);
   }
 
   private void setSyncText(String title, String message, TextView textView) {
@@ -522,7 +522,6 @@ Log.e(TAG, "[BraveSync] setAppropriateView firstSetupComplete="+firstSetupComple
   /** OnClickListener for the clear button. We show an alert dialog to confirm the action */
   @Override
   public void onClick(View v) {
-Log.e(TAG, "[BraveSync] BraveSyncScreensPreference.onClick");
       if ((getActivity() == null) || (v != mScanChainCodeButton && v != mStartNewChainButton
           && v != mEnterCodeWordsButton && v != mDoneButton && v != mDoneLaptopButton
           && v != mUseCameraButton && v != mConfirmCodeWordsButton && v != mMobileButton && v != mLaptopButton
@@ -530,39 +529,25 @@ Log.e(TAG, "[BraveSync] BraveSyncScreensPreference.onClick");
           && v != mQRCodeButton && v != mCodeWordsButton)) return;
 
       if (mScanChainCodeButton == v) {
-Log.e(TAG, "[BraveSync] mScanChainCodeButton");
           setJoinExistingChainLayout();
       } else if (mStartNewChainButton == v) {
-Log.e(TAG, "[BraveSync] mStartNewChainButton");
-Log.e(TAG, "[BraveSync] mStartNewChainButton 001 mCodephrase="+mCodephrase);
           // Creating a new chain
           GetCodephrase();
-Log.e(TAG, "[BraveSync] mStartNewChainButton 002 after GetCodephrase() mCodephrase="+mCodephrase);
           setNewChainLayout();
-Log.e(TAG, "[BraveSync] mStartNewChainButton 003 after setNewChainLayout() mCodephrase="+mCodephrase);
-
-              seedWordsReceived(mCodephrase);
-Log.e(TAG, "[BraveSync] mStartNewChainButton 004 after seedWordsReceived() mCodephrase="+mCodephrase);
+          seedWordsReceived(mCodephrase);
       } else if (mMobileButton == v) {
-Log.e(TAG, "[BraveSync] mMobileButton");
           setAddMobileDeviceLayout();
       } else if (mLaptopButton == v) {
-Log.e(TAG, "[BraveSync] mLaptopButton");
           setAddLaptopLayout();
       } else if (mDoneButton == v) {
-Log.e(TAG, "[BraveSync] mDoneButton");
           setSyncDoneLayout();
       } else if (mDoneLaptopButton == v) {
-Log.e(TAG, "[BraveSync] mDoneLaptopButton");
           setSyncDoneLayout();
       } else if (mUseCameraButton == v) {
-Log.e(TAG, "[BraveSync] mUseCameraButton");
           setJoinExistingChainLayout();
       } else if (mQRCodeButton == v) {
-Log.e(TAG, "[BraveSync] mQRCodeButton");
           setAddMobileDeviceLayout();
       } else if (mCodeWordsButton == v) {
-Log.e(TAG, "[BraveSync] mCodeWordsButton");
           setAddLaptopLayout();
       } else if (mPasteButton == v) {
           if (null != mCodeWords) {
@@ -580,29 +565,26 @@ Log.e(TAG, "[BraveSync] mCodeWordsButton");
               Toast.makeText(getActivity().getApplicationContext(), getResources().getString(R.string.brave_sync_copied_text), Toast.LENGTH_LONG).show();
           }
       } else if (mConfirmCodeWordsButton == v) {
-Log.e(TAG, "[BraveSync] mConfirmCodeWordsButton");
           BraveActivity mainActivity = BraveActivity.getBraveActivity();
           String[] words = mCodeWords.getText().toString().trim().replace("   ", " ").replace("\n", " ").split(" ");
           if (BIP39_WORD_COUNT != words.length) {
-Log.e(TAG, "[BraveSync] mConfirmCodeWordsButton - wrong words count");
+              Log.e(TAG, "Confirm code words - wrong words count " + words.length);
               onSyncError(getResources().getString(
                   R.string.brave_sync_word_count_error));
               return;
           }
 
           if (null != mainActivity && null != mainActivity.mBraveSyncWorker) {
-              String hexString = mainActivity.mBraveSyncWorker.GetSeedHexFromWords(String.join(" ", words));
-Log.e(TAG, "[BraveSync] mConfirmCodeWordsButton - hexString="+hexString);
+              String hexString = mainActivity.mBraveSyncWorker.GetSeedHexFromWords(TextUtils.join(" ", words));
               if (hexString == null || hexString.isEmpty()) {
-Log.e(TAG, "[BraveSync] mConfirmCodeWordsButton - wrong codephrase");
+                  Log.e(TAG, "Confirm code words - wrong codephrase");
                   onSyncError(getResources().getString(
                       R.string.brave_sync_wrong_code_error));
                   return;
               }
           }
 
-          String codephraseCandidate = String.join(" ", words);
-Log.e(TAG, "[BraveSync] mConfirmCodeWordsButton - mCodephrase="+mCodephrase);
+          String codephraseCandidate = TextUtils.join(" ", words);
           // Validate the code words with GetSeedHexFromWords
           String seedHex = mainActivity.mBraveSyncWorker.GetSeedHexFromWords(codephraseCandidate);
           if (null == seedHex || seedHex.isEmpty()) {
@@ -614,7 +596,6 @@ Log.e(TAG, "[BraveSync] mConfirmCodeWordsButton - mCodephrase="+mCodephrase);
           // Code phrase looks valid, we can pass it down to sync system
           mCodephrase = codephraseCandidate;
           seedWordsReceived(mCodephrase);
-
           setAppropriateView();
       } else if (mEnterCodeWordsButton == v) {
           getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
@@ -662,24 +643,20 @@ Log.e(TAG, "[BraveSync] mConfirmCodeWordsButton - mCodephrase="+mCodephrase);
               });
           }
       } else if (mRemoveDeviceButton == v) {
-Log.e(TAG, "[BraveSync] mRemoveDeviceButton");
           BraveSyncDevices.SyncDeviceInfo deviceToDelete = (BraveSyncDevices.SyncDeviceInfo) v.getTag();
           assert deviceToDelete.mIsCurrentDevice;
           assert mDeviceName.equals(deviceToDelete.mName);
           deleteDeviceDialog(deviceToDelete, v);
       } else if (mShowCategoriesButton == v) {
-Log.e(TAG, "[BraveSync] mShowCategoriesButton");
           SettingsLauncher.getInstance().launchSettingsPage(
                   getContext(), BraveManageSyncSettings.class);
       } else if (mAddDeviceButton == v) {
-Log.e(TAG, "[BraveSync] mAddDeviceButton");
           setNewChainLayout();
       }
   }
 
   // This function used when we have scanned the QR code to connect to the chain
   private void seedHexReceived(String seedHex) {
-Log.e(TAG, "seedHexReceived seedHex="+seedHex);
       assert seedHex != null && !seedHex.isEmpty();
       assert isBarCodeValid(seedHex);
 
@@ -692,7 +669,6 @@ Log.e(TAG, "seedHexReceived seedHex="+seedHex);
               BraveActivity mainActivity = BraveActivity.getBraveActivity();
               if (null != mainActivity && null != mainActivity.mBraveSyncWorker) {
                   String seedWords = mainActivity.mBraveSyncWorker.GetWordsFromSeedHex(seedHex);
-Log.e(TAG, "seedHexReceived seedWords="+seedWords);
                   seedWordsReceivedImpl(seedWords);
               }
               setAppropriateView();
@@ -704,7 +680,6 @@ Log.e(TAG, "seedHexReceived seedWords="+seedWords);
   // 1) when we have entered the code words to connect to the chain
   // 2) when we have created a new chain
   private void seedWordsReceived(String seedWords) {
-Log.e(TAG, "seedWordsReceived seedWords="+seedWords);
       if (null == getActivity()) {
           return;
       }
@@ -836,7 +811,6 @@ Log.e(TAG, "seedWordsReceived seedWords="+seedWords);
 
   @Override
   public void onResume() {
-Log.e(TAG, "[BraveSync] BraveSyncScreensPreference.onResume");
       super.onResume();
       try {
           if (null != mCameraSourcePreview && View.GONE != mScrollViewSyncChainCode.getVisibility()) {
@@ -851,7 +825,6 @@ Log.e(TAG, "[BraveSync] BraveSyncScreensPreference.onResume");
 
   @Override
   public void onPause() {
-Log.e(TAG, "[BraveSync] BraveSyncScreensPreference.onPause");
       super.onPause();
       if (mCameraSourcePreview != null) {
           mCameraSourcePreview.stop();
@@ -862,12 +835,10 @@ Log.e(TAG, "[BraveSync] BraveSyncScreensPreference.onPause");
 
   @Override
   public void onDestroy() {
-Log.e(TAG, "[BraveSync] BraveSyncScreensPreference.onDestroy");
       super.onDestroy();
       if (mCameraSourcePreview != null) {
           mCameraSourcePreview.release();
       }
-Log.e(TAG, "[BraveSync] BraveSyncScreensPreference.onDestroy deviceInfoObserverSet="+deviceInfoObserverSet);
       if (deviceInfoObserverSet) {
           BraveSyncDevices.get().removeDeviceInfoChangedListener(this);
           deviceInfoObserverSet = false;
@@ -877,9 +848,7 @@ Log.e(TAG, "[BraveSync] BraveSyncScreensPreference.onDestroy deviceInfoObserverS
   // Barcode is valid when its raw representation has length of 64
   // and when it's possible to convert the barcode to bip39 code words
   private boolean isBarCodeValid(String barcode) {
-Log.e(TAG, "isBarCodeValid barcode="+barcode);
-Log.e(TAG, "isBarCodeValid barcode.length()="+barcode.length());
-Log.e(TAG, "isBarCodeValid 001 return " + (barcode.length() == 64));
+      Log.i(TAG, "isBarCodeValid barcode length=" + barcode.length());
       if (barcode == null) {
           Log.e(TAG, "Barcode is empty");
           return false;
@@ -903,9 +872,8 @@ Log.e(TAG, "isBarCodeValid 001 return " + (barcode.length() == 64));
   @Override
   public void onDetectedQrCode(Barcode barcode) {
       if (barcode != null) {
-          //Log.i(TAG, "!!!code == " + barcode.displayValue);
           final String barcodeValue = barcode.displayValue;
-Log.e(TAG, "onDetectedQrCode barcodeValue="+barcodeValue);
+          Log.e(TAG, "onDetectedQrCode barcodeValue="+barcodeValue);
           if (!isBarCodeValid(barcodeValue)) {
               getActivity().runOnUiThread(new Runnable() {
                   @Override
@@ -918,14 +886,13 @@ Log.e(TAG, "onDetectedQrCode barcodeValue="+barcodeValue);
           }
 
           String seedHex = barcodeValue;
-Log.e(TAG, "onDetectedQrCode seedHex="+seedHex);
           // seedHexReceived will call setAppropriateView
           seedHexReceived(seedHex);
       }
   }
 
   private void showEndDialog(String message) {
-Log.e(TAG, "[BraveSync] BraveSyncScreensPreference.showEndDialog message="+message);
+      Log.i(TAG, "showEndDialog message=" + message);
       AlertDialog.Builder alert = new AlertDialog.Builder(getActivity(), R.style.Theme_Chromium_AlertDialog);
       if (null == alert) {
           return;
@@ -945,9 +912,9 @@ Log.e(TAG, "[BraveSync] BraveSyncScreensPreference.showEndDialog message="+messa
   }
 
   private void deleteDeviceDialog(BraveSyncDevices.SyncDeviceInfo deviceToDelete, View v) {
-Log.e(TAG, "[BraveSync] deleteDeviceDialog 000 deviceToDelete.mName=" + deviceToDelete.mName);
         assert deviceToDelete != null;
         assert !deviceToDelete.mName.isEmpty();
+        Log.i(TAG, "deleteDeviceDialog deviceToDelete.mName=" + deviceToDelete.mName);
         AlertDialog.Builder alert = new AlertDialog.Builder(getActivity(), R.style.Theme_Chromium_AlertDialog);
         if (null == alert) {
             return;
@@ -956,7 +923,6 @@ Log.e(TAG, "[BraveSync] deleteDeviceDialog 000 deviceToDelete.mName=" + deviceTo
             @Override
             public void onClick(DialogInterface dialog, int button) {
                 if (button == AlertDialog.BUTTON_POSITIVE) {
-Log.e(TAG, "[BraveSync] deleteDeviceDialog.onClick BUTTON_POSITIVE");
                     BraveActivity mainActivity = BraveActivity.getBraveActivity();
                     if (null != mainActivity && null != mainActivity.mBraveSyncWorker) {
                         if (deviceToDelete.mIsCurrentDevice) {
@@ -1037,7 +1003,6 @@ Log.e(TAG, "[BraveSync] deleteDeviceDialog.onClick BUTTON_POSITIVE");
   }
 
   private void setNewChainLayout() {
-Log.e(TAG, "[BraveSync] BraveSyncScreensPreference.setNewChainLayout");
       getActivity().setTitle(R.string.brave_sync_start_new_chain);
       if (null != mScrollViewSyncInitial) {
           mScrollViewSyncInitial.setVisibility(View.GONE);
@@ -1062,27 +1027,24 @@ Log.e(TAG, "[BraveSync] BraveSyncScreensPreference.setNewChainLayout");
 
   private String mCodephrase;
   public String GetCodephrase() {
-Log.e(TAG, "[BraveSync] GetCodephrase 000 mCodephrase="+mCodephrase);
-    if (mCodephrase == null || mCodephrase.isEmpty()) {
-      BraveActivity mainActivity = BraveActivity.getBraveActivity();
-Log.e(TAG, "[BraveSync] GetCodephrase - ask mainActivity.mBraveSyncWorker");
-      mCodephrase = mainActivity.mBraveSyncWorker.GetCodephrase();
-Log.e(TAG, "[BraveSync] GetCodephrase 003");
-    }
-Log.e(TAG, "[BraveSync] GetCodephrase mCodephrase="+mCodephrase);
-    return mCodephrase;
+      if (mCodephrase == null || mCodephrase.isEmpty()) {
+          BraveActivity mainActivity = BraveActivity.getBraveActivity();
+          mCodephrase = mainActivity.mBraveSyncWorker.GetCodephrase();
+      }
+      return mCodephrase;
   }
+
   public void InvalidateCodephrase() {
-Log.e(TAG, "[BraveSync] InvalidateCodephrase 000");
-    mCodephrase = null;
+      mCodephrase = null;
   }
 
   private void setAddMobileDeviceLayout() {
       getActivity().setTitle(R.string.brave_sync_btn_mobile);
       if (null != mBraveSyncTextViewAddMobileDevice) {
           setSyncText(getResources().getString(R.string.brave_sync_scan_sync_code),
-                        getResources().getString(R.string.brave_sync_add_mobile_device_text_part_1) + "\n\n" +
-                        getResources().getString(R.string.brave_sync_add_mobile_device_text_part_2) + "\n", mBraveSyncTextViewAddMobileDevice);
+                      getResources().getString(R.string.brave_sync_add_mobile_device_text_part_1) + "\n\n" +
+                              getResources().getString(R.string.brave_sync_add_mobile_device_text_part_2) + "\n",
+                      mBraveSyncTextViewAddMobileDevice);
       }
       if (null != mBraveSyncWarningTextViewAddMobileDevice) {
         String braveSyncCodeWarning = getResources().getString(R.string.brave_sync_code_warning);
@@ -1113,11 +1075,10 @@ Log.e(TAG, "[BraveSync] InvalidateCodephrase 000");
           public void run() {
               BraveActivity mainActivity = BraveActivity.getBraveActivity();
               if (null != mainActivity && null != mainActivity.mBraveSyncWorker) {
-Log.e(TAG, "[BraveSync] setAddMobileDeviceLayout GetCodephrase()=" + GetCodephrase());
                   String seedHex = mainActivity.mBraveSyncWorker.GetSeedHexFromWords(GetCodephrase());
-Log.e(TAG, "[BraveSync] setAddMobileDeviceLayout seedHex=" + seedHex);
                   if (null == seedHex || seedHex.isEmpty()) {
                       // Give up, seed must be valid
+                      Log.e(TAG, "setAddMobileDeviceLayout seedHex is empty");
                       assert false;
                   } else {
                       fillQrCode(seedHex);
@@ -1128,10 +1089,8 @@ Log.e(TAG, "[BraveSync] setAddMobileDeviceLayout seedHex=" + seedHex);
   }
 
   private void fillQrCode(String qrDataFinal) {
-      Log.e(TAG, "fillQrCode 000 qrDataFinal="+qrDataFinal);
-
       if (!isBarCodeValid(qrDataFinal)) {
-Log.e(TAG, "FillQrCode 001");
+          Log.e(TAG, "fillQrCode - invalid QR code");
           // Normally must not reach here ever, because the code is validated right after scan
           assert false;
           showEndDialog(getResources().getString(R.string.sync_device_failure));
@@ -1172,7 +1131,6 @@ Log.e(TAG, "FillQrCode 001");
   }
 
   private void setAddLaptopLayout() {
-Log.e(TAG, "[BraveSync] setAddLaptopLayout 000");
       getActivity().setTitle(R.string.brave_sync_btn_laptop);
       if (null != mBraveSyncTextViewAddLaptop) {
           setSyncText(getResources().getString(R.string.brave_sync_add_laptop_text_title),
@@ -1208,23 +1166,19 @@ Log.e(TAG, "[BraveSync] setAddLaptopLayout 000");
       getActivity().runOnUiThread(new Runnable() {
           @Override
           public void run() {
-Log.e(TAG, "[BraveSync] setAddLaptopLayout.runOnUiThread.run 000");
               String codePhrase = GetCodephrase();
               assert codePhrase != null && !codePhrase.isEmpty();
-Log.e(TAG, "[BraveSync] setAddLaptopLayout.runOnUiThread.run codePhrase="+codePhrase);
               mBraveSyncAddDeviceCodeWords.setText(codePhrase);
           }
       });
   }
 
   private void setSyncDoneLayout() {
-Log.e(TAG, "[BraveSync] setSyncDoneLayout 000");
       BraveActivity mainActivity = BraveActivity.getBraveActivity();
       assert (null != mainActivity && null != mainActivity.mBraveSyncWorker);
       mainActivity.mBraveSyncWorker.SaveCodephrase(GetCodephrase());
       mainActivity.mBraveSyncWorker.FinalizeSyncSetup();
 
-Log.e(TAG, "[BraveSync] BraveSyncScreensPreference.setSyncDoneLayout deviceInfoObserverSet="+deviceInfoObserverSet);
       if (!deviceInfoObserverSet) {
           BraveSyncDevices.get().addDeviceInfoChangedListener(this);
           deviceInfoObserverSet = true;
@@ -1321,7 +1275,6 @@ Log.e(TAG, "[BraveSync] BraveSyncScreensPreference.setSyncDoneLayout deviceInfoO
   // Handles 'Back' button. Returns true if it is handled, false otherwise.
   @Override
   public boolean onBackPressed() {
-Log.e(TAG, "[BraveSync] BraveSyncScreensPreference.onBackPressed");
       if ((View.VISIBLE == mScrollViewSyncChainCode.getVisibility())
       || (View.VISIBLE == mScrollViewSyncStartChain.getVisibility())) {
           setAppropriateView();
@@ -1338,5 +1291,5 @@ Log.e(TAG, "[BraveSync] BraveSyncScreensPreference.onBackPressed");
   }
 
   @Override
-  public void onCreatePreferences(Bundle bundle, String s) {}
+  public void onCreatePreferences(Bundle bundle, String s) {} /**/
 }

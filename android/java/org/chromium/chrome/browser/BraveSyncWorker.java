@@ -5,58 +5,17 @@
 
 package org.chromium.chrome.browser;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.pm.ApplicationInfo;
-import android.os.Build;
-import android.os.Looper;
-import android.util.Base64;
-import android.util.JsonReader;
-import android.util.JsonToken;
-import android.webkit.JavascriptInterface;
 
 import org.chromium.base.annotations.CalledByNative;
 import org.chromium.base.annotations.JNINamespace;
 import org.chromium.base.task.PostTask;
 import org.chromium.base.task.TaskTraits;
-import org.chromium.base.ContextUtils;
 import org.chromium.base.Log;
 import org.chromium.base.ThreadUtils;
-import org.chromium.components.url_formatter.UrlFormatter;
-import org.chromium.chrome.browser.partnerbookmarks.PartnerBookmarksShim;
-import org.chromium.content_public.browser.LoadUrlParams;
-import org.chromium.components.embedder_support.view.ContentView;
-import org.chromium.ui.base.ViewAndroidDelegate;
-import org.chromium.ui.base.WindowAndroid;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.lang.IllegalArgumentException;
 import java.lang.Runnable;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Date;
-//import java.util.HashSet;
-//import java.util.HashMap;
-//import java.util.Random;
-//import java.util.Scanner;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.UnsupportedEncodingException;
-
 
 @JNINamespace("chrome::android")
 public class BraveSyncWorker {
@@ -69,13 +28,11 @@ public class BraveSyncWorker {
 
     @CalledByNative
     private void setNativePtr(long nativePtr) {
-Log.e(TAG, "[BraveSync] BraveSyncWorker.Init nativePtr=" + nativePtr);
         assert mNativeBraveSyncWorker == 0;
         mNativeBraveSyncWorker = nativePtr;
     }
 
     private void Init() {
-Log.e(TAG, "[BraveSync] BraveSyncWorker.Init mNativeBraveSyncWorker=" + mNativeBraveSyncWorker);
       if (mNativeBraveSyncWorker == 0) {
           nativeInit();
       }
@@ -94,7 +51,6 @@ Log.e(TAG, "[BraveSync] BraveSyncWorker.Init mNativeBraveSyncWorker=" + mNativeB
     }
 
     public BraveSyncWorker(Context context) {
-Log.e(TAG, "[BraveSync] BraveSyncWorker.CTOR");
         mContext = context;
         Init();
         (new MigrationFromV1()).MigrateFromSyncV1();
@@ -145,7 +101,7 @@ Log.e(TAG, "[BraveSync] BraveSyncWorker.CTOR");
                   .remove(PREF_LAST_ORDER)
                   .remove(PREF_SYNC_DEVICE_NAME)
                   .apply();
-            // old Keep PREF_SEED just in case
+            // Keep old PREF_SEED just in case
         }
 
         private void DeleteSyncV1LevelDb() {
@@ -158,6 +114,7 @@ Log.e(TAG, "[BraveSync] BraveSyncWorker.CTOR");
             PostTask.postTask(TaskTraits.BEST_EFFORT_MAY_BLOCK, () ->
             {
                 if (HaveSyncV1Prefs()) {
+                    Log.i(TAG, "Found sync v1 data, doing migration");
                     DeleteSyncV1Prefs();
                     DeleteSyncV1LevelDb();
                     // Mark sync v1 was enabled to trigger informers
@@ -174,30 +131,19 @@ Log.e(TAG, "[BraveSync] BraveSyncWorker.CTOR");
     };
 
     public String GetCodephrase() {
-      String codephrase = nativeGetSyncCodeWords(mNativeBraveSyncWorker);
-Log.e(TAG, "[BraveSync] GetCodephrase codephrase="+codephrase);
-      return codephrase;
+      return nativeGetSyncCodeWords(mNativeBraveSyncWorker);
     }
 
     public void SaveCodephrase(String codephrase) {
-Log.e(TAG, "[BraveSync] SaveCodephrase codephrase="+codephrase);
       nativeSaveCodeWords(mNativeBraveSyncWorker, codephrase);
     }
 
     public String GetSeedHexFromWords(String codephrase) {
-Log.e(TAG, "[BraveSync] GetSeedHexFromWords codephrase="+codephrase);
-      String seedHex = nativeGetSeedHexFromWords(codephrase);
-Log.e(TAG, "[BraveSync] GetSeedHexFromWords seedHex="+seedHex);
-      //return nativeGetSeedHexFromWords(codephrase);
-      return seedHex;
+      return nativeGetSeedHexFromWords(codephrase);
     }
 
     public String GetWordsFromSeedHex(String seedHex) {
-Log.e(TAG, "[BraveSync] GetWordsFromSeedHex seedHex="+seedHex);
-      //return nativeGetWordsFromSeedHex(seedHex);
-      String words = nativeGetWordsFromSeedHex(seedHex);
-Log.e(TAG, "[BraveSync] GetWordsFromSeedHex words="+words);
-      return words;
+      return nativeGetWordsFromSeedHex(seedHex);
     }
 
     public void RequestSync() {
