@@ -7,6 +7,7 @@
 #define BRAVE_BROWSER_ANDROID_BRAVE_SYNC_WORKER_H_
 
 #include <jni.h>
+#include <string>
 
 #include "base/android/jni_weak_ref.h"
 #include "base/scoped_observer.h"
@@ -21,32 +22,32 @@ namespace android {
 class BraveSyncWorker : public syncer::SyncServiceObserver {
  public:
   BraveSyncWorker(JNIEnv* env,
-    //jobject obj
-    const base::android::JavaRef<jobject>& obj
-  );
+                  const base::android::JavaRef<jobject>& obj);
   ~BraveSyncWorker() override;
 
   void Destroy(JNIEnv* env,
+               const base::android::JavaParamRef<jobject>& jcaller);
+
+  base::android::ScopedJavaLocalRef<jstring> GetSyncCodeWords(
+      JNIEnv* env,
       const base::android::JavaParamRef<jobject>& jcaller);
 
-  base::android::ScopedJavaLocalRef<jstring> GetSyncCodeWords(JNIEnv* env,
-        const base::android::JavaParamRef<jobject>& jcaller);
-
   void SaveCodeWords(JNIEnv* env,
-    const base::android::JavaParamRef<jobject>& jcaller,
-    const base::android::JavaParamRef<jstring>& passphrase);
+                     const base::android::JavaParamRef<jobject>& jcaller,
+                     const base::android::JavaParamRef<jstring>& passphrase);
 
   void RequestSync(JNIEnv* env,
-    const base::android::JavaParamRef<jobject>& jcaller);
+                   const base::android::JavaParamRef<jobject>& jcaller);
 
   void FinalizeSyncSetup(JNIEnv* env,
-    const base::android::JavaParamRef<jobject>& jcaller);
+                         const base::android::JavaParamRef<jobject>& jcaller);
 
-  bool IsFirstSetupComplete(JNIEnv* env,
-    const base::android::JavaParamRef<jobject>& jcaller);
+  bool IsFirstSetupComplete(
+      JNIEnv* env,
+      const base::android::JavaParamRef<jobject>& jcaller);
 
   void ResetSync(JNIEnv* env,
-    const base::android::JavaParamRef<jobject>& jcaller);
+                 const base::android::JavaParamRef<jobject>& jcaller);
 
  private:
   syncer::SyncService* GetSyncService() const;

@@ -5,6 +5,9 @@
 
 #include "brave/browser/sync/brave_sync_devices_android.h"
 
+#include <string>
+#include <utility>
+
 #include "base/android/jni_android.h"
 #include "base/android/jni_string.h"
 #include "base/json/json_writer.h"
@@ -24,14 +27,11 @@ namespace android {
 BraveSyncDevicesAndroid::BraveSyncDevicesAndroid(
     JNIEnv* env, const base::android::JavaRef<jobject>& obj) :
     weak_java_brave_sync_worker_(env, obj) {
-
   Java_BraveSyncDevices_setNativePtr(env, obj,
     reinterpret_cast<intptr_t>(this));
 
-  DLOG(ERROR) << "[BraveSync] " << __func__ << " CTOR done setNativePtr";
   profile_ =
       ProfileManager::GetActiveUserProfile()->GetOriginalProfile();
-  DLOG(ERROR) << "[BraveSync] " << __func__ << " profile_="<<profile_;
   DCHECK_NE(profile_, nullptr);
 
   syncer::DeviceInfoTracker* tracker =
@@ -53,7 +53,6 @@ void BraveSyncDevicesAndroid::Destroy(JNIEnv* env,
 }
 
 void BraveSyncDevicesAndroid::OnDeviceInfoChange() {
-  DLOG(ERROR) << "[BraveSync] " << __func__ << " 000";
   // Notify Java code
   JNIEnv* env = base::android::AttachCurrentThread();
   Java_BraveSyncDevices_deviceInfoChanged(env,
@@ -61,7 +60,6 @@ void BraveSyncDevicesAndroid::OnDeviceInfoChange() {
 }
 
 base::Value BraveSyncDevicesAndroid::GetSyncDeviceList() {
-DLOG(ERROR) << "[BraveSync] " << __func__ << " 000";
   auto* device_info_service =
       DeviceInfoSyncServiceFactory::GetForProfile(profile_);
   syncer::DeviceInfoTracker* tracker =
@@ -80,7 +78,7 @@ DLOG(ERROR) << "[BraveSync] " << __func__ << " 000";
     device_value.SetBoolKey("isCurrentDevice", is_current_device);
     device_list.Append(std::move(device_value));
   }
-DLOG(ERROR) << "[BraveSync] " << __func__ << " device_list=" <<device_list;
+
   return device_list;
 }
 
@@ -90,17 +88,16 @@ base::android::ScopedJavaLocalRef<jstring>
   base::Value device_list = GetSyncDeviceList();
   std::string json_string;
   if (!base::JSONWriter::Write(device_list, &json_string)) {
-    DVLOG(1) << "Writing as JSON failed. Passing empty string to Java code.";
+    VLOG(1) << "Writing as JSON failed. Passing empty string to Java code.";
     json_string = std::string();
   }
-DLOG(ERROR) << "[BraveSync] " << __func__ << " json_string=" << json_string;
+
   return base::android::ConvertUTF8ToJavaString(env, json_string);
 }
 
 static void JNI_BraveSyncDevices_Init(
     JNIEnv* env,
     const base::android::JavaParamRef<jobject>& jcaller) {
-DLOG(ERROR) << "[BraveSync] " << __func__ << " 000";
   new BraveSyncDevicesAndroid(env, jcaller);
 }
 

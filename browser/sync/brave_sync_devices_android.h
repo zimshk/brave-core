@@ -9,26 +9,25 @@
 #include <jni.h>
 
 #include "base/android/jni_weak_ref.h"
-#include "base/values.h"
 #include "base/scoped_observer.h"
+#include "base/values.h"
 #include "chrome/browser/sync/profile_sync_service_android.h"
 #include "components/sync_device_info/device_info_tracker.h"
 
 namespace chrome {
 namespace android {
 
-
 class BraveSyncDevicesAndroid : public syncer::DeviceInfoTracker::Observer {
  public:
   BraveSyncDevicesAndroid(JNIEnv* env,
-      const base::android::JavaRef<jobject>& obj);
+                          const base::android::JavaRef<jobject>& obj);
   virtual ~BraveSyncDevicesAndroid();
 
   void Destroy(JNIEnv* env,
-      const base::android::JavaParamRef<jobject>& jcaller);
+               const base::android::JavaParamRef<jobject>& jcaller);
 
-  base::android::ScopedJavaLocalRef<jstring>
-      GetSyncDeviceListJson(JNIEnv* env,
+  base::android::ScopedJavaLocalRef<jstring> GetSyncDeviceListJson(
+      JNIEnv* env,
       const base::android::JavaParamRef<jobject>& jcaller);
 
  private:
@@ -37,9 +36,8 @@ class BraveSyncDevicesAndroid : public syncer::DeviceInfoTracker::Observer {
 
   base::Value GetSyncDeviceList();
 
-
   ScopedObserver<syncer::DeviceInfoTracker, syncer::DeviceInfoTracker::Observer>
-    device_info_tracker_observer_{this};
+      device_info_tracker_observer_{this};
 
   JavaObjectWeakGlobalRef weak_java_brave_sync_worker_;
   Profile* profile_ = nullptr;

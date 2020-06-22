@@ -5,14 +5,14 @@
 
 package org.chromium.chrome.browser.sync;
 
-import org.chromium.base.annotations.CalledByNative;
-import org.chromium.base.annotations.JNINamespace;
-import org.chromium.base.Log;
-import org.chromium.base.ThreadUtils;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import org.chromium.base.Log;
+import org.chromium.base.ThreadUtils;
+import org.chromium.base.annotations.CalledByNative;
+import org.chromium.base.annotations.JNINamespace;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -42,16 +42,14 @@ public class BraveSyncDevices {
 
     @CalledByNative
     private void setNativePtr(long nativePtr) {
-Log.e(TAG, "[BraveSync] BraveSyncDevices.Init nativePtr=" + nativePtr);
         assert mNativeBraveSyncDevicesAndroid == 0;
         mNativeBraveSyncDevicesAndroid = nativePtr;
     }
 
     private void Init() {
-Log.e(TAG, "[BraveSync] BraveSyncDevices.Init mNativeBraveSyncDevicesAndroid=" + mNativeBraveSyncDevicesAndroid);
-      if (mNativeBraveSyncDevicesAndroid == 0) {
-          nativeInit();
-      }
+        if (mNativeBraveSyncDevicesAndroid == 0) {
+            nativeInit();
+        }
     }
 
     @Override
@@ -79,13 +77,11 @@ Log.e(TAG, "[BraveSync] BraveSyncDevices.Init mNativeBraveSyncDevicesAndroid=" +
             new CopyOnWriteArrayList<DeviceInfoChangedListener>();
 
     public void addDeviceInfoChangedListener(DeviceInfoChangedListener listener) {
-Log.e(TAG, "[BraveSync] addDeviceInfoChangedListener 000");
         ThreadUtils.assertOnUiThread();
         mDeviceInfoListeners.add(listener);
     }
 
     public void removeDeviceInfoChangedListener(DeviceInfoChangedListener listener) {
-Log.e(TAG, "[BraveSync] removeDeviceInfoChangedListener 000");
         ThreadUtils.assertOnUiThread();
         mDeviceInfoListeners.remove(listener);
     }
@@ -96,7 +92,6 @@ Log.e(TAG, "[BraveSync] removeDeviceInfoChangedListener 000");
      */
     @CalledByNative
     protected void deviceInfoChanged() {
-Log.e(TAG, "[BraveSync] deviceInfoChanged 000 - invoking listeners");
         for (DeviceInfoChangedListener listener : mDeviceInfoListeners) {
             listener.deviceInfoChanged();
         }
@@ -110,32 +105,29 @@ Log.e(TAG, "[BraveSync] deviceInfoChanged 000 - invoking listeners");
     }
 
     public ArrayList<SyncDeviceInfo> GetSyncDeviceList() {
-Log.e(TAG, "[BraveSync] GetSyncDeviceList 000");
         ArrayList<SyncDeviceInfo> deviceList = new ArrayList<SyncDeviceInfo>();
         String json = nativeGetSyncDeviceListJson(mNativeBraveSyncDevicesAndroid);
         // Add root element to make it real JSON, otherwise getJSONArray cannot parse it
         json = "{\"devices\":" + json + "}";
-Log.e(TAG, "[BraveSync] GetSyncDeviceList json="+json);
         try {
             JSONObject result = new JSONObject(json);
             JSONArray devices = result.getJSONArray("devices");
-Log.e(TAG, "[BraveSync] GetSyncDeviceList devices.length()="+devices.length());
+            Log.i(TAG, "GetSyncDeviceList devices length is " + devices.length());
             for (int i = 0; i < devices.length(); i++) {
-              SyncDeviceInfo deviceInfo = new SyncDeviceInfo();
-              JSONObject device = devices.getJSONObject(i);
-              deviceInfo.mName = device.getString("name");
-              deviceInfo.mIsCurrentDevice = device.getBoolean("isCurrentDevice");
-              deviceInfo.mType = device.getString("type");
-              long lastUpdatedTimestamp = device.getLong("lastUpdatedTimestamp");
-              deviceInfo.mLastUpdatedTimestamp = new Date(lastUpdatedTimestamp);
-              deviceList.add(deviceInfo);
+                SyncDeviceInfo deviceInfo = new SyncDeviceInfo();
+                JSONObject device = devices.getJSONObject(i);
+                deviceInfo.mName = device.getString("name");
+                deviceInfo.mIsCurrentDevice = device.getBoolean("isCurrentDevice");
+                deviceInfo.mType = device.getString("type");
+                long lastUpdatedTimestamp = device.getLong("lastUpdatedTimestamp");
+                deviceInfo.mLastUpdatedTimestamp = new Date(lastUpdatedTimestamp);
+                deviceList.add(deviceInfo);
             }
         } catch (JSONException e) {
             Log.e(TAG, "GetDeviceNameByObjectId JSONException error " + e);
         } catch (IllegalStateException e) {
             Log.e(TAG, "GetDeviceNameByObjectId IllegalStateException error " + e);
         }
-Log.e(TAG, "[BraveSync] GetSyncDeviceList deviceList.size()="+deviceList.size());
         return deviceList;
     }
 
@@ -143,15 +135,4 @@ Log.e(TAG, "[BraveSync] GetSyncDeviceList deviceList.size()="+deviceList.size())
     private native void nativeDestroy(long nativeBraveSyncDevicesAndroid);
 
     private native String nativeGetSyncDeviceListJson(long nativeBraveSyncDevicesAndroid);
-
-
-/*
-// syncer::SyncServiceObserver implementation.
-void OnStateChanged(syncer::SyncService* sync) override;
-
-// syncer::DeviceInfoTracker::Observer
-void OnDeviceInfoChange() override;
-
-*/
-
 }

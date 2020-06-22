@@ -6,6 +6,7 @@
 #include "brave/browser/android/brave_sync_worker.h"
 
 #include <string>
+#include <vector>
 
 #include "base/android/jni_android.h"
 #include "base/android/jni_string.h"
@@ -39,9 +40,9 @@
 //    isFirstSetupComplete
 
 namespace {
-  static const size_t SEED_BIP39_WORD_COUNT = 24u;
-  static const size_t SEED_BYTES_COUNT = 32u;
-}
+static const size_t SEED_BIP39_WORD_COUNT = 24u;
+static const size_t SEED_BYTES_COUNT = 32u;
+}  // namespace
 
 namespace chrome {
 namespace android {
@@ -50,38 +51,38 @@ namespace android {
 #define DB_FILE_NAME      "brave_sync_db"
 
 BraveSyncWorker::BraveSyncWorker(JNIEnv* env,
-  const base::android::JavaRef<jobject>& obj) :
-  weak_java_brave_sync_worker_(env, obj) {
+                                 const base::android::JavaRef<jobject>& obj)
+    : weak_java_brave_sync_worker_(env, obj) {
+  Java_BraveSyncWorker_setNativePtr(env, obj, reinterpret_cast<intptr_t>(this));
 
-  Java_BraveSyncWorker_setNativePtr(env, obj,
-    reinterpret_cast<intptr_t>(this));
-
-  profile_ =
-      ProfileManager::GetActiveUserProfile()->GetOriginalProfile();
+  profile_ = ProfileManager::GetActiveUserProfile()->GetOriginalProfile();
   DCHECK_NE(profile_, nullptr);
 }
 
-BraveSyncWorker::~BraveSyncWorker() {
-}
+BraveSyncWorker::~BraveSyncWorker() {}
 
-void BraveSyncWorker::Destroy(JNIEnv* env, const
-        base::android::JavaParamRef<jobject>& jcaller) {
+void BraveSyncWorker::Destroy(
+    JNIEnv* env,
+    const base::android::JavaParamRef<jobject>& jcaller) {
   delete this;
 }
 
-static void JNI_BraveSyncWorker_DestroyV1LevelDb(JNIEnv* env,
-        const base::android::JavaParamRef<jobject>& obj) {
+static void JNI_BraveSyncWorker_DestroyV1LevelDb(
+    JNIEnv* env,
+    const base::android::JavaParamRef<jobject>& obj) {
   base::FilePath app_data_path;
   base::PathService::Get(base::DIR_ANDROID_APP_DATA, &app_data_path);
   base::FilePath dbFilePath = app_data_path.Append(DB_FILE_NAME);
 
-  leveldb::Status status = leveldb::DestroyDB(dbFilePath.value().c_str(),
-    leveldb::Options());
-  VLOG(3) << "[BraveSync] " << __func__ << " destroy DB status is "<<status.ToString();
+  leveldb::Status status =
+      leveldb::DestroyDB(dbFilePath.value().c_str(), leveldb::Options());
+  VLOG(3) << "[BraveSync] " << __func__ << " destroy DB status is "
+          << status.ToString();
 }
 
-static void JNI_BraveSyncWorker_MarkSyncV1WasEnabledAndMigrated(JNIEnv* env,
-        const base::android::JavaParamRef<jobject>& obj) {
+static void JNI_BraveSyncWorker_MarkSyncV1WasEnabledAndMigrated(
+    JNIEnv* env,
+    const base::android::JavaParamRef<jobject>& obj) {
   DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
   Profile* profile =
       ProfileManager::GetActiveUserProfile()->GetOriginalProfile();
@@ -91,9 +92,9 @@ static void JNI_BraveSyncWorker_MarkSyncV1WasEnabledAndMigrated(JNIEnv* env,
   VLOG(3) << "[BraveSync] " << __func__ << " done";
 }
 
-base::android::ScopedJavaLocalRef<jstring> BraveSyncWorker::GetSyncCodeWords
-      (JNIEnv* env,
-      const base::android::JavaParamRef<jobject>& jcaller) {
+base::android::ScopedJavaLocalRef<jstring> BraveSyncWorker::GetSyncCodeWords(
+    JNIEnv* env,
+    const base::android::JavaParamRef<jobject>& jcaller) {
   brave_sync::Prefs brave_sync_prefs(profile_->GetPrefs());
   std::string sync_code = brave_sync_prefs.GetSeed();
 
@@ -106,10 +107,12 @@ base::android::ScopedJavaLocalRef<jstring> BraveSyncWorker::GetSyncCodeWords
   return base::android::ConvertUTF8ToJavaString(env, sync_code);
 }
 
-void BraveSyncWorker::SaveCodeWords(JNIEnv* env,
-  const base::android::JavaParamRef<jobject>& jcaller,
-  const base::android::JavaParamRef<jstring>& passphrase) {
-  std::string str_passphrase = base::android::ConvertJavaStringToUTF8(passphrase);
+void BraveSyncWorker::SaveCodeWords(
+    JNIEnv* env,
+    const base::android::JavaParamRef<jobject>& jcaller,
+    const base::android::JavaParamRef<jstring>& passphrase) {
+  std::string str_passphrase =
+      base::android::ConvertJavaStringToUTF8(passphrase);
 
   std::vector<uint8_t> seed;
   if (!brave_sync::crypto::PassphraseToBytes32(str_passphrase, &seed)) {
@@ -133,10 +136,11 @@ syncer::SyncService* BraveSyncWorker::GetSyncService() const {
 // Most of methods below were taken from by PeopleHandler class to
 // bring logic of enablind / disabling sync from deskop to Android
 
-void BraveSyncWorker::RequestSync(JNIEnv* env,
-  const base::android::JavaParamRef<jobject>& jcaller) {
+void BraveSyncWorker::RequestSync(
+    JNIEnv* env,
+    const base::android::JavaParamRef<jobject>& jcaller) {
   syncer::SyncService* service =
-        ProfileSyncServiceFactory::GetForProfile(profile_);
+      ProfileSyncServiceFactory::GetForProfile(profile_);
 
   if (service && !sync_service_observer_.IsObserving(service)) {
     sync_service_observer_.Add(service);
@@ -173,20 +177,23 @@ void BraveSyncWorker::MarkFirstSetupComplete() {
       syncer::SyncFirstSetupCompleteSource::ADVANCED_FLOW_CONFIRM);
 }
 
-void BraveSyncWorker::FinalizeSyncSetup(JNIEnv* env,
-  const base::android::JavaParamRef<jobject>& jcaller) {
+void BraveSyncWorker::FinalizeSyncSetup(
+    JNIEnv* env,
+    const base::android::JavaParamRef<jobject>& jcaller) {
   MarkFirstSetupComplete();
 }
 
-bool BraveSyncWorker::IsFirstSetupComplete(JNIEnv* env,
-  const base::android::JavaParamRef<jobject>& jcaller) {
+bool BraveSyncWorker::IsFirstSetupComplete(
+    JNIEnv* env,
+    const base::android::JavaParamRef<jobject>& jcaller) {
   syncer::SyncService* sync_service = GetSyncService();
   return sync_service &&
-      sync_service->GetUserSettings()->IsFirstSetupComplete();
+         sync_service->GetUserSettings()->IsFirstSetupComplete();
 }
 
-void BraveSyncWorker::ResetSync(JNIEnv* env,
-  const base::android::JavaParamRef<jobject>& jcaller) {
+void BraveSyncWorker::ResetSync(
+    JNIEnv* env,
+    const base::android::JavaParamRef<jobject>& jcaller) {
   syncer::SyncService* sync_service = GetSyncService();
   if (sync_service) {
     if (sync_service_observer_.IsObserving(sync_service)) {
@@ -214,17 +221,16 @@ struct SyncConfigInfo {
 };
 
 SyncConfigInfo::SyncConfigInfo()
-    : encrypt_all(false),
-      set_new_passphrase(false) {}
+    : encrypt_all(false), set_new_passphrase(false) {}
 
 SyncConfigInfo::~SyncConfigInfo() {}
 
 // Return false if we are not interested configure encryption
 bool FillSyncConfigInfo(syncer::SyncService* service,
-    SyncConfigInfo* configuration,
-    const std::string& passphrase) {
-  bool first_setup_in_progress = service &&
-          !service->GetUserSettings()->IsFirstSetupComplete();
+                        SyncConfigInfo* configuration,
+                        const std::string& passphrase) {
+  bool first_setup_in_progress =
+      service && !service->GetUserSettings()->IsFirstSetupComplete();
 
   configuration->encrypt_all =
       service->GetUserSettings()->IsEncryptEverythingEnabled();
@@ -249,11 +255,12 @@ bool FillSyncConfigInfo(syncer::SyncService* service,
   return true;
 }
 
-}
+}  // namespace
 
 void BraveSyncWorker::OnStateChanged(syncer::SyncService* sync) {
-  // Fill SyncConfigInfo as it is done in brave_sync_subpage.js:handleSyncPrefsChanged_
-  // And then configure encryption as in  PeopleHandler::HandleSetEncryption
+  // Fill SyncConfigInfo as it is done in
+  // brave_sync_subpage.js:handleSyncPrefsChanged_ And then configure encryption
+  // as in  PeopleHandler::HandleSetEncryption
 
   SyncConfigInfo configuration;
 
@@ -266,7 +273,8 @@ void BraveSyncWorker::OnStateChanged(syncer::SyncService* sync) {
   }
 
   if (!FillSyncConfigInfo(service, &configuration, this->passphrase_)) {
-    VLOG(3) << "[BraveSync] " << __func__ << " opertations with passphrase are not required";
+    VLOG(3) << "[BraveSync] " << __func__
+            << " opertations with passphrase are not required";
     return;
   }
 
@@ -332,12 +340,13 @@ static void JNI_BraveSyncWorker_Init(
   new BraveSyncWorker(env, jcaller);
 }
 
-base::android::ScopedJavaLocalRef<jstring> JNI_BraveSyncWorker_GetSeedHexFromWords(
-  JNIEnv* env,
-  const base::android::JavaParamRef<jobject>& jcaller,
-  const base::android::JavaParamRef<jstring>& seed_words) {
-  std::string str_seed_words = base::android::ConvertJavaStringToUTF8(
-        seed_words);
+base::android::ScopedJavaLocalRef<jstring>
+JNI_BraveSyncWorker_GetSeedHexFromWords(
+    JNIEnv* env,
+    const base::android::JavaParamRef<jobject>& jcaller,
+    const base::android::JavaParamRef<jstring>& seed_words) {
+  std::string str_seed_words =
+      base::android::ConvertJavaStringToUTF8(seed_words);
   DCHECK(!str_seed_words.empty());
 
   std::string sync_code_hex;
@@ -346,20 +355,18 @@ base::android::ScopedJavaLocalRef<jstring> JNI_BraveSyncWorker_GetSeedHexFromWor
     DCHECK_EQ(bytes.size(), SEED_BYTES_COUNT);
     sync_code_hex = base::HexEncode(&bytes.at(0), bytes.size());
   } else {
-    VLOG(1) << __func__ <<
-        " PassphraseToBytes32 failed for " << str_seed_words;
+    VLOG(1) << __func__ << " PassphraseToBytes32 failed for " << str_seed_words;
   }
 
   return base::android::ConvertUTF8ToJavaString(env, sync_code_hex);
 }
 
-base::android::ScopedJavaLocalRef<jstring> JNI_BraveSyncWorker_GetWordsFromSeedHex(
-  JNIEnv* env,
-  const base::android::JavaParamRef<jobject>& jcaller,
-  const base::android::JavaParamRef<jstring>& seed_hex) {
-
-  std::string str_seed_hex = base::android::ConvertJavaStringToUTF8(
-        seed_hex);
+base::android::ScopedJavaLocalRef<jstring>
+JNI_BraveSyncWorker_GetWordsFromSeedHex(
+    JNIEnv* env,
+    const base::android::JavaParamRef<jobject>& jcaller,
+    const base::android::JavaParamRef<jstring>& seed_hex) {
+  std::string str_seed_hex = base::android::ConvertJavaStringToUTF8(seed_hex);
   DCHECK(!str_seed_hex.empty());
 
   std::vector<uint8_t> bytes;
@@ -367,22 +374,20 @@ base::android::ScopedJavaLocalRef<jstring> JNI_BraveSyncWorker_GetWordsFromSeedH
   if (base::HexStringToBytes(str_seed_hex, &bytes)) {
     DCHECK_EQ(bytes.size(), SEED_BYTES_COUNT);
     if (bytes.size(), SEED_BYTES_COUNT) {
-        sync_code_words = brave_sync::crypto::PassphraseFromBytes32(bytes);
-        std::vector<std::string> splitted_code_words =
-            base::SplitString(sync_code_words, " ",
-                base::WhitespaceHandling::TRIM_WHITESPACE,
-                base::SplitResult::SPLIT_WANT_NONEMPTY);
-        if (splitted_code_words.size() != SEED_BIP39_WORD_COUNT) {
-          LOG(ERROR) << "wrong codewords count " << splitted_code_words.size();
-          sync_code_words = "";
-        }
+      sync_code_words = brave_sync::crypto::PassphraseFromBytes32(bytes);
+      std::vector<std::string> splitted_code_words = base::SplitString(
+          sync_code_words, " ", base::WhitespaceHandling::TRIM_WHITESPACE,
+          base::SplitResult::SPLIT_WANT_NONEMPTY);
+      if (splitted_code_words.size() != SEED_BIP39_WORD_COUNT) {
+        LOG(ERROR) << "wrong codewords count " << splitted_code_words.size();
+        sync_code_words = "";
+      }
     } else {
       LOG(ERROR) << "wrong seed bytes " << bytes.size();
     }
     DCHECK_NE(sync_code_words, "");
   } else {
-    VLOG(1) << __func__ <<
-        " HexStringToBytes failed for " << str_seed_hex;
+    VLOG(1) << __func__ << " HexStringToBytes failed for " << str_seed_hex;
   }
 
   return base::android::ConvertUTF8ToJavaString(env, sync_code_words);

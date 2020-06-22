@@ -8,12 +8,12 @@ package org.chromium.chrome.browser;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import org.chromium.base.Log;
+import org.chromium.base.ThreadUtils;
 import org.chromium.base.annotations.CalledByNative;
 import org.chromium.base.annotations.JNINamespace;
 import org.chromium.base.task.PostTask;
 import org.chromium.base.task.TaskTraits;
-import org.chromium.base.Log;
-import org.chromium.base.ThreadUtils;
 
 import java.lang.Runnable;
 
@@ -33,9 +33,9 @@ public class BraveSyncWorker {
     }
 
     private void Init() {
-      if (mNativeBraveSyncWorker == 0) {
-          nativeInit();
-      }
+        if (mNativeBraveSyncWorker == 0) {
+            nativeInit();
+        }
     }
 
     @Override
@@ -60,7 +60,8 @@ public class BraveSyncWorker {
         // Deprecated
         public static final String PREF_NAME = "SyncPreferences";
         private static final String PREF_LAST_FETCH_NAME = "TimeLastFetch";
-        private static final String PREF_LATEST_DEVICE_RECORD_TIMESTAMPT_NAME = "LatestDeviceRecordTime";
+        private static final String PREF_LATEST_DEVICE_RECORD_TIMESTAMPT_NAME =
+                "LatestDeviceRecordTime";
         private static final String PREF_LAST_TIME_SEND_NOT_SYNCED_NAME = "TimeLastSendNotSynced";
         public static final String PREF_DEVICE_ID = "DeviceId";
         public static final String PREF_BASE_ORDER = "BaseOrder";
@@ -71,8 +72,10 @@ public class BraveSyncWorker {
         private static final String PREF_SYNC_BOOKMARKS = "brave_sync_bookmarks";
         public static final String PREF_SYNC_TABS = "brave_sync_tabs"; // never used
         public static final String PREF_SYNC_HISTORY = "brave_sync_history"; // never used
-        public static final String PREF_SYNC_AUTOFILL_PASSWORDS = "brave_sync_autofill_passwords"; // never used
-        public static final String PREF_SYNC_PAYMENT_SETTINGS = "brave_sync_payment_settings"; // never used
+        public static final String PREF_SYNC_AUTOFILL_PASSWORDS =
+                "brave_sync_autofill_passwords"; // never used
+        public static final String PREF_SYNC_PAYMENT_SETTINGS =
+                "brave_sync_payment_settings"; // never used
 
         private boolean HaveSyncV1Prefs() {
             SharedPreferences sharedPref = mContext.getSharedPreferences(PREF_NAME, 0);
@@ -88,19 +91,19 @@ public class BraveSyncWorker {
             SharedPreferences sharedPref = mContext.getSharedPreferences(PREF_NAME, 0);
             SharedPreferences.Editor editor = sharedPref.edit();
             editor.remove(PREF_LAST_FETCH_NAME)
-                  .remove(PREF_LATEST_DEVICE_RECORD_TIMESTAMPT_NAME)
-                  .remove(PREF_LAST_TIME_SEND_NOT_SYNCED_NAME)
-                  .remove(PREF_SYNC_SWITCH)
-                  .remove(PREF_SYNC_BOOKMARKS)
-                  .remove(PREF_SYNC_TABS)
-                  .remove(PREF_SYNC_HISTORY)
-                  .remove(PREF_SYNC_AUTOFILL_PASSWORDS)
-                  .remove(PREF_SYNC_PAYMENT_SETTINGS)
-                  .remove(PREF_DEVICE_ID)
-                  .remove(PREF_BASE_ORDER)
-                  .remove(PREF_LAST_ORDER)
-                  .remove(PREF_SYNC_DEVICE_NAME)
-                  .apply();
+                    .remove(PREF_LATEST_DEVICE_RECORD_TIMESTAMPT_NAME)
+                    .remove(PREF_LAST_TIME_SEND_NOT_SYNCED_NAME)
+                    .remove(PREF_SYNC_SWITCH)
+                    .remove(PREF_SYNC_BOOKMARKS)
+                    .remove(PREF_SYNC_TABS)
+                    .remove(PREF_SYNC_HISTORY)
+                    .remove(PREF_SYNC_AUTOFILL_PASSWORDS)
+                    .remove(PREF_SYNC_PAYMENT_SETTINGS)
+                    .remove(PREF_DEVICE_ID)
+                    .remove(PREF_BASE_ORDER)
+                    .remove(PREF_LAST_ORDER)
+                    .remove(PREF_SYNC_DEVICE_NAME)
+                    .apply();
             // Keep old PREF_SEED just in case
         }
 
@@ -111,19 +114,17 @@ public class BraveSyncWorker {
         public void MigrateFromSyncV1() {
             // Do all migration work in file IO thread because we may need to
             // read shared preferences and delete level db
-            PostTask.postTask(TaskTraits.BEST_EFFORT_MAY_BLOCK, () ->
-            {
+            PostTask.postTask(TaskTraits.BEST_EFFORT_MAY_BLOCK, () -> {
                 if (HaveSyncV1Prefs()) {
                     Log.i(TAG, "Found sync v1 data, doing migration");
                     DeleteSyncV1Prefs();
                     DeleteSyncV1LevelDb();
                     // Mark sync v1 was enabled to trigger informers
-                    ThreadUtils.runOnUiThreadBlocking(
-                        new Runnable() {
-                            @Override
-                            public void run() {
-                                nativeMarkSyncV1WasEnabledAndMigrated();
-                            }
+                    ThreadUtils.runOnUiThreadBlocking(new Runnable() {
+                        @Override
+                        public void run() {
+                            nativeMarkSyncV1WasEnabledAndMigrated();
+                        }
                     });
                 }
             });
@@ -131,35 +132,35 @@ public class BraveSyncWorker {
     };
 
     public String GetCodephrase() {
-      return nativeGetSyncCodeWords(mNativeBraveSyncWorker);
+        return nativeGetSyncCodeWords(mNativeBraveSyncWorker);
     }
 
     public void SaveCodephrase(String codephrase) {
-      nativeSaveCodeWords(mNativeBraveSyncWorker, codephrase);
+        nativeSaveCodeWords(mNativeBraveSyncWorker, codephrase);
     }
 
     public String GetSeedHexFromWords(String codephrase) {
-      return nativeGetSeedHexFromWords(codephrase);
+        return nativeGetSeedHexFromWords(codephrase);
     }
 
     public String GetWordsFromSeedHex(String seedHex) {
-      return nativeGetWordsFromSeedHex(seedHex);
+        return nativeGetWordsFromSeedHex(seedHex);
     }
 
     public void RequestSync() {
-      nativeRequestSync(mNativeBraveSyncWorker);
+        nativeRequestSync(mNativeBraveSyncWorker);
     }
 
     public boolean IsFirstSetupComplete() {
-      return nativeIsFirstSetupComplete(mNativeBraveSyncWorker);
+        return nativeIsFirstSetupComplete(mNativeBraveSyncWorker);
     }
 
     public void FinalizeSyncSetup() {
-      nativeFinalizeSyncSetup(mNativeBraveSyncWorker);
+        nativeFinalizeSyncSetup(mNativeBraveSyncWorker);
     }
 
     public void ResetSync() {
-      nativeResetSync(mNativeBraveSyncWorker);
+        nativeResetSync(mNativeBraveSyncWorker);
     }
 
     private native void nativeInit();
