@@ -6,8 +6,8 @@ index 0916e619f58d9146367a62c101ef9fdec0f5c0ad..75a77fca11887887e205c19ababab33b
              if (sInstance == null) {
                  SyncContentResolverDelegate contentResolver =
                          new SystemSyncContentResolverDelegate();
--                sInstance = new AndroidSyncSettings(contentResolver);
-+                sInstance = new BraveAndroidSyncSettings(contentResolver);
+-                //sInstance = new BraveAndroidSyncSettings(contentResolver);
++                sInstance = new AndroidSyncSettings(contentResolver);
              }
              return sInstance;
          }
