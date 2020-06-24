@@ -245,6 +245,7 @@ source_set("ui") {
   if (!is_android) {
     deps += [
       "//brave/app:brave_generated_resources_grit",
+      "//brave/browser/resources/bookmarks:resources",
       "//brave/browser:version_info",
       "//brave/components/brave_sync",
       "//components/sync_device_info",
