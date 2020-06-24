@@ -48,7 +48,7 @@ public class BraveNewTabPageLayout extends NewTabPageLayout {
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-        mBraveStatsView = (ViewGroup) findViewById(R.id.brave_stats);
+        mBraveStatsView = (ViewGroup) findViewById(R.id.brave_stats_layout);
     }
 
     @Override

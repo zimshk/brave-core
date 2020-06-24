@@ -171,7 +171,7 @@ public class BraveNewTabPageView extends NewTabPageView {
     protected void onFinishInflate() {
         super.onFinishInflate();
 
-        ViewGroup braveStatsView = (ViewGroup) getNewTabPageLayout().findViewById(R.id.brave_stats);
+        ViewGroup braveStatsView = (ViewGroup) getNewTabPageLayout().findViewById(R.id.brave_stats_layout);
         mAdsBlockedCountTextView = (TextView) braveStatsView.findViewById(R.id.brave_stats_text_ads_count);
         mDataSavedValueTextView = (TextView) braveStatsView.findViewById(R.id.brave_stats_data_saved_value);
         mEstTimeSavedCountTextView = (TextView) braveStatsView.findViewById(R.id.brave_stats_text_time_count);
