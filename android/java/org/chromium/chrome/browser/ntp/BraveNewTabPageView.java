@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.view.ContextMenu;
 import android.widget.LinearLayout;
+import android.widget.FrameLayout;
 import android.view.LayoutInflater;
 import android.view.Gravity;
 import android.graphics.Bitmap;
@@ -201,6 +202,15 @@ public class BraveNewTabPageView extends NewTabPageView {
             @Override
             public void onClick(View v) {
                 showOnboarding(OnboardingPrefManager.ONBOARDING_TIME);
+            }
+        });
+
+        FrameLayout mBadgeLayout = mNewTabPageLayout.findViewById(R.id.badge_layout);
+        ImageView mBadgeImageView = mNewTabPageLayout.findViewById(R.id.badge_image_view);
+        mBadgeImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showOnboarding(OnboardingPrefManager.ONBOARDING_INVALID_OPTION);
             }
         });
     }
