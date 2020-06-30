@@ -65,7 +65,7 @@ IN_PROC_BROWSER_TEST_F(BraveMainDelegateBrowserTest, DisabledFeatures) {
       &features::kNotificationTriggers,
       &features::kSmsReceiver,
       &features::kVideoPlaybackQuality,
-      &features::kLookalikeUrlNavigationSuggestionsUI,
+//      &features::kLookalikeUrlNavigationSuggestionsUI,
       &features::kTabHoverCards,
       &language::kUseButtonTranslateBubbleUi,
   };
