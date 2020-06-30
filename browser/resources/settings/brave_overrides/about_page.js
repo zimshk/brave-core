@@ -14,7 +14,24 @@ RegisterPolymerTemplateModifications({
       if (!version) {
         console.error('[Brave Settings Overrides] Could not find version div')
       }
-      version.innerHTML = '<a id="release-notes" target="_blank" href="https://brave.com/latest/">' + version.innerHTML + '</a>'
+
+      // example contents of `version.innerHTML` (string):
+      // Version 1.10.97 Chromium: 83.0.4103.116 (Official Build) (64-bit)
+
+      // pull Chromium version out
+      let previousText = version.innerHTML
+      const [chromiumVersion = ''] = previousText.match(/\sChromium:\s([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)\s/) || []
+      if (chromiumVersion) {
+        previousText = previousText.replace(chromiumVersion, '')
+      }
+
+      // Wrap Brave version with link to Release Notes
+      version.innerHTML = '<a id="release-notes" target="_blank" href="https://brave.com/latest/">' + previousText + '</a>'
+
+      // Put Chromium version on next line
+      if (chromiumVersion) {
+        version.insertAdjacentHTML('afterend', '<div class="secondary">' + chromiumVersion.trim() + '</div>')
+      }
     }
   }
 })
