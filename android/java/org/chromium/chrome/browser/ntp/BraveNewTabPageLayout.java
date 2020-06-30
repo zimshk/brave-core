@@ -188,9 +188,7 @@ public class BraveNewTabPageLayout extends NewTabPageLayout {
         if (getPlaceholder() != null) {
             getPlaceholder().setVisibility(View.GONE);
         }
-        if (sponsoredTab != null) {
-            checkAndShowNTPImage(false);
-        }
+        checkAndShowNTPImage(false);
         mNTPBackgroundImagesBridge.addObserver(mNTPBackgroundImageServiceObserver);
     }
 
@@ -462,9 +460,7 @@ public class BraveNewTabPageLayout extends NewTabPageLayout {
             if (sponsoredTab == null) {
                 initilizeSponsoredTab();
             }
-            if (sponsoredTab != null) {
-                checkAndShowNTPImage(false);
-            }
+            checkAndShowNTPImage(false);
         }
 
         @Override
