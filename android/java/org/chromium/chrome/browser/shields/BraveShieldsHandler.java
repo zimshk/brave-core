@@ -39,6 +39,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.Bitmap;
 
 import org.chromium.base.SysUtils;
+import org.chromium.base.Log;
 import org.chromium.base.task.AsyncTask;
 import org.chromium.chrome.browser.profiles.Profile;
 import org.chromium.chrome.browser.preferences.website.BraveShieldsContentSettings;
@@ -64,6 +65,7 @@ public class BraveShieldsHandler implements BraveRewardsHelper.LargeIconReadyCal
         public BlockersInfo() {
             mAdsBlocked = 0;
             mTrackersBlocked = 0;
+            mDataSaved = 0;
             mHTTPSUpgrades = 0;
             mScriptsBlocked = 0;
             mFingerprintsBlocked = 0;
@@ -71,6 +73,7 @@ public class BraveShieldsHandler implements BraveRewardsHelper.LargeIconReadyCal
 
         public int mAdsBlocked;
         public int mTrackersBlocked;
+        public long mDataSaved;
         public int mHTTPSUpgrades;
         public int mScriptsBlocked;
         public int mFingerprintsBlocked;
@@ -146,6 +149,8 @@ public class BraveShieldsHandler implements BraveRewardsHelper.LargeIconReadyCal
             blockersInfo.mAdsBlocked++;
         } else if (block_type.equals(BraveShieldsContentSettings.RESOURCE_IDENTIFIER_TRACKERS)) {
             blockersInfo.mTrackersBlocked++;
+        } else if (block_type.equals(BraveShieldsContentSettings.RESOURCE_IDENTIFIER_DATA_SAVED)) {
+            blockersInfo.mDataSaved = Long.parseLong(subresource);
         } else if (block_type.equals(BraveShieldsContentSettings.RESOURCE_IDENTIFIER_HTTP_UPGRADABLE_RESOURCES)) {
             blockersInfo.mHTTPSUpgrades++;
         } else if (block_type.equals(BraveShieldsContentSettings.RESOURCE_IDENTIFIER_JAVASCRIPTS)) {
@@ -294,6 +299,15 @@ public class BraveShieldsHandler implements BraveRewardsHelper.LargeIconReadyCal
 
         BlockersInfo blockersInfo = mTabsStat.get(tabId);
         return blockersInfo.mAdsBlocked + blockersInfo.mTrackersBlocked;
+    }
+
+    public long getDataSaved(int tabId) {
+        if (!mTabsStat.containsKey(tabId)) {
+            return 0;
+        }
+
+        BlockersInfo blockersInfo = mTabsStat.get(tabId);
+        return blockersInfo.mDataSaved;
     }
 
     public void updateValues(int adsAndTrackers, int httpsUpgrades, int scriptsBlocked, int fingerprintsBlocked) {
