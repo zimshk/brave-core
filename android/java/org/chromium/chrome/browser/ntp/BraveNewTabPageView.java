@@ -63,6 +63,7 @@ import org.chromium.chrome.browser.offlinepages.RequestCoordinatorBridge;
 import org.chromium.chrome.browser.offlinepages.DownloadUiActionFlags;
 import org.chromium.chrome.browser.onboarding.OnboardingPrefManager;
 import org.chromium.chrome.browser.onboarding.OnboradingBottomSheetDialogFragment;
+import org.chromium.chrome.browser.brave_stats.BraveStatsBottomSheetDialogFragment;
 
 public class BraveNewTabPageView extends NewTabPageView {
     private static final String TAG = "BraveNewTabPageView";
@@ -116,7 +117,8 @@ public class BraveNewTabPageView extends NewTabPageView {
         }
         checkAndShowNTPImage(false);
         mNTPBackgroundImagesBridge.addObserver(mNTPBackgroundImageServiceObserver);
-        showOnboarding(OnboardingPrefManager.ONBOARDING_INVALID_OPTION);
+        // showOnboarding(OnboardingPrefManager.ONBOARDING_INVALID_OPTION);
+        showOnboarding();
     }
 
     @Override
@@ -410,6 +412,12 @@ public class BraveNewTabPageView extends NewTabPageView {
         onboradingBottomSheetDialogFragment.setNewTabPageListener(newTabPageListener);
         onboradingBottomSheetDialogFragment.show(mTabImpl.getActivity().getSupportFragmentManager(), "onboarding_bottom_sheet_dialog_fragment");
         onboradingBottomSheetDialogFragment.setCancelable(false);
+    }
+
+    private void showOnboarding() {
+        BraveStatsBottomSheetDialogFragment braveStatsBottomSheetDialogFragment = BraveStatsBottomSheetDialogFragment.newInstance();
+        braveStatsBottomSheetDialogFragment.show(mTabImpl.getActivity().getSupportFragmentManager(), "brave_stats_bottom_sheet_dialog_fragment");
+        braveStatsBottomSheetDialogFragment.setCancelable(false);
     }
 
     private NewTabPageListener newTabPageListener = new NewTabPageListener() {
