@@ -3,7 +3,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+#include <utility>
+
 #include "brave/components/private_channel/browser/private_channel_service.h"
+#include "brave/components/private_channel/browser/static_values.h"
+#include "brave/components/private_channel/browser/request_utils.h"
 #include "brave/components/private_channel/client_private_channel.h"
 
 #include "base/logging.h"
@@ -15,42 +19,44 @@
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/net/system_network_context_manager.h"
 
-const int kMaxPrivateChannelServerResponseSizeBytes = 1024 * 1024;
-
-// @gpestana(TODO: refactor const to static values) 
-const std::string metaUrl = "http://0.0.0.0:80/v1/meta";
-const std::string firstRoundUrl = "http://0.0.0.0:80/v1/attestation/start";
-const std::string secondRoundUrl = "http://0.0.0.0:80/v1/attestation/result";
-
-// @gpestana(TODO: refactor to static values)
-static const uint8_t PRIVATE_CHANNEL_SERVER_PK[] = {
-  250, 180, 202, 58, 178, 175, 23, 9, 183, 97, 62, 167, 202,
-  142, 210, 41, 122, 118, 82, 204, 98, 71, 134, 215, 67, 15,
-  128, 124, 217, 120, 172, 93};
+using namespace brave_private_channel_request_utils;  // NOLINT
 
 namespace brave_private_channel {
 
-  // @gpestana(TODO: do we need anything to pass as constructor?)
-  PrivateChannel::PrivateChannel(){
+  PrivateChannel::PrivateChannel(bool init, std::string referral_code) {
+    referral_code_ = referral_code;
+    if (!init) {
+      server_pubkey_ = PRIVATE_CHANNEL_SERVER_PK;
+      return;
+    }
+
+    this->FetchMetadataPrivateChannelServer();
   }
 
-  PrivateChannel::~PrivateChannel(){
+  PrivateChannel::~PrivateChannel() {
   }
 
   void PrivateChannel::PerformReferralAttestation() {
-     LOG(INFO) << "PrivateChannel::PerformReferralAttestation";
+    LOG(INFO) << "PrivateChannel::PerformReferralAttestation";
 
+    this->FirstRoundProtocol(server_pubkey_);
+  }
+
+  void PrivateChannel::FetchMetadataPrivateChannelServer() {
     auto resource_request = std::make_unique<network::ResourceRequest>();
     resource_request->method = "GET";
-    resource_request->url = GURL(metaUrl);
-    resource_request->headers.SetHeader("Content-Type", "application/x-www-form-urlencoded");
+    resource_request->url =
+      GURL(BuildUrl(EndpointType::META, PRIVATE_CHANNEL_API_VERSION));
+    resource_request->
+      headers.SetHeader("Content-Type", "application/x-www-form-urlencoded");
     resource_request->load_flags =
       net::LOAD_DO_NOT_SEND_COOKIES | net::LOAD_DO_NOT_SAVE_COOKIES |
       net::LOAD_BYPASS_CACHE | net::LOAD_DISABLE_CACHE |
       net::LOAD_DO_NOT_SEND_AUTH_DATA;
 
     network::mojom::URLLoaderFactory* loader_factory =
-      g_browser_process->system_network_context_manager()->GetURLLoaderFactory();
+      g_browser_process->
+        system_network_context_manager()->GetURLLoaderFactory();
 
     net::NetworkTrafficAnnotationTag traffic_annotation =
       net::DefineNetworkTrafficAnnotation("brave_private_channel_meta", R"(
@@ -85,6 +91,8 @@ namespace brave_private_channel {
 
   void PrivateChannel::OnPrivateChannelMetaLoadComplete(
       std::unique_ptr<std::string> response_body) {
+        LOG(INFO) << "PrivateChannel::OnPrivateChannelMetaLoadComplete";
+
         int response_code = -1;
         if (http_loader_->ResponseInfo() &&
             http_loader_->ResponseInfo()->headers)
@@ -102,14 +110,13 @@ namespace brave_private_channel {
                      << ", payload: " << safe_response_body
                      << ", url: " << http_loader_->GetFinalURL().spec();
           return;
-
         }
-        LOG(INFO) << "PrivateChannel::OnPrivateChannelMetaLoadComplete: " << safe_response_body;
-      
-        this->FirstRoundProtocol(safe_response_body);
+
+        // TODO(@gpestana): parse response_body to `const uint8_t`
+        server_pubkey_ = PRIVATE_CHANNEL_SERVER_PK;
   }
 
-  void PrivateChannel::FirstRoundProtocol(std::string server_pk) {
+  void PrivateChannel::FirstRoundProtocol(const uint8_t* server_pk) {
     LOG(INFO) << "PrivateChannel::FirstRoundProtocol";
 
     // TODO(gpestana): refactor and get signals
@@ -120,22 +127,20 @@ namespace brave_private_channel {
     const char* input[] = { sig0.c_str(), sig1.c_str(), sig2.c_str() };
     int input_size = sizeof(input)/sizeof(input[0]);
 
-    auto request_artefacts = ChallengeFirstRound(input, input_size, PRIVATE_CHANNEL_SERVER_PK);
-    
-    // TODO(gpestana): get referral id (most likely from the private 
-    // channel constructor)    
-    std::string id = "ref_id";
+    auto request_artefacts =
+      ChallengeFirstRound(input, input_size, server_pubkey_);
 
     const std::string payload = base::StringPrintf(
       "pk=%s&th_key=%s&enc_signals=%s&client_id=%s",
       request_artefacts.client_pk.c_str(),
       request_artefacts.shared_pubkey.c_str(),
       request_artefacts.encrypted_hashes.c_str(),
-      id.c_str());
+      referral_code_.c_str());
 
     auto resource_request = std::make_unique<network::ResourceRequest>();
     resource_request->method = "POST";
-    resource_request->url = GURL(firstRoundUrl);
+    resource_request->url =
+      GURL(BuildUrl(EndpointType::FIRST_ROUND, PRIVATE_CHANNEL_API_VERSION));
     std::string content_type = "application/x-www-form-urlencoded";
     resource_request->headers.SetHeader("Content-Type", content_type);
     resource_request->load_flags =
@@ -143,11 +148,12 @@ namespace brave_private_channel {
       net::LOAD_BYPASS_CACHE | net::LOAD_DISABLE_CACHE |
       net::LOAD_DO_NOT_SEND_AUTH_DATA;
 
-    network::mojom::URLLoaderFactory* loader_factory =
-      g_browser_process->system_network_context_manager()->GetURLLoaderFactory();
+    network::mojom::URLLoaderFactory* loader_factory = g_browser_process->
+      system_network_context_manager()->GetURLLoaderFactory();
 
     net::NetworkTrafficAnnotationTag traffic_annotation =
-      net::DefineNetworkTrafficAnnotation("brave_private_channel_first_round", R"(
+      net::DefineNetworkTrafficAnnotation(
+      "brave_private_channel_first_round", R"(
         semantics {
           sender:
             "Brave Private Channel Service"
@@ -174,7 +180,7 @@ namespace brave_private_channel {
         &PrivateChannel::OnPrivateChannelFirstRoundLoadComplete,
           base::Unretained(this),
           request_artefacts.client_sk,
-          id,
+          referral_code_,
           input_size),
         kMaxPrivateChannelServerResponseSizeBytes);
   }
@@ -184,7 +190,6 @@ namespace brave_private_channel {
       std::string id,
       int input_size,
       std::unique_ptr<std::string> response_body) {
-
         LOG(INFO) << "PrivateChannel::OnPrivateChannelFirstRoundLoadComplete";
 
         int response_code = -1;
@@ -198,15 +203,14 @@ namespace brave_private_channel {
 
         if (http_loader_->NetError() != net::OK || response_code < 200 ||
             response_code > 299) {
-          LOG(ERROR) << "Failed run the first round of the private channels protocol"
+          LOG(ERROR)
+              << "Failed run the first round of the private channels protocol"
               << ", error: " << http_loader_->NetError()
               << ", response code: " << response_code
               << ", payload: " << safe_response_body
               << ", url: " << http_loader_->GetFinalURL().spec();
           return;
-
         }
-        LOG(INFO) << "PrivateChannel::OnPrivateChannelFirstRoundLoadComplete: " << safe_response_body;
 
         this->SecondRoundProtocol(
           safe_response_body.c_str(), client_sk, id, input_size);
@@ -217,8 +221,7 @@ namespace brave_private_channel {
     std::string client_sk,
     std::string id,
     int input_size) {
-
-    LOG(INFO) << "PrivateChannel::SecondRoundProtocol: " << encrypted_input;
+    LOG(INFO) << "PrivateChannel::SecondRoundProtocol";
 
     auto request_artefacts = SecondRound(
       encrypted_input.c_str(), input_size, &client_sk[0]);
@@ -232,7 +235,8 @@ namespace brave_private_channel {
 
     auto resource_request = std::make_unique<network::ResourceRequest>();
     resource_request->method = "POST";
-    resource_request->url = GURL(secondRoundUrl);
+    resource_request->url =
+      GURL(BuildUrl(EndpointType::SECOND_ROUND, PRIVATE_CHANNEL_API_VERSION));
     std::string content_type = "application/x-www-form-urlencoded";
     resource_request->headers.SetHeader("Content-Type", content_type);
     resource_request->load_flags =
@@ -240,11 +244,12 @@ namespace brave_private_channel {
       net::LOAD_BYPASS_CACHE | net::LOAD_DISABLE_CACHE |
       net::LOAD_DO_NOT_SEND_AUTH_DATA;
 
-    network::mojom::URLLoaderFactory* loader_factory =
-      g_browser_process->system_network_context_manager()->GetURLLoaderFactory();
+    network::mojom::URLLoaderFactory* loader_factory = g_browser_process->
+      system_network_context_manager()->GetURLLoaderFactory();
 
     net::NetworkTrafficAnnotationTag traffic_annotation =
-      net::DefineNetworkTrafficAnnotation("brave_private_channel_second_round", R"(
+      net::DefineNetworkTrafficAnnotation(
+        "brave_private_channel_second_round", R"(
         semantics {
           sender:
             "Brave Private Channel Service"
@@ -278,4 +283,4 @@ namespace brave_private_channel {
         LOG(INFO) << "PrivateChannel::OnPrivateChannelSecondRoundLoadComplete";
   }
 
-} // namespace 
+}  // namespace brave_private_channel

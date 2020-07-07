@@ -3,8 +3,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-#ifndef BRAVE_COMPONENTS_PRIVATE_CHANNEL_BROWSER_BRAVE_REFERRALS_SERVICE_H_
-#define BRAVE_COMPONENTS_PRIVATE_CHANNEL_BROWSER_BRAVE_REFERRALS_SERVICE_H_
+#ifndef BRAVE_COMPONENTS_PRIVATE_CHANNEL_BROWSER_PRIVATE_CHANNEL_SERVICE_H_
+#define BRAVE_COMPONENTS_PRIVATE_CHANNEL_BROWSER_PRIVATE_CHANNEL_SERVICE_H_
 
 #include <memory>
 #include <string>
@@ -21,16 +21,18 @@ namespace brave_private_channel {
 
 class PrivateChannel {
  public:
-    explicit PrivateChannel();
+    explicit PrivateChannel(bool init, std::string referral_code);
     ~PrivateChannel();
 
     void PerformReferralAttestation();
 
  private:
+  void FetchMetadataPrivateChannelServer();
+
   void OnPrivateChannelMetaLoadComplete(
       std::unique_ptr<std::string> response_body);
-  
-  void FirstRoundProtocol(std::string pubkey);
+
+  void FirstRoundProtocol(const uint8_t* server_pubkey);
 
   void OnPrivateChannelFirstRoundLoadComplete(
       std::string client_sk,
@@ -49,9 +51,10 @@ class PrivateChannel {
 
 
   std::unique_ptr<network::SimpleURLLoader> http_loader_;
-
+  const uint8_t* server_pubkey_;
+  std::string referral_code_;
 };
 
 }  // namespace brave_private_channel
 
-#endif  // BRAVE_COMPONENTS_PRIVATE_CHANNEL_BROWSER_BRAVE_REFERRALS_SERVICE_H_
+#endif  // BRAVE_COMPONENTS_PRIVATE_CHANNEL_BROWSER_PRIVATE_CHANNEL_SERVICE_H_

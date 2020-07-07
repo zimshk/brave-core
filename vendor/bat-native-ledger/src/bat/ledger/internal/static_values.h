@@ -52,13 +52,6 @@
 #define API_DEVELOPMENT_SERVER            \
 "https://api.rewards.brave.software"
 
-#define PRIVATE_CHANNEL_STAGING_SERVER              \
-"https://repsys.rewards.brave.software"
-#define PRIVATE_CHANNEL_PRODUCTION_SERVER           \
-"https://repsys.rewards.brave.com"
-#define PRIVATE_CHANNEL_DEVELOPMENT_SERVER            \
-"https://repsys.rewards.brave.software"
-
 #define PREFIX_V1                       "/v1"
 #define PREFIX_V2                       "/v2"
 #define PREFIX_V3                       "/v3"
@@ -129,11 +122,6 @@ static const uint8_t g_hkdfSalt[] = {
     158, 84, 125, 69, 246, 207, 162, 247, 107, 172, 37, 34, 53,
     246, 105, 20, 215, 5, 248, 154, 179, 191, 46, 17, 6, 72, 210,
     91, 10, 169, 145, 248, 22, 147, 117, 24, 105, 12};
-
-static const uint8_t PRIVATE_CHANNEL_SERVER_PK[] = {
-  182, 201, 246, 247, 14, 5, 127, 202, 244, 2, 231, 11, 101, 189,
-   114, 9, 152, 192, 159, 165, 54, 184, 99, 115, 179, 47, 167, 148,
-   3, 84, 204, 60};
 
 static const uint64_t _default_min_page_time_before_logging_a_visit = 8;
 
