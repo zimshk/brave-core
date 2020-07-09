@@ -28,6 +28,7 @@ import java.util.Map;
  */
 public class OnboardingPrefManager {
     private static final String PREF_ONBOARDING = "onboarding";
+    private static final String PREF_ONBOARDING_V2 = "onboarding_v2";
     private static final String PREF_NEXT_ONBOARDING_DATE = "next_onboarding_date";
     private static final String PREF_ONBOARDING_FOR_SKIP = "onboarding_for_skip";
     private static final String PREF_ONBOARDING_SKIP_COUNT = "onboarding_skip_count";
@@ -88,6 +89,22 @@ public class OnboardingPrefManager {
     public void setOnboardingShown(boolean isShown) {
         SharedPreferences.Editor sharedPreferencesEditor = mSharedPreferences.edit();
         sharedPreferencesEditor.putBoolean(PREF_ONBOARDING, isShown);
+        sharedPreferencesEditor.apply();
+    }
+
+    /**
+     * Returns the user preference for whether the onboarding is shown.
+     */
+    public boolean isNewOnboardingShown() {
+        return mSharedPreferences.getBoolean(PREF_ONBOARDING_V2, false);
+    }
+
+    /**
+     * Sets the user preference for whether the onboarding is shown.
+     */
+    public void setNewOnboardingShown(boolean isShown) {
+        SharedPreferences.Editor sharedPreferencesEditor = mSharedPreferences.edit();
+        sharedPreferencesEditor.putBoolean(PREF_ONBOARDING_V2, isShown);
         sharedPreferencesEditor.apply();
     }
 

@@ -33,6 +33,8 @@ import org.chromium.base.TraceEvent;
 import org.chromium.chrome.R;
 import org.chromium.base.task.AsyncTask;
 import org.chromium.base.ThreadUtils;
+import org.chromium.base.ContextUtils;
+import org.chromium.chrome.browser.util.PackageUtils;
 import org.chromium.chrome.browser.lifecycle.ActivityLifecycleDispatcher;
 import org.chromium.chrome.browser.ntp.NewTabPageView;
 import org.chromium.chrome.browser.preferences.BravePref;
@@ -63,7 +65,9 @@ import org.chromium.chrome.browser.offlinepages.RequestCoordinatorBridge;
 import org.chromium.chrome.browser.offlinepages.DownloadUiActionFlags;
 import org.chromium.chrome.browser.onboarding.OnboardingPrefManager;
 import org.chromium.chrome.browser.onboarding.OnboradingBottomSheetDialogFragment;
-import org.chromium.chrome.browser.brave_stats.BraveStatsBottomSheetDialogFragment;
+import org.chromium.chrome.browser.brave_stats.BraveStatsUtil;
+import org.chromium.chrome.browser.preferences.BravePreferenceKeys;
+import org.chromium.chrome.browser.preferences.SharedPreferencesManager;
 
 public class BraveNewTabPageView extends NewTabPageView {
     private static final String TAG = "BraveNewTabPageView";
@@ -117,8 +121,10 @@ public class BraveNewTabPageView extends NewTabPageView {
         }
         checkAndShowNTPImage(false);
         mNTPBackgroundImagesBridge.addObserver(mNTPBackgroundImageServiceObserver);
-        // showOnboarding(OnboardingPrefManager.ONBOARDING_INVALID_OPTION);
-        showOnboarding();
+        if (PackageUtils.isFirstInstall(ContextUtils.getApplicationContext())
+                && !OnboardingPrefManager.getInstance().isNewOnboardingShown()) {
+            showOnboarding(OnboardingPrefManager.ONBOARDING_INVALID_OPTION);
+        }
     }
 
     @Override
@@ -212,9 +218,17 @@ public class BraveNewTabPageView extends NewTabPageView {
         mBadgeImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showOnboarding(OnboardingPrefManager.ONBOARDING_INVALID_OPTION);
+                if (OnboardingPrefManager.getInstance().isBraveStatsEnabled()) {
+                    BraveStatsUtil.showBraveStats();
+                } else {
+                    showOnboarding(OnboardingPrefManager.ONBOARDING_INVALID_OPTION);
+                }
             }
         });
+
+        if (OnboardingPrefManager.getInstance().isNewOnboardingShown()) {
+            mBadgeLayout.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -235,9 +249,9 @@ public class BraveNewTabPageView extends NewTabPageView {
         long dataSaved = BravePrefServiceBridge.getInstance().getDataSaved(mProfile);
         long estimatedMillisecondsSaved = (trackersBlockedCount + adsBlockedCount) * MILLISECONDS_PER_ITEM;
 
-        mAdsBlockedCountTextView.setText(getBraveStatsStringFormNumber(adsBlockedCount, false));
-        mDataSavedValueTextView.setText(getBraveStatsStringFormNumber(dataSaved, true));
-        mEstTimeSavedCountTextView.setText(getBraveStatsStringFromTime(estimatedMillisecondsSaved / 1000));
+        mAdsBlockedCountTextView.setText(BraveStatsUtil.getBraveStatsStringFormNumber(adsBlockedCount, false));
+        mDataSavedValueTextView.setText(BraveStatsUtil.getBraveStatsStringFormNumber(dataSaved, true));
+        mEstTimeSavedCountTextView.setText(BraveStatsUtil.getBraveStatsStringFromTime(estimatedMillisecondsSaved / 1000));
 
         if ((BravePrefServiceBridge.getInstance().getBoolean(BravePref.NTP_SHOW_BACKGROUND_IMAGE)
                 || NTPUtil.isReferralEnabled())
@@ -249,58 +263,6 @@ public class BraveNewTabPageView extends NewTabPageView {
         }
 
         TraceEvent.end(TAG + ".updateBraveStats()");
-    }
-
-    /*
-    * Gets string view of specific number for Brave stats
-    */
-    private String getBraveStatsStringFormNumber(long number, boolean isBytes) {
-        String result = "";
-        String suffix = "";
-        long base = isBytes ? 1024L : 1000L;
-        if (number >= base * base * base) {
-            result = result + (number / (base * base * base));
-            number = number % (base * base * base);
-            result = result + "." + (number / (10L * base * base));
-            suffix = isBytes ? "GB" : "B";
-        } else if (number >= (10L * base * base) && number < (base * base * base)) {
-            result = result + (number / (base * base));
-            suffix = isBytes ? "MB" : "M";
-        } else if (number >= (base * base) && number < (10L * base * base)) {
-            result = result + (number / (base * base));
-            number = number % (base * base);
-            result = result + "." + (number / (100L * base));
-            suffix = isBytes ? "MB" : "M";
-        } else if (number >= (10L * base) && number < (base * base)) {
-            result = result + (number / base);
-            suffix = isBytes ? "KB" : "K";
-        } else if (number >= base && number < (10L * base)) {
-            result = result + (number / base);
-            number = number % base;
-            result = result + "." + (number / 100L);
-            suffix = isBytes ? "KB" : "K";
-        } else {
-            result = result + number;
-        }
-        result = result + suffix;
-        return result;
-    }
-
-    /*
-    * Gets string view of specific time in seconds for Brave stats
-    */
-    private String getBraveStatsStringFromTime(long seconds) {
-        String result = "";
-        if (seconds > 24 * 60 * 60) {
-            result = result + (seconds / (24 * 60 * 60)) + "d";
-        } else if (seconds > 60 * 60) {
-            result = result + (seconds / (60 * 60)) + "h";
-        } else if (seconds > 60) {
-            result = result + (seconds / 60) + "m";
-        } else {
-            result = result + seconds + "s";
-        }
-        return result;
     }
 
     private void showNTPImage(NTPImage ntpImage) {
@@ -412,12 +374,6 @@ public class BraveNewTabPageView extends NewTabPageView {
         onboradingBottomSheetDialogFragment.setNewTabPageListener(newTabPageListener);
         onboradingBottomSheetDialogFragment.show(mTabImpl.getActivity().getSupportFragmentManager(), "onboarding_bottom_sheet_dialog_fragment");
         onboradingBottomSheetDialogFragment.setCancelable(false);
-    }
-
-    private void showOnboarding() {
-        BraveStatsBottomSheetDialogFragment braveStatsBottomSheetDialogFragment = BraveStatsBottomSheetDialogFragment.newInstance();
-        braveStatsBottomSheetDialogFragment.show(mTabImpl.getActivity().getSupportFragmentManager(), "brave_stats_bottom_sheet_dialog_fragment");
-        braveStatsBottomSheetDialogFragment.setCancelable(false);
     }
 
     private NewTabPageListener newTabPageListener = new NewTabPageListener() {
