@@ -31,8 +31,10 @@ using brave_shields::ControlType;
 
 const char kPluginsLengthScript[] =
     "domAutomationController.send(navigator.plugins.length);";
+const char kUserAgentScript[] =
+    "domAutomationController.send(navigator.userAgent);";
 
-class BraveNavigatorPluginsFarblingBrowserTest : public InProcessBrowserTest {
+class BraveNavigatorFarblingBrowserTest : public InProcessBrowserTest {
  public:
   void SetUpOnMainThread() override {
     InProcessBrowserTest::SetUpOnMainThread();
@@ -51,9 +53,6 @@ class BraveNavigatorPluginsFarblingBrowserTest : public InProcessBrowserTest {
     embedded_test_server()->ServeFilesFromDirectory(test_data_dir);
 
     ASSERT_TRUE(embedded_test_server()->Start());
-
-    top_level_page_url_ = embedded_test_server()->GetURL("a.com", "/");
-    farbling_url_ = embedded_test_server()->GetURL("a.com", "/simple.html");
   }
 
   void TearDown() override {
@@ -61,25 +60,26 @@ class BraveNavigatorPluginsFarblingBrowserTest : public InProcessBrowserTest {
     content_client_.reset();
   }
 
-  const GURL& farbling_url() { return farbling_url_; }
-
   HostContentSettingsMap* content_settings() {
     return HostContentSettingsMapFactory::GetForProfile(browser()->profile());
   }
 
-  void AllowFingerprinting() {
+  void AllowFingerprinting(std::string domain) {
     brave_shields::SetFingerprintingControlType(
-        content_settings(), ControlType::ALLOW, top_level_page_url_);
+        content_settings(), ControlType::ALLOW,
+        embedded_test_server()->GetURL(domain, "/"));
   }
 
-  void BlockFingerprinting() {
+  void BlockFingerprinting(std::string domain) {
     brave_shields::SetFingerprintingControlType(
-        content_settings(), ControlType::BLOCK, top_level_page_url_);
+        content_settings(), ControlType::BLOCK,
+        embedded_test_server()->GetURL(domain, "/"));
   }
 
-  void SetFingerprintingDefault() {
+  void SetFingerprintingDefault(std::string domain) {
     brave_shields::SetFingerprintingControlType(
-        content_settings(), ControlType::DEFAULT, top_level_page_url_);
+        content_settings(), ControlType::DEFAULT,
+        embedded_test_server()->GetURL(domain, "/"));
   }
 
   template <typename T>
@@ -106,32 +106,31 @@ class BraveNavigatorPluginsFarblingBrowserTest : public InProcessBrowserTest {
   }
 
  private:
-  GURL top_level_page_url_;
-  GURL farbling_url_;
   std::unique_ptr<ChromeContentClient> content_client_;
   std::unique_ptr<BraveContentBrowserClient> browser_content_client_;
 };
 
 // Tests results of farbling known values
-IN_PROC_BROWSER_TEST_F(BraveNavigatorPluginsFarblingBrowserTest,
-                       FarbleNavigatorPlugins) {
+IN_PROC_BROWSER_TEST_F(BraveNavigatorFarblingBrowserTest, FarbleNavigator) {
+  std::string domain = "a.com";
+  GURL url = embedded_test_server()->GetURL(domain, "/simple.html");
   // Farbling level: off
   // get real length of navigator.plugins
-  AllowFingerprinting();
-  NavigateToURLUntilLoadStop(farbling_url());
+  AllowFingerprinting(domain);
+  NavigateToURLUntilLoadStop(url);
   int off_length = ExecScriptGetInt(kPluginsLengthScript, contents());
 
   // Farbling level: balanced (default)
   // navigator.plugins should contain all real plugins + 2 fake ones
-  SetFingerprintingDefault();
-  NavigateToURLUntilLoadStop(farbling_url());
+  SetFingerprintingDefault(domain);
+  NavigateToURLUntilLoadStop(url);
   int balanced_length = ExecScriptGetInt(kPluginsLengthScript, contents());
   EXPECT_EQ(balanced_length, off_length + 2);
 
   // Farbling level: maximum
   // navigator.plugins should contain no real plugins, only 2 fake ones
-  BlockFingerprinting();
-  NavigateToURLUntilLoadStop(farbling_url());
+  BlockFingerprinting(domain);
+  NavigateToURLUntilLoadStop(url);
   int maximum_length = ExecScriptGetInt(kPluginsLengthScript, contents());
   EXPECT_EQ(maximum_length, 2);
   EXPECT_EQ(ExecScriptGetStr(
@@ -168,4 +167,36 @@ IN_PROC_BROWSER_TEST_F(BraveNavigatorPluginsFarblingBrowserTest,
                 "domAutomationController.send(navigator.plugins[1].length);",
                 contents()),
             0);
+}
+
+// Tests results of farbling user agent
+IN_PROC_BROWSER_TEST_F(BraveNavigatorFarblingBrowserTest,
+                       FarbleNavigatorUserAgent) {
+  std::string domain_b = "b.com";
+  std::string domain_z = "z.com";
+  GURL url_b = embedded_test_server()->GetURL(domain_b, "/simple.html");
+  GURL url_z = embedded_test_server()->GetURL(domain_z, "/simple.html");
+
+  // Farbling level: off
+  // get real navigator.userAgent
+  AllowFingerprinting(domain_b);
+  NavigateToURLUntilLoadStop(url_b);
+  std::string off_ua_b = ExecScriptGetStr(kUserAgentScript, contents());
+  AllowFingerprinting(domain_z);
+  NavigateToURLUntilLoadStop(url_z);
+  std::string off_ua_z = ExecScriptGetStr(kUserAgentScript, contents());
+  // user agent should be the same on every domain if farbling is off
+  EXPECT_EQ(off_ua_b, off_ua_z);
+
+  // Farbling level: maximum
+  // navigator.userAgent should be suffixed by a pseudo-random number of spaces
+  // based on domain and session key
+  BlockFingerprinting(domain_b);
+  NavigateToURLUntilLoadStop(url_b);
+  std::string max_ua_b = ExecScriptGetStr(kUserAgentScript, contents());
+  EXPECT_EQ(max_ua_b, off_ua_b + "   ");
+  BlockFingerprinting(domain_z);
+  NavigateToURLUntilLoadStop(url_z);
+  std::string max_ua_z = ExecScriptGetStr(kUserAgentScript, contents());
+  EXPECT_EQ(max_ua_z, off_ua_z + "  ");
 }
