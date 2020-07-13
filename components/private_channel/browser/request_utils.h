@@ -20,6 +20,6 @@ std::string BuildUrl(
     const EndpointType endpoint,
     const std::string api_version);
 
-}  // namespace brave_private_channel_request_util
+}  // namespace brave_private_channel_request_utils
 
 #endif  // BRAVE_COMPONENTS_PRIVATE_CHANNEL_BROWSER_REQUEST_UTILS_H_

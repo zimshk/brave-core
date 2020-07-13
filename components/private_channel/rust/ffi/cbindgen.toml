@@ -6,7 +6,7 @@ include_guard = "PRIVATE_CHANNEL_RUST_FFI_H"
 # Whether to parse dependent crates and include their types in the generated
 # bindings
 parse_deps = true
-# A black list of crate names that are not allowed to be parsed
+# A list of headers to #include
 include = ["brave_private_channel"]
 
 [parse.expand]

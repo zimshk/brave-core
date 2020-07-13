@@ -142,17 +142,17 @@ pub unsafe extern "C" fn client_second_round(
 		};
 
     let mut partial_enc_buff = encoded_partial_decryption.into_boxed_slice();
-    let partial_enc_size = partial_enc_buff.clone().len();
+    let partial_enc_size = partial_enc_buff.len();
     let partial_enc_ptr = partial_enc_buff.as_mut_ptr();
     std::mem::forget(partial_enc_buff);
 
     let mut proofs_buff = encoded_proofs.into_boxed_slice();
-    let proofs_size = proofs_buff.clone().len();
+    let proofs_size = proofs_buff.len();
     let proofs_ptr = proofs_buff.as_mut_ptr();
     std::mem::forget(proofs_buff);
 
     let mut rand_vec_buff = encoded_rand_vec.into_boxed_slice();
-    let rand_vec_size = rand_vec_buff.clone().len();
+    let rand_vec_size = rand_vec_buff.len();
     let rand_vec_ptr = rand_vec_buff.as_mut_ptr();
     std::mem::forget(rand_vec_buff);
 

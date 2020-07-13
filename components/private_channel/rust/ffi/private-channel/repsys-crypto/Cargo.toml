@@ -9,7 +9,7 @@ curve25519-dalek = { version = "2.0.0", default-features = false, features = ["s
 zkp = "0.7.0"
 elgamal_ristretto = { git = "https://github.com/iquerejeta/elgamal"}
 rand_core = { version = "0.5.1", default-features = false }
-clear_on_drop = { version = "0.2" }
+clear_on_drop = "0.2"
 sha2 = "0.8.0"
 hex = "0.3.2"
 vrf = "0.2.0"

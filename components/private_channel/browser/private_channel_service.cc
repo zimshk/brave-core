@@ -120,17 +120,17 @@ namespace brave_private_channel {
 
     // TODO(gpestana): refactor and extract signals
     std::string s = "";
-      const char* input[] = { 
-        s.c_str(), s.c_str(), s.c_str(), s.c_str(), s.c_str(),
-        s.c_str(), s.c_str(), s.c_str(), s.c_str(), s.c_str(),
-        s.c_str(), s.c_str(), s.c_str(), s.c_str(), s.c_str(),
-        s.c_str(), s.c_str(), s.c_str(), s.c_str(), s.c_str(),
-        s.c_str(), s.c_str(), s.c_str(), s.c_str(), s.c_str(),
-        s.c_str(), s.c_str(), s.c_str(), s.c_str(), s.c_str(),
-        s.c_str(), s.c_str(), s.c_str(), s.c_str(), s.c_str(),
-        s.c_str(), s.c_str(), s.c_str(), s.c_str(), s.c_str(),
-        s.c_str(), s.c_str(), s.c_str(), s.c_str(), s.c_str(),
-        s.c_str(), s.c_str(), s.c_str(), s.c_str(), s.c_str(),
+    const char* input[] = {
+      s.c_str(), s.c_str(), s.c_str(), s.c_str(), s.c_str(),
+      s.c_str(), s.c_str(), s.c_str(), s.c_str(), s.c_str(),
+      s.c_str(), s.c_str(), s.c_str(), s.c_str(), s.c_str(),
+      s.c_str(), s.c_str(), s.c_str(), s.c_str(), s.c_str(),
+      s.c_str(), s.c_str(), s.c_str(), s.c_str(), s.c_str(),
+      s.c_str(), s.c_str(), s.c_str(), s.c_str(), s.c_str(),
+      s.c_str(), s.c_str(), s.c_str(), s.c_str(), s.c_str(),
+      s.c_str(), s.c_str(), s.c_str(), s.c_str(), s.c_str(),
+      s.c_str(), s.c_str(), s.c_str(), s.c_str(), s.c_str(),
+      s.c_str(), s.c_str(), s.c_str(), s.c_str(), s.c_str(),
     };
 
     int input_size = sizeof(input)/sizeof(input[0]);
@@ -151,7 +151,6 @@ namespace brave_private_channel {
       GURL(BuildUrl(EndpointType::FIRST_ROUND, PRIVATE_CHANNEL_API_VERSION));
     std::string content_type = "application/x-www-form-urlencoded";
     resource_request->headers.SetHeader("Content-Type", content_type);
-    
     resource_request->load_flags =
       net::LOAD_DO_NOT_SEND_COOKIES | net::LOAD_DO_NOT_SAVE_COOKIES |
       net::LOAD_BYPASS_CACHE | net::LOAD_DISABLE_CACHE |
