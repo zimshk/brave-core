@@ -31,14 +31,19 @@ const uint8_t MOCK_SERVER_REPLY[] = {2, 0, 0, 0, 0, 0, 0, 0, 240, 197, 94, 143,
   12, 67};
 
 void TestEndToEnd() {
-	std::string sig1 = "signal1";
-	std::string sig2 = "signal2";
+  std::string sig1 = "signal1";
+  std::string sig2 = "signal2";
   const char* input[] = {sig1.c_str(), sig2.c_str()};
 
   int size_input = sizeof(input)/sizeof(input[0]);
 
   C_ResultChallenge result =
     private_channel::start_challenge(input, size_input, SERVER_PK);
+
+  private_channel::free_pointer_u8(result.pkey_ptr);
+  private_channel::free_pointer_u8(result.skey_ptr);
+  private_channel::free_pointer_u8(result.shared_pubkey_ptr);
+  private_channel::free_pointer_u8(result.encrypted_hashes_ptr);
 
   // send content of C_ResultChallenge over HTTP to server
 
@@ -47,6 +52,9 @@ void TestEndToEnd() {
   C_ResultSecondRound result_secondr = private_channel::second_round(
     MOCK_SERVER_REPLY, size_enc_input, result.skey_ptr);
 
+  private_channel::free_pointer_u8(result_secondr.encoded_partial_dec_ptr);
+  private_channel::free_pointer_u8(result_secondr.encoded_proofs_ptr);
+  private_channel::free_pointer_u8(result_secondr.random_vec_ptr);
   // send content of C_ResultSecondRound over HTTP to server
 }
 

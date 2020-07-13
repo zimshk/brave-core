@@ -33,6 +33,11 @@
     results.encrypted_hashes_ptr, results.encrypted_hashes_size);
   artefacts.error = results.error;
 
+  private_channel::free_pointer_u8(results.pkey_ptr);
+  private_channel::free_pointer_u8(results.skey_ptr);
+  private_channel::free_pointer_u8(results.shared_pubkey_ptr);
+  private_channel::free_pointer_u8(results.encrypted_hashes_ptr);
+
   return artefacts;
   }
 
@@ -58,6 +63,10 @@
   artefacts.rand_vec = convert_to_str(
     results.random_vec_ptr, results.random_vec_size);
   artefacts.error = results.error;
+
+  private_channel::free_pointer_u8(results.encoded_partial_dec_ptr);
+  private_channel::free_pointer_u8(results.encoded_proofs_ptr);
+  private_channel::free_pointer_u8(results.random_vec_ptr);
 
   return artefacts;
   }

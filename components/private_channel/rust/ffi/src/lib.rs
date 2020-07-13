@@ -8,10 +8,6 @@ use std::slice;
 
 pub const KEY_SIZE: usize = 32;
 
-trait ErrorResult {
-    fn default() -> Self;
-}
-
 #[repr(C)]
 pub struct ResultChallenge {
     pub pkey_ptr: *const u8,
@@ -23,7 +19,7 @@ pub struct ResultChallenge {
     pub error: bool,
 }
 
-impl ErrorResult for ResultChallenge {
+impl Default for ResultChallenge {
     fn default() -> ResultChallenge {
         let mock_vec = vec![];
         ResultChallenge {
@@ -49,7 +45,7 @@ pub struct ResultSecondRound {
     pub error: bool,
 }
 
-impl ErrorResult for ResultSecondRound {
+impl Default for ResultSecondRound {
     fn default() -> ResultSecondRound {
         let mock_vec = vec![];
         ResultSecondRound {
@@ -167,6 +163,10 @@ pub unsafe extern "C" fn client_second_round(
     }
 }
 
-// #TODO: finish me!
-//#[no_mangle]
-//pub unsafe extern "C" fn free_buf(ptr *mut u8) {}
+#[no_mangle]
+pub unsafe extern "C" fn u8_pointer_destroy(ptr: *const u8) {
+    if !ptr.is_null() {
+        drop(ptr)
+    }
+}
+

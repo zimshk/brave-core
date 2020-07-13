@@ -22,4 +22,8 @@ namespace private_channel {
       return client_second_round(enc_input_ptr, input_size, sk);
   }
 
+  void free_pointer_u8(const uint8_t *ptr) {
+    return u8_pointer_destroy(ptr);
+  }
+
 }  // namespace private_channel

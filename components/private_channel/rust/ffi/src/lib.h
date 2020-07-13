@@ -44,4 +44,6 @@ C_ResultChallenge client_start_challenge(const char *const *input,
                                          int input_size,
                                          const uint8_t *server_pk_encoded);
 
+void u8_pointer_destroy(const uint8_t *ptr);
+
 #endif /* BRAVE_COMPONENTS_PRIVATE_CHANNEL_RUST_FFI_SRC_LIB_H_ */

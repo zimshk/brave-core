@@ -20,6 +20,8 @@ namespace private_channel {
 	
   C_ResultSecondRound second_round(
     const uint8_t* enc_input_ptr, int size,  const uint8_t*  sk);
+
+  void free_pointer_u8(const uint8_t *ptr);
 }
 
 #endif	// BRAVE_COMPONENTS_PRIVATE_CHANNEL_RUST_FFI_SRC_PRIVATE_CHANNEL_H_
