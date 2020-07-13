@@ -9,6 +9,8 @@
 const char kChromeExtensionScheme[] = "chrome-extension";
 const char kBraveUIScheme[] = "brave";
 const char kMagnetScheme[] = "magnet";
+const char kIPFSScheme[] = "ipfs";
+const char kDefaultIPFSGateway[] = "https://dweb.link/ipfs/";
 const char kBinanceScheme[] = "com.brave.binance";
 const char kWidevineMoreInfoURL[] = "https://www.eff.org/issues/drm";
 const char kWidevineTOS[] = "https://policies.google.com/terms";

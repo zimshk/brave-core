@@ -30,6 +30,7 @@
 #include "brave/components/brave_shields/common/brave_shield_constants.h"
 #include "brave/components/brave_wallet/browser/buildflags/buildflags.h"
 #include "brave/components/brave_webtorrent/browser/buildflags/buildflags.h"
+#include "brave/components/ipfs/browser/buildflags/buildflags.h"
 #include "brave/components/services/brave_content_browser_overlay_manifest.h"
 #include "brave/components/speedreader/buildflags.h"
 #include "brave/grit/brave_generated_resources.h"
@@ -80,6 +81,10 @@ using extensions::ChromeContentBrowserClientExtensionsPart;
 #if BUILDFLAG(ENABLE_BRAVE_WEBTORRENT)
 #include "brave/components/brave_webtorrent/browser/content_browser_client_helper.h"
 #include "brave/browser/extensions/brave_webtorrent_navigation_throttle.h"
+#endif
+
+#if BUILDFLAG(IPFS_ENABLED)
+#include "brave/components/ipfs/browser/content_browser_client_helper.h"
 #endif
 
 #if BUILDFLAG(BRAVE_REWARDS_ENABLED)
@@ -155,6 +160,12 @@ void BraveContentBrowserClient::BrowserURLHandlerCreated(
   handler->AddHandlerPair(&webtorrent::HandleTorrentURLRewrite,
                           &webtorrent::HandleTorrentURLReverseRewrite);
 #endif
+#if BUILDFLAG(IPFS_ENABLED)
+  handler->AddHandlerPair(&ipfs::HandleIPFSURLRewrite,
+                          content::BrowserURLHandler::null_handler());
+  handler->AddHandlerPair(&ipfs::HandleIPFSURLRewrite,
+                          &ipfs::HandleIPFSURLReverseRewrite);
+#endif
   handler->AddHandlerPair(&HandleURLRewrite, &HandleURLReverseOverrideRewrite);
   ChromeContentBrowserClient::BrowserURLHandlerCreated(handler);
 }
@@ -182,6 +193,14 @@ bool BraveContentBrowserClient::HandleExternalProtocol(
     webtorrent::HandleMagnetProtocol(url, std::move(web_contents_getter),
                                      page_transition, has_user_gesture,
                                      initiating_origin);
+    return true;
+  }
+#endif
+#if BUILDFLAG(IPFS_ENABLED)
+  if (ipfs::IsIPFSProtocol(url)) {
+    ipfs::HandleIPFSProtocol(url, std::move(web_contents_getter),
+                             page_transition, has_user_gesture,
+                             initiating_origin);
     return true;
   }
 #endif
