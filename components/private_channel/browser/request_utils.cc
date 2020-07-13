@@ -16,7 +16,7 @@ std::string BuildUrl(
   std::string url;
 
   // @gpestana(TODO: refactor to static values, based on env flag)
-  std::string base_url = PRIVATE_CHANNEL_LOCAL_SERVER;
+  std::string base_url = PRIVATE_CHANNEL_DEVELOPMENT_SERVER;
   switch(endpoint) {
     case EndpointType::META:
       url = base_url + PRIVATE_CHANNEL_API_VERSION +PRIVATE_CHANNEL_META_ENDPOINT;

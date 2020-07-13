@@ -53,7 +53,6 @@ namespace brave_private_channel {
       net::LOAD_DO_NOT_SEND_COOKIES | net::LOAD_DO_NOT_SAVE_COOKIES |
       net::LOAD_BYPASS_CACHE | net::LOAD_DISABLE_CACHE |
       net::LOAD_DO_NOT_SEND_AUTH_DATA;
-
     network::mojom::URLLoaderFactory* loader_factory =
       g_browser_process->
         system_network_context_manager()->GetURLLoaderFactory();
@@ -119,12 +118,21 @@ namespace brave_private_channel {
   void PrivateChannel::FirstRoundProtocol(const uint8_t* server_pk) {
     LOG(INFO) << "PrivateChannel::FirstRoundProtocol";
 
-    // TODO(gpestana): refactor and get signals
-    std::string sig0 = "check1";
-    std::string sig1 = "check2";
-    std::string sig2 = "check3";
+    // TODO(gpestana): refactor and extract signals
+    std::string s = "";
+      const char* input[] = { 
+        s.c_str(), s.c_str(), s.c_str(), s.c_str(), s.c_str(),
+        s.c_str(), s.c_str(), s.c_str(), s.c_str(), s.c_str(),
+        s.c_str(), s.c_str(), s.c_str(), s.c_str(), s.c_str(),
+        s.c_str(), s.c_str(), s.c_str(), s.c_str(), s.c_str(),
+        s.c_str(), s.c_str(), s.c_str(), s.c_str(), s.c_str(),
+        s.c_str(), s.c_str(), s.c_str(), s.c_str(), s.c_str(),
+        s.c_str(), s.c_str(), s.c_str(), s.c_str(), s.c_str(),
+        s.c_str(), s.c_str(), s.c_str(), s.c_str(), s.c_str(),
+        s.c_str(), s.c_str(), s.c_str(), s.c_str(), s.c_str(),
+        s.c_str(), s.c_str(), s.c_str(), s.c_str(), s.c_str(),
+    };
 
-    const char* input[] = { sig0.c_str(), sig1.c_str(), sig2.c_str() };
     int input_size = sizeof(input)/sizeof(input[0]);
 
     auto request_artefacts =
@@ -143,6 +151,7 @@ namespace brave_private_channel {
       GURL(BuildUrl(EndpointType::FIRST_ROUND, PRIVATE_CHANNEL_API_VERSION));
     std::string content_type = "application/x-www-form-urlencoded";
     resource_request->headers.SetHeader("Content-Type", content_type);
+    
     resource_request->load_flags =
       net::LOAD_DO_NOT_SEND_COOKIES | net::LOAD_DO_NOT_SAVE_COOKIES |
       net::LOAD_BYPASS_CACHE | net::LOAD_DISABLE_CACHE |
