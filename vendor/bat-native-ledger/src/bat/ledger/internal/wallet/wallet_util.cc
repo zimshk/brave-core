@@ -28,6 +28,7 @@ ledger::ExternalWalletPtr ResetWallet(ledger::ExternalWalletPtr wallet) {
 
   wallet->token = "";
   wallet->address = "";
+  wallet->anon_address = "";
   wallet->user_name = "";
   wallet->one_time_string = "";
   wallet->verify_url = "";

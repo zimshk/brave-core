@@ -53,7 +53,6 @@ TEST(WalletUtilTest, ResetWallet) {
   verified->user_name = "3";
   verified->one_time_string = "4";
   verified->status = ledger::WalletStatus::VERIFIED;
-  verified->transferred = true;
 
   result = braveledger_wallet::ResetWallet(std::move(verified));
 
@@ -62,7 +61,6 @@ TEST(WalletUtilTest, ResetWallet) {
   ASSERT_EQ(result->user_name, "");
   ASSERT_EQ(result->one_time_string, "");
   ASSERT_EQ(result->status, ledger::WalletStatus::DISCONNECTED_VERIFIED);
-  ASSERT_EQ(result->transferred, true);
 
   // non verfied wallet
   auto non_verified = ledger::ExternalWallet::New();
