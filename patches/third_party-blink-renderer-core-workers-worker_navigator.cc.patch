@@ -1,0 +1,20 @@
+diff --git a/third_party/blink/renderer/core/workers/worker_navigator.cc b/third_party/blink/renderer/core/workers/worker_navigator.cc
+index 99f3efbc7f1f0f11ad7593bc147b1595abf098cf..4b13bc33bb21f651c650ce03861d6e28ced4e313 100644
+--- a/third_party/blink/renderer/core/workers/worker_navigator.cc
++++ b/third_party/blink/renderer/core/workers/worker_navigator.cc
+@@ -40,6 +40,7 @@ WorkerNavigator::WorkerNavigator(const String& user_agent,
+                                  const UserAgentMetadata& ua_metadata,
+                                  ExecutionContext* execution_context)
+     : ExecutionContextClient(execution_context),
++      BRAVE_WORKER_NAVIGATOR_CONSTRUCTOR
+       NavigatorLanguage(execution_context),
+       user_agent_(user_agent),
+       ua_metadata_(ua_metadata) {}
+@@ -71,6 +72,7 @@ void WorkerNavigator::NotifyUpdate() {
+ void WorkerNavigator::Trace(Visitor* visitor) {
+   ScriptWrappable::Trace(visitor);
+   ExecutionContextClient::Trace(visitor);
++  BRAVE_WORKER_NAVIGATOR_TRACE
+   NavigatorLanguage::Trace(visitor);
+   Supplementable<WorkerNavigator>::Trace(visitor);
+ }

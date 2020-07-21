@@ -1,0 +1,21 @@
+diff --git a/third_party/blink/renderer/core/frame/navigator.cc b/third_party/blink/renderer/core/frame/navigator.cc
+index 8918712cc0aceac0ed1e04c1379a37248c0bb296..4c67206b76dbad3c119958e320c65e24aab556ab 100644
+--- a/third_party/blink/renderer/core/frame/navigator.cc
++++ b/third_party/blink/renderer/core/frame/navigator.cc
+@@ -39,7 +39,7 @@
+ namespace blink {
+ 
+ Navigator::Navigator(LocalFrame* frame)
+-    : NavigatorLanguage(frame ? frame->DomWindow() : nullptr),
++      BRAVE_NAVIGATOR_CONSTRUCTOR
+       ExecutionContextClient(frame) {}
+ 
+ String Navigator::productSub() const {
+@@ -116,6 +116,7 @@ String Navigator::GetAcceptLanguages() {
+ 
+ void Navigator::Trace(Visitor* visitor) {
+   ScriptWrappable::Trace(visitor);
++  BRAVE_NAVIGATOR_TRACE
+   NavigatorLanguage::Trace(visitor);
+   ExecutionContextClient::Trace(visitor);
+   Supplementable<Navigator>::Trace(visitor);
