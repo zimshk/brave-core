@@ -12,10 +12,11 @@
 
 #include "base/json/json_reader.h"
 #include "base/strings/stringprintf.h"
+#include "base/strings/string_number_conversions.h"
 #include "bat/ledger/global_constants.h"
 #include "bat/ledger/internal/ledger_impl.h"
 #include "bat/ledger/internal/uphold/uphold.h"
-#include "bat/ledger/internal/request/request_util.h"
+#include "bat/ledger/internal/request/request_promotion.h"
 #include "bat/ledger/internal/static_values.h"
 #include "bat/ledger/internal/state/state_util.h"
 #include "net/http/http_status_code.h"
@@ -45,13 +46,9 @@ void WalletBalance::Fetch(ledger::FetchBalanceCallback callback) {
 
   const std::string payment_id = braveledger_state::GetPaymentId(ledger_);
 
-  std::string path = base::StringPrintf(
-      "/wallet/%s/balance",
-      payment_id.c_str());
-  const std::string url = braveledger_request_util::BuildUrl(
-      path,
-      PREFIX_V2,
-      braveledger_request_util::ServerTypes::BALANCE);
+  const std::string url = braveledger_request_util::GetBalanceWalletURL(
+      braveledger_state::GetPaymentId(ledger_));
+
   auto load_callback = std::bind(&WalletBalance::OnFetch,
       this,
       _1,
@@ -84,21 +81,14 @@ void WalletBalance::OnFetch(
     return;
   }
 
-  const auto* total = dictionary->FindStringKey("balance");
-  double total_anon = 0.0;
-  if (total) {
-    total_anon = std::stod(*total);
+  const auto confirmed = dictionary->FindDoubleKey("confirmed");
+  if (confirmed) {
+    balance->total = *confirmed;
   }
-  balance->total = total_anon;
 
-  const auto* funds = dictionary->FindStringKey("cardBalance");
-  std::string user_funds = "0";
-  if (funds) {
-    user_funds = *funds;
-  }
-  balance->user_funds = user_funds;
-
-  balance->wallets.insert(std::make_pair(ledger::kWalletAnonymous, total_anon));
+  balance->user_funds = balance->total;
+  balance->wallets.insert(
+      std::make_pair(ledger::kWalletAnonymous, balance->total));
 
   if (balance->total == 0.0) {
     braveledger_state::SetFetchOldBalanceEnabled(ledger_, false);
