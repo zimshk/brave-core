@@ -63,11 +63,7 @@ Polymer({
   },
 
   attached: async function() {
-    const [syncCode, deviceList] = await Promise.all([
-      this.browserProxy_.getSyncCode(),
-      this.browserProxy_.getDeviceList()
-    ])
-    this.syncCode = syncCode
+    const deviceList = await this.browserProxy_.getDeviceList()
     this.addWebUIListener('device-info-changed', this.handleDeviceInfo_.bind(this))
     this.handleDeviceInfo_(deviceList)
   },
@@ -82,11 +78,20 @@ Polymer({
     return displayDate.toDateString()
   },
 
-  onViewSyncCode_: function() {
+  getSyncCode_: async function() {
+    if (!!this.syncCode)
+      return
+    const syncCode = await this.browserProxy_.getSyncCode()
+    this.syncCode = syncCode
+  },
+
+  onViewSyncCode_: async function() {
+    await this.getSyncCode_()
     this.syncCodeDialogType_ = 'words'
   },
 
-  onAddDevice_: function() {
+  onAddDevice_: async function() {
+    await this.getSyncCode_()
     this.syncCodeDialogType_ = 'choose'
   },
 
