@@ -41,13 +41,13 @@ void TestEndToEnd() {
   C_ResultChallenge result =
     private_channel::start_challenge(input, size_input, SERVER_PK);
 
+  assert(result.key_size == KEY_SIZE);
+  assert(result.error == false);
+
   private_channel::free_pointer_u8(result.pkey_ptr);
   private_channel::free_pointer_u8(result.skey_ptr);
   private_channel::free_pointer_u8(result.shared_pubkey_ptr);
   private_channel::free_pointer_u8(result.encrypted_hashes_ptr);
-
-  //TODO(@gpestana, verify the output of the first round)
-  assert(true);
 
   // send content of C_ResultChallenge over HTTP to server
 
@@ -56,12 +56,14 @@ void TestEndToEnd() {
   C_ResultSecondRound result_secondr = private_channel::second_round(
     MOCK_SERVER_REPLY, size_enc_input, result.skey_ptr);
 
+  assert(result_secondr.error == false);
+
   private_channel::free_pointer_u8(result_secondr.encoded_partial_dec_ptr);
   private_channel::free_pointer_u8(result_secondr.encoded_proofs_ptr);
   private_channel::free_pointer_u8(result_secondr.random_vec_ptr);
   // send content of C_ResultSecondRound over HTTP to server
 
-  //TODO(@gpestana, verify the output of last round)
+
 }
 
 int main() {
