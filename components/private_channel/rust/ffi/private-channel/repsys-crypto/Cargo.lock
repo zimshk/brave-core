@@ -272,7 +272,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "elgamal_ristretto"
 version = "0.2.3"
-source = "git+https://github.com/iquerejeta/elgamal#9359ba3ea8841297e75e6850fb84de7e8194573d"
+source = "git+https://github.com/iquerejeta/elgamal?rev=21f88566f187e827bd929d2e17e5a15e71e579d8#21f88566f187e827bd929d2e17e5a15e71e579d8"
 dependencies = [
  "bincode 1.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "clear_on_drop 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -707,7 +707,7 @@ dependencies = [
  "clear_on_drop 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "criterion 0.2.11 (registry+https://github.com/rust-lang/crates.io-index)",
  "curve25519-dalek 2.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "elgamal_ristretto 0.2.3 (git+https://github.com/iquerejeta/elgamal)",
+ "elgamal_ristretto 0.2.3 (git+https://github.com/iquerejeta/elgamal?rev=21f88566f187e827bd929d2e17e5a15e71e579d8)",
  "hex 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "pairing 0.14.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "rand_core 0.5.1 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -998,7 +998,7 @@ dependencies = [
 "checksum curve25519-dalek 2.0.0 (registry+https://github.com/rust-lang/crates.io-index)" = "26778518a7f6cffa1d25a44b602b62b979bd88adb9e99ffec546998cf3404839"
 "checksum digest 0.8.1 (registry+https://github.com/rust-lang/crates.io-index)" = "f3d0c8c8752312f9713efd397ff63acb9f85585afbf179282e720e7704954dd5"
 "checksum either 1.5.3 (registry+https://github.com/rust-lang/crates.io-index)" = "bb1f6b1ce1c140482ea30ddd3335fc0024ac7ee112895426e0a629a6c20adfe3"
-"checksum elgamal_ristretto 0.2.3 (git+https://github.com/iquerejeta/elgamal)" = "<none>"
+"checksum elgamal_ristretto 0.2.3 (git+https://github.com/iquerejeta/elgamal?rev=21f88566f187e827bd929d2e17e5a15e71e579d8)" = "<none>"
 "checksum failure 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)" = "f8273f13c977665c5db7eb2b99ae520952fe5ac831ae4cd09d80c4c7042b5ed9"
 "checksum failure_derive 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)" = "0bc225b78e0391e4b8683440bf2e63c2deeeb2ce5189eab46e2b68c6d3725d08"
 "checksum fake-simd 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)" = "e88a8acf291dafb59c2d96e8f59828f3838bb1a70398823ade51a84de6a6deed"

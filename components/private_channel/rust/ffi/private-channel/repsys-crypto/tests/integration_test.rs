@@ -1,6 +1,11 @@
-#[allow(warnings)]
-use super::*;
+#[allow(unused_imports)]
+use repsys_crypto::{
+    combine_pks, compute_checks, encrypt_input, generate_keys, partial_decryption_and_proof,
+    randomize_and_prove, verify_partial_decryption_proofs,
+};
 
+use curve25519_dalek::constants::RISTRETTO_BASEPOINT_TABLE;
+use curve25519_dalek::ristretto::RistrettoPoint;
 use curve25519_dalek::scalar::Scalar;
 use rand_core::OsRng;
 
@@ -97,7 +102,8 @@ fn test_e2e_passing() {
         &randomized_vector,
         &partial_decryption,
         &proofs_correct_decryption
-    ).unwrap());
+    )
+    .unwrap());
 
     // Finally, the server fully decrypts the ciphertext and checks if the
     // decryption equals zero.
@@ -130,10 +136,10 @@ fn test_e2e_not_passing() {
         Scalar::random(&mut OsRng),
     ];
 
-    let (sk_server, pk_server) = generate_keys();
+    let (sk_server, pk_server) = repsys_crypto::generate_keys();
     let pk_server_proof = sk_server.prove_knowledge();
 
-    let (sk_user, pk_user) = generate_keys();
+    let (sk_user, pk_user) = repsys_crypto::generate_keys();
     let pk_user_proof = sk_user.prove_knowledge();
 
     assert!(pk_server.verify_proof_knowledge(&pk_server_proof));
@@ -158,7 +164,8 @@ fn test_e2e_not_passing() {
         &randomized_vector,
         &partial_decryption,
         &proofs_correct_decryption
-    ).unwrap());
+    )
+    .unwrap());
 
     let (final_decryption, _proofs_correct_decryption_server) =
         partial_decryption_and_proof(&partial_decryption, &sk_server);
@@ -167,4 +174,21 @@ fn test_e2e_not_passing() {
 
     // tests must not pass since the `vector_hashes` is generated randomly
     assert_eq!(false, check_tests(plaintext));
+}
+
+/// Checks if a vector of "tests" has passed. A given test passes if its
+/// correspondent index is zero in the Ristretto group. It returns the result
+/// of the check.
+pub fn check_tests(final_decryption: Vec<RistrettoPoint>) -> bool {
+    let mut passed = true;
+    let zero_point = RISTRETTO_BASEPOINT_TABLE.basepoint() * Scalar::zero();
+
+    for (index, value) in final_decryption.into_iter().enumerate() {
+        if !(value == zero_point) {
+            print!("\nCheck {} failed. User is using an emulator.\n", index);
+            passed = false;
+            break;
+        }
+    }
+    passed
 }

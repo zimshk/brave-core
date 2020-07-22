@@ -1,18 +1,14 @@
 #[macro_use]
 extern crate zkp;
-extern crate elgamal_ristretto;
-
-#[cfg(test)]
-mod test;
 
 use curve25519_dalek::constants::RISTRETTO_BASEPOINT_TABLE;
 use curve25519_dalek::ristretto::RistrettoPoint;
 use curve25519_dalek::scalar::Scalar;
 use rand_core::OsRng;
 
-use elgamal_ristretto::public::PublicKey;
-use elgamal_ristretto::private::SecretKey;
 use elgamal_ristretto::ciphertext::Ciphertext;
+use elgamal_ristretto::private::SecretKey;
+use elgamal_ristretto::public::PublicKey;
 use zkp::{CompactProof, Transcript};
 
 /// Generates asymmetric key pair and proof of knowledge of the secret (zero knowledge)
@@ -37,7 +33,6 @@ pub fn compute_checks(
     vector_checks: Vec<Scalar>,
 ) -> Result<Vec<Ciphertext>, &'static str> {
     if encrypted_hashes.len() != vector_checks.len() {
-        println!("Error: Size of encrypted hashes slice must be the same as vector checks (encHash: {} Vs vecCheck: {})", encrypted_hashes.len(), vector_checks.len());
         return Err("Size of encrypted hashes slice must be the same as vector checks");
     }
     let encrypted_checks = vector_checks
@@ -53,17 +48,16 @@ define_proof! {dleq, "DLEQ Proof", (x), (A, B, H), (G) : A = (x * B), H = (x * G
 
 /// Randomizes and proofs correctness of operation
 pub fn randomize_and_prove(
-    encrypted_checks: &Vec<Ciphertext>,
+    encrypted_checks: &[Ciphertext],
 ) -> (Vec<Ciphertext>, Vec<CompactProof>) {
-    let mut randomized_vector: Vec<Ciphertext> = Vec::new();
-    let mut proofs_correct_randomization: Vec<CompactProof> = Vec::new();
+    let mut randomized_vector: Vec<Ciphertext> = Vec::with_capacity(encrypted_checks.len());
+    let mut proofs_correct_randomization: Vec<CompactProof> =
+        Vec::with_capacity(encrypted_checks.len());
 
     for i in 0..encrypted_checks.len() {
         let randomizer = Scalar::random(&mut OsRng);
 
-        randomized_vector.push(
-            encrypted_checks[i] * randomizer
-        );
+        randomized_vector.push(encrypted_checks[i] * randomizer);
         let mut transcript = Transcript::new(b"CorrectRandomization");
         let (proof, _) = dleq::prove_compact(
             &mut transcript,
@@ -82,33 +76,33 @@ pub fn randomize_and_prove(
 
 /// Verify Randomization proofs
 pub fn verify_randomization_proofs(
-    encrypted_vector: &Vec<Ciphertext>,
-    randomized_vector: &Vec<Ciphertext>,
-    proofs: &Vec<CompactProof>,
+    encrypted_vector: &[Ciphertext],
+    randomized_vector: &[Ciphertext],
+    proofs: &[CompactProof],
 ) -> Result<bool, &'static str> {
     if encrypted_vector.len() != randomized_vector.len() {
-        println!("Error: Size of encrypted vector must equal the size of the randomized vector. Got {} (enc vec) and {} (part decrypted)", encrypted_vector.len(), randomized_vector.len());
         return Err("Size of encrypted vector must be the same as randomized vector");
     }
 
     if encrypted_vector.len() != proofs.len() {
-        println!("Error: Size of encrypted vector must equal the number of proofs. Got {} (enc vec) and {} (proofs)", encrypted_vector.len(), proofs.len());
         return Err("Size of encrypted hashes slice must be the same as vector checks");
     }
 
     let mut result = true;
     for i in 0..proofs.len() {
         let mut transcript = Transcript::new(b"CorrectRandomization");
-        result = result & dleq::verify_compact(
-            &proofs[i],
-            &mut transcript,
-            dleq::VerifyAssignments {
-                A: &randomized_vector[i].points.0.compress(),
-                B: &encrypted_vector[i].points.0.compress(),
-                H: &randomized_vector[i].points.1.compress(),
-                G: &encrypted_vector[i].points.1.compress(),
-            },
-        ).is_ok()
+        result = result
+            & dleq::verify_compact(
+                &proofs[i],
+                &mut transcript,
+                dleq::VerifyAssignments {
+                    A: &randomized_vector[i].points.0.compress(),
+                    B: &encrypted_vector[i].points.0.compress(),
+                    H: &randomized_vector[i].points.1.compress(),
+                    G: &encrypted_vector[i].points.1.compress(),
+                },
+            )
+            .is_ok()
     }
     Ok(result)
 }
@@ -117,7 +111,7 @@ pub fn verify_randomization_proofs(
 /// correct decryption.
 /// The partial decryption is due to the shared key.
 pub fn partial_decryption_and_proof(
-    randomized_vector: &Vec<Ciphertext>,
+    randomized_vector: &[Ciphertext],
     sk: &SecretKey,
 ) -> (Vec<Ciphertext>, Vec<CompactProof>) {
     let partial_decryption: Vec<Ciphertext> = randomized_vector
@@ -141,29 +135,27 @@ pub fn partial_decryption_and_proof(
 /// Verify vector of proofs
 pub fn verify_partial_decryption_proofs(
     public_key: &PublicKey,
-    ctxt: &Vec<Ciphertext>,
-    partial_dec_ctxt: &Vec<Ciphertext>,
-    proofs: &Vec<zkp::CompactProof>,
+    ctxt: &[Ciphertext],
+    partial_dec_ctxt: &[Ciphertext],
+    proofs: &[zkp::CompactProof],
 ) -> Result<bool, &'static str> {
     if ctxt.len() != partial_dec_ctxt.len() {
-        println!("Error: Size of encrypted vector must equal the size of the partially decrypted vector. Got {} (enc vec) and {} (part decrypted)", ctxt.len(), partial_dec_ctxt.len());
         return Err("Size of encrypted vector must be the same as partially decrypted vector");
     }
 
     if ctxt.len() != proofs.len() {
-        println!("Error: Size of encrypted vector must equal the number of proofs. Got {} (enc vec) and {} (proofs)", ctxt.len(), proofs.len());
         return Err("Size of encrypted hashes slice must be the same as vector checks");
     }
     let mut result = true;
     for i in 0..proofs.len() {
-        result = result & public_key.verify_correct_decryption(
-            &proofs[i].clone(),
-            &ctxt[i],
-            &partial_dec_ctxt[i].points.1,
-        );
+        result = result
+            & public_key.verify_correct_decryption(
+                &proofs[i].clone(),
+                &ctxt[i],
+                &partial_dec_ctxt[i].points.1,
+            );
     }
     Ok(result)
-
 }
 
 /// Checks if a vector of "tests" has passed. A given test passes if its
@@ -173,9 +165,8 @@ pub fn check_tests(final_decryption: Vec<RistrettoPoint>) -> bool {
     let mut passed = true;
     let zero_point = RISTRETTO_BASEPOINT_TABLE.basepoint() * Scalar::zero();
 
-    for (index, value) in final_decryption.into_iter().enumerate() {
+    for (_index, value) in final_decryption.into_iter().enumerate() {
         if !(value == zero_point) {
-            print!("\nCheck {} failed. User is using an emulator.\n", index);
             passed = false;
             break;
         }
@@ -219,25 +210,32 @@ mod tests {
         let encrypted_values = encrypt_input(pk, vector_scalar);
         let (randomized_vector, proof_correct_rand) = randomize_and_prove(&encrypted_values);
 
-        let verification = verify_randomization_proofs(&encrypted_values, &randomized_vector, &proof_correct_rand);
+        let verification =
+            verify_randomization_proofs(&encrypted_values, &randomized_vector, &proof_correct_rand);
 
         assert!(verification.unwrap());
 
         let fake_reencryption = encrypt_input(pk, vector_scalar);
-        let wrong_verification = verify_randomization_proofs(&encrypted_values, &fake_reencryption, &proof_correct_rand);
+        let wrong_verification =
+            verify_randomization_proofs(&encrypted_values, &fake_reencryption, &proof_correct_rand);
 
         assert!(!wrong_verification.unwrap());
 
-        let wrong_size: &[Scalar] = &[
-            Scalar::random(&mut OsRng),
-            Scalar::random(&mut OsRng),
-        ];
+        let wrong_size: &[Scalar] = &[Scalar::random(&mut OsRng), Scalar::random(&mut OsRng)];
         let wrong_size_encrypted_values = encrypt_input(pk, wrong_size);
-        let wrong_verification = verify_randomization_proofs(&encrypted_values, &wrong_size_encrypted_values, &proof_correct_rand);
+        let wrong_verification = verify_randomization_proofs(
+            &encrypted_values,
+            &wrong_size_encrypted_values,
+            &proof_correct_rand,
+        );
 
         assert!(!wrong_verification.is_ok());
 
-        let wrong_nr_proofs_verification = verify_randomization_proofs(&encrypted_values, &randomized_vector, &(proof_correct_rand[1..3].to_vec()));
+        let wrong_nr_proofs_verification = verify_randomization_proofs(
+            &encrypted_values,
+            &randomized_vector,
+            &(proof_correct_rand[1..3].to_vec()),
+        );
 
         assert!(!wrong_nr_proofs_verification.is_ok());
     }
@@ -264,7 +262,7 @@ mod tests {
             &pk_1,
             &encrypted_values,
             &partial_decryption,
-            &proofs_correct_decryption
+            &proofs_correct_decryption,
         );
 
         assert!(verification.unwrap());
@@ -274,21 +272,18 @@ mod tests {
             &pk_1,
             &encrypted_values,
             &fake_partial_decryption,
-            &proofs_correct_decryption
+            &proofs_correct_decryption,
         );
 
         assert!(!wrong_verification.unwrap());
 
-        let wrong_size: &[Scalar] = &[
-            Scalar::random(&mut OsRng),
-            Scalar::random(&mut OsRng),
-        ];
+        let wrong_size: &[Scalar] = &[Scalar::random(&mut OsRng), Scalar::random(&mut OsRng)];
         let wrong_size_encrypted_values = encrypt_input(combined_key, wrong_size);
         let wrong_verification = verify_partial_decryption_proofs(
             &pk_1,
             &encrypted_values,
             &wrong_size_encrypted_values,
-            &proofs_correct_decryption
+            &proofs_correct_decryption,
         );
 
         assert!(!wrong_verification.is_ok());
@@ -297,10 +292,9 @@ mod tests {
             &pk_1,
             &encrypted_values,
             &partial_decryption,
-            &(proofs_correct_decryption[1..3].to_vec()));
+            &(proofs_correct_decryption[1..3].to_vec()),
+        );
 
         assert!(!wrong_nr_proofs_verification.is_ok());
     }
 }
-
-

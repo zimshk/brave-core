@@ -1,10 +1,5 @@
-  /* Copyright (c) 2019 The Brave Authors. All rights reserved.
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-
-#ifndef BRAVE_COMPONENTS_PRIVATE_CHANNEL_RUST_FFI_SRC_LIB_H_
-#define BRAVE_COMPONENTS_PRIVATE_CHANNEL_RUST_FFI_SRC_LIB_H_
+#ifndef PRIVATE_CHANNEL_RUST_FFI_H
+#define PRIVATE_CHANNEL_RUST_FFI_H
 
 #include <stdarg.h>
 #include <stdbool.h>
@@ -46,4 +41,4 @@ C_ResultChallenge client_start_challenge(const char *const *input,
 
 void u8_pointer_destroy(const uint8_t *ptr);
 
-#endif /* BRAVE_COMPONENTS_PRIVATE_CHANNEL_RUST_FFI_SRC_LIB_H_ */
+#endif /* PRIVATE_CHANNEL_RUST_FFI_H */

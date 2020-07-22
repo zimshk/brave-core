@@ -68,13 +68,16 @@ pub unsafe extern "C" fn client_start_challenge(
     server_pk_encoded: *const u8,
 ) -> ResultChallenge {
     assert!(!input.is_null(), "Null pointers passed as input");
-    assert!(!server_pk_encoded.is_null(), "Null pointers passed as input");
+    assert!(
+        !server_pk_encoded.is_null(),
+        "Null pointers passed as input"
+    );
 
     let server_pk = match slice::from_raw_parts(server_pk_encoded, KEY_SIZE).try_into() {
         Ok(pk) => pk,
         Err(_) => {
-          return ResultChallenge::default();
-        },
+            return ResultChallenge::default();
+        }
     };
 
     let mut v_out = Vec::new();
@@ -84,11 +87,15 @@ pub unsafe extern "C" fn client_start_challenge(
         v_out.push(s_ptr.to_str().unwrap().to_string());
     }
 
-    let (pkey, skey, shared_pk, enc_hashes) = 
-			match brave_private_channel::start_challenge(v_out, server_pk) {
-				Ok((pk, s, sh, h)) => (pk, s, sh, h),
-				Err(_) => return ResultChallenge::default(),
-			};
+    let brave_private_channel::FirstRoundOutput {
+        pkey,
+        skey,
+        shared_pk,
+        enc_hashes,
+    } = match brave_private_channel::start_challenge(v_out, server_pk) {
+        Ok(result) => result,
+        Err(_) => return ResultChallenge::default(),
+    };
 
     let mut pkey_buff = pkey.into_boxed_slice();
     let pkey_ptr = pkey_buff.as_mut_ptr();
@@ -121,33 +128,39 @@ pub unsafe extern "C" fn client_start_challenge(
 #[no_mangle]
 pub unsafe extern "C" fn client_second_round(
     input: *const u8,
-    input_size: c_int,  
+    input_size: c_int,
     client_sk_encoded: *const u8,
 ) -> ResultSecondRound {
     assert!(!input.is_null(), "Null pointers passed as input");
-    assert!(!client_sk_encoded.is_null(), "Null pointers passed as input");
-    
+    assert!(
+        !client_sk_encoded.is_null(),
+        "Null pointers passed as input"
+    );
+
     let skey_buff = slice::from_raw_parts(client_sk_encoded, KEY_SIZE as usize);
 
     let v_enc = slice::from_raw_parts(input, input_size as usize);
 
-    let (encoded_partial_decryption, encoded_proofs, encoded_rand_vec) =
-			match brave_private_channel::second_round(v_enc, skey_buff) {
-				Ok((pd, p, v)) => (pd, p, v),
-				Err(_) => return ResultSecondRound::default(),
-		};
+    let brave_private_channel::SecondRoundOutput {
+        partial_dec,
+        proofs,
+        rand_vec,
+    } = match brave_private_channel::second_round(v_enc, skey_buff) {
+        Ok(result) => result,
+        Err(_) => return ResultSecondRound::default(),
+    };
 
-    let mut partial_enc_buff = encoded_partial_decryption.into_boxed_slice();
+    let mut partial_enc_buff = partial_dec.into_boxed_slice();
     let partial_enc_size = partial_enc_buff.len();
     let partial_enc_ptr = partial_enc_buff.as_mut_ptr();
     std::mem::forget(partial_enc_buff);
 
-    let mut proofs_buff = encoded_proofs.into_boxed_slice();
+    let mut proofs_buff = proofs.into_boxed_slice();
     let proofs_size = proofs_buff.len();
     let proofs_ptr = proofs_buff.as_mut_ptr();
     std::mem::forget(proofs_buff);
 
-    let mut rand_vec_buff = encoded_rand_vec.into_boxed_slice();
+    let mut rand_vec_buff = rand_vec.into_boxed_slice();
     let rand_vec_size = rand_vec_buff.len();
     let rand_vec_ptr = rand_vec_buff.as_mut_ptr();
     std::mem::forget(rand_vec_buff);
@@ -169,4 +182,3 @@ pub unsafe extern "C" fn u8_pointer_destroy(ptr: *const u8) {
         drop(ptr)
     }
 }
-

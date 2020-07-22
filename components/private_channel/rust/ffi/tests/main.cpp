@@ -4,6 +4,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #include <iostream>
+#include <assert.h>
 #include <array>
 #include <string>
 #include <vector>
@@ -45,6 +46,9 @@ void TestEndToEnd() {
   private_channel::free_pointer_u8(result.shared_pubkey_ptr);
   private_channel::free_pointer_u8(result.encrypted_hashes_ptr);
 
+  //TODO(@gpestana, verify the output of the first round)
+  assert(true);
+
   // send content of C_ResultChallenge over HTTP to server
 
   int size_enc_input = sizeof(MOCK_SERVER_REPLY)/sizeof(MOCK_SERVER_REPLY[0]);
@@ -56,6 +60,8 @@ void TestEndToEnd() {
   private_channel::free_pointer_u8(result_secondr.encoded_proofs_ptr);
   private_channel::free_pointer_u8(result_secondr.random_vec_ptr);
   // send content of C_ResultSecondRound over HTTP to server
+
+  //TODO(@gpestana, verify the output of last round)
 }
 
 int main() {
