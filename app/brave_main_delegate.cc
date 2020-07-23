@@ -209,6 +209,7 @@ bool BraveMainDelegate::BasicStartupComplete(int* exit_code) {
   const std::unordered_set<const char*> disabled_features = {
     autofill::features::kAutofillEnableAccountWalletStorage.name,
     autofill::features::kAutofillServerCommunication.name,
+    blink::features::kAVIF.name,
     blink::features::kTextFragmentAnchor.name,
     features::kAllowPopupsDuringPageUnload.name,
     features::kNotificationTriggers.name,
