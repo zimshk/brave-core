@@ -32,6 +32,9 @@
 
 namespace TemplateURLPrepopulateData {
 
+void LocalizeEngineList(std::vector<BravePrepopulatedEngineID>& engines,
+      int country_id);
+
 namespace {
 
 // Maps BravePrepopulatedEngineID to Chromium's PrepopulatedEngine.
@@ -56,7 +59,6 @@ const std::map<BravePrepopulatedEngineID, const PrepopulatedEngine*>
         {PREPOPULATED_ENGINE_ID_YAHOO_ID, &brave_yahoo_id},
         {PREPOPULATED_ENGINE_ID_YAHOO_IN, &brave_yahoo_in},
         {PREPOPULATED_ENGINE_ID_YAHOO_IT, &brave_yahoo_it},
-        {PREPOPULATED_ENGINE_ID_YAHOO_JP, &brave_yahoo_jp},
         {PREPOPULATED_ENGINE_ID_YAHOO_MX, &brave_yahoo_mx},
         {PREPOPULATED_ENGINE_ID_YAHOO_MY, &brave_yahoo_my},
         {PREPOPULATED_ENGINE_ID_YAHOO_NL, &brave_yahoo_nl},
@@ -68,7 +70,6 @@ const std::map<BravePrepopulatedEngineID, const PrepopulatedEngine*>
         {PREPOPULATED_ENGINE_ID_YAHOO_SE, &brave_yahoo_se},
         {PREPOPULATED_ENGINE_ID_YAHOO_SG, &brave_yahoo_sg},
         {PREPOPULATED_ENGINE_ID_YAHOO_TH, &brave_yahoo_th},
-        {PREPOPULATED_ENGINE_ID_YAHOO_TR, &brave_yahoo_tr},
         {PREPOPULATED_ENGINE_ID_YAHOO_TW, &brave_yahoo_tw},
         {PREPOPULATED_ENGINE_ID_YAHOO_UK, &brave_yahoo_uk},
         {PREPOPULATED_ENGINE_ID_YAHOO_VE, &brave_yahoo_ve},
@@ -83,7 +84,6 @@ const std::map<BravePrepopulatedEngineID, const PrepopulatedEngine*>
 
 // Default order in which engines will appear in the UI.
 std::vector<BravePrepopulatedEngineID> brave_engines_default = {
-    PREPOPULATED_ENGINE_ID_YAHOO,
     PREPOPULATED_ENGINE_ID_GOOGLE,
     PREPOPULATED_ENGINE_ID_DUCKDUCKGO,
     PREPOPULATED_ENGINE_ID_QWANT,
@@ -92,6 +92,15 @@ std::vector<BravePrepopulatedEngineID> brave_engines_default = {
 };
 
 // Variations of the order / default options by country.
+std::vector<BravePrepopulatedEngineID> brave_engines_with_yahoo = {
+    PREPOPULATED_ENGINE_ID_YAHOO,
+    PREPOPULATED_ENGINE_ID_GOOGLE,
+    PREPOPULATED_ENGINE_ID_DUCKDUCKGO,
+    PREPOPULATED_ENGINE_ID_QWANT,
+    PREPOPULATED_ENGINE_ID_BING,
+    PREPOPULATED_ENGINE_ID_STARTPAGE,
+};
+
 std::vector<BravePrepopulatedEngineID> brave_engines_DE = {
     PREPOPULATED_ENGINE_ID_YAHOO,
     PREPOPULATED_ENGINE_ID_DUCKDUCKGO_DE,
@@ -128,10 +137,52 @@ const std::map<int, std::vector<BravePrepopulatedEngineID>>
          brave_engines_FR},
         {country_codes::CountryCharsToCountryID('A', 'U'),
          brave_engines_AU_NZ_IE},
+
+        //!!!RESOLVE
         {country_codes::CountryCharsToCountryID('N', 'Z'),
          brave_engines_AU_NZ_IE},
         {country_codes::CountryCharsToCountryID('I', 'E'),
-         brave_engines_AU_NZ_IE}};
+         brave_engines_AU_NZ_IE},
+        //!!!RESOLVE
+
+        {country_codes::CountryCharsToCountryID('A', 'T'),
+         brave_engines_with_yahoo},
+        {country_codes::CountryCharsToCountryID('B', 'R'),
+         brave_engines_with_yahoo},
+        {country_codes::CountryCharsToCountryID('C', 'A'),
+         brave_engines_with_yahoo},
+        {country_codes::CountryCharsToCountryID('C', 'H'),
+         brave_engines_with_yahoo},
+        {country_codes::CountryCharsToCountryID('D', 'K'),
+         brave_engines_with_yahoo},
+        {country_codes::CountryCharsToCountryID('E', 'S'),
+         brave_engines_with_yahoo},
+        {country_codes::CountryCharsToCountryID('F', 'I'),
+         brave_engines_with_yahoo},
+        {country_codes::CountryCharsToCountryID('G', 'B'),
+         brave_engines_with_yahoo},
+        {country_codes::CountryCharsToCountryID('H', 'K'),
+         brave_engines_with_yahoo},
+        {country_codes::CountryCharsToCountryID('I', 'N'),
+         brave_engines_with_yahoo},
+        {country_codes::CountryCharsToCountryID('I', 'T'),
+         brave_engines_with_yahoo},
+        {country_codes::CountryCharsToCountryID('M', 'X'),
+         brave_engines_with_yahoo},
+        {country_codes::CountryCharsToCountryID('M', 'Y'),
+         brave_engines_with_yahoo},
+        {country_codes::CountryCharsToCountryID('N', 'L'),
+         brave_engines_with_yahoo},
+        {country_codes::CountryCharsToCountryID('N', 'O'),
+         brave_engines_with_yahoo},
+        {country_codes::CountryCharsToCountryID('S', 'E'),
+         brave_engines_with_yahoo},
+        {country_codes::CountryCharsToCountryID('S', 'G'),
+         brave_engines_with_yahoo},
+        {country_codes::CountryCharsToCountryID('T', 'W'),
+         brave_engines_with_yahoo},
+        {country_codes::CountryCharsToCountryID('U', 'S'),
+         brave_engines_with_yahoo}};
 
 // Default search engine. Overridable on a per-country basis.
 const BravePrepopulatedEngineID default_engine =
@@ -181,6 +232,8 @@ const std::map<int, BravePrepopulatedEngineID>
          PREPOPULATED_ENGINE_ID_YAHOO_FI},
         {country_codes::CountryCharsToCountryID('F', 'R'),
          PREPOPULATED_ENGINE_ID_YAHOO_FR},
+        {country_codes::CountryCharsToCountryID('G', 'B'),
+         PREPOPULATED_ENGINE_ID_YAHOO_UK},
         {country_codes::CountryCharsToCountryID('H', 'K'),
          PREPOPULATED_ENGINE_ID_YAHOO_HK},
         {country_codes::CountryCharsToCountryID('I', 'D'),
@@ -189,8 +242,6 @@ const std::map<int, BravePrepopulatedEngineID>
          PREPOPULATED_ENGINE_ID_YAHOO_IN},
         {country_codes::CountryCharsToCountryID('I', 'T'),
          PREPOPULATED_ENGINE_ID_YAHOO_IT},
-        {country_codes::CountryCharsToCountryID('J', 'P'),
-         PREPOPULATED_ENGINE_ID_YAHOO_JP},
         {country_codes::CountryCharsToCountryID('M', 'X'),
          PREPOPULATED_ENGINE_ID_YAHOO_MX},
         {country_codes::CountryCharsToCountryID('M', 'Y'),
@@ -213,12 +264,8 @@ const std::map<int, BravePrepopulatedEngineID>
          PREPOPULATED_ENGINE_ID_YAHOO_SG},
         {country_codes::CountryCharsToCountryID('T', 'H'),
          PREPOPULATED_ENGINE_ID_YAHOO_TH},
-        {country_codes::CountryCharsToCountryID('T', 'R'),
-         PREPOPULATED_ENGINE_ID_YAHOO_TR},
         {country_codes::CountryCharsToCountryID('T', 'W'),
          PREPOPULATED_ENGINE_ID_YAHOO_TW},
-        {country_codes::CountryCharsToCountryID('U', 'K'),
-         PREPOPULATED_ENGINE_ID_YAHOO_UK},
         {country_codes::CountryCharsToCountryID('V', 'E'),
          PREPOPULATED_ENGINE_ID_YAHOO_VE},
         {country_codes::CountryCharsToCountryID('V', 'N'),
@@ -256,22 +303,6 @@ void UpdateTemplateURLDataKeyword(
     case PREPOPULATED_ENGINE_ID_BING:
       t_urld->SetKeyword(base::ASCIIToUTF16(":b"));
       break;
-  }
-}
-
-// Some engines (like Yahoo) have different URLs per country
-// The intention of this function is to find the generic one
-// (ex: PREPOPULATED_ENGINE_ID_YAHOO) and then substitute the
-// country specific version.
-void LocalizeEngineList(std::vector<BravePrepopulatedEngineID>& engines,
-      int country_id) {
-  for (size_t i = 0; i < engines.size(); ++i) {
-    if (engines[i] == PREPOPULATED_ENGINE_ID_YAHOO) {
-      const auto& it = yahoo_engines_by_country_id_map.find(country_id);
-      if (it != yahoo_engines_by_country_id_map.end()) {
-        engines[i] = it->second;
-      }
-    }
   }
 }
 
@@ -321,6 +352,22 @@ GetBravePrepopulatedEnginesForCountryID(
 }
 
 }  // namespace
+
+// Some engines (like Yahoo) have different URLs per country
+// The intention of this function is to find the generic one
+// (ex: PREPOPULATED_ENGINE_ID_YAHOO) and then substitute the
+// country specific version.
+void LocalizeEngineList(std::vector<BravePrepopulatedEngineID>& engines,
+      int country_id) {
+  for (size_t i = 0; i < engines.size(); ++i) {
+    if (engines[i] == PREPOPULATED_ENGINE_ID_YAHOO) {
+      const auto& it = yahoo_engines_by_country_id_map.find(country_id);
+      if (it != yahoo_engines_by_country_id_map.end()) {
+        engines[i] = it->second;
+      }
+    }
+  }
+}
 
 // Redefines function with the same name in Chromium. We need to account for
 // the version of Brave engines as well: kCurrentDataVersion is defined in

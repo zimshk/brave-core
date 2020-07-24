@@ -12,7 +12,7 @@ namespace TemplateURLPrepopulateData {
 
 // IMPORTANT! Make sure to bump this value if you make changes to the
 // engines below or add/remove engines.
-const int kBraveCurrentDataVersion = 5;
+const int kBraveCurrentDataVersion = 6;
 
 PrepopulatedEngine ModifyEngineParams(const PrepopulatedEngine& engine,
     const wchar_t* const name,
@@ -308,14 +308,6 @@ const PrepopulatedEngine brave_yahoo_it = {
     PREPOPULATED_ENGINE_ID_YAHOO_IT
 };
 
-const PrepopulatedEngine brave_yahoo_jp = ModifyEngineParams(
-  yahoo_jp,
-  BRAVE_YAHOO_NAME,
-  BRAVE_YAHOO_KEYWORD,
-  BRAVE_YAHOO_SEARCH_URL("jp"),
-  BRAVE_YAHOO_SUGGEST_URL("jp"),
-  PREPOPULATED_ENGINE_ID_YAHOO_JP);
-
 const PrepopulatedEngine brave_yahoo_mx = ModifyEngineParams(
   yahoo_mx,
   BRAVE_YAHOO_NAME,
@@ -416,14 +408,6 @@ const PrepopulatedEngine brave_yahoo_th = ModifyEngineParams(
   BRAVE_YAHOO_SEARCH_URL("th"),
   BRAVE_YAHOO_SUGGEST_URL("th"),
   PREPOPULATED_ENGINE_ID_YAHOO_TH);
-
-const PrepopulatedEngine brave_yahoo_tr = ModifyEngineParams(
-  yahoo_tr,
-  BRAVE_YAHOO_NAME,
-  BRAVE_YAHOO_KEYWORD,
-  BRAVE_YAHOO_SEARCH_URL("tr"),
-  BRAVE_YAHOO_SUGGEST_URL("tr"),
-  PREPOPULATED_ENGINE_ID_YAHOO_TR);
 
 const PrepopulatedEngine brave_yahoo_tw = ModifyEngineParams(
   yahoo_tw,

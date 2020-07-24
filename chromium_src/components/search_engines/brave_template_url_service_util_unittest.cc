@@ -10,6 +10,7 @@
 #include "base/strings/string_util.h"
 #include "base/strings/utf_string_conversions.h"
 #include "brave/components/search_engines/brave_prepopulated_engines.h"
+#include "components/country_codes/country_codes.h"
 #include "components/search_engines/search_engines_pref_names.h"
 #include "components/search_engines/search_terms_data.h"
 #include "components/search_engines/template_url.h"
@@ -18,6 +19,11 @@
 #include "components/search_engines/util.h"
 #include "components/sync_preferences/testing_pref_service_syncable.h"
 #include "testing/gtest/include/gtest/gtest.h"
+
+namespace TemplateURLPrepopulateData {
+  extern void LocalizeEngineList(std::vector<BravePrepopulatedEngineID>& engines,
+      int country_id);
+}
 
 namespace {
 
@@ -137,4 +143,43 @@ TEST_F(BraveTemplateURLServiceUtilTest,
   // Verify count and order.
   EXPECT_EQ(local_turls.size(), template_urls.size());
   TestDefaultOrder(template_urls, {":d", ":q", ":g", ":b", ":sp", ":ya"});
+}
+
+TEST_F(BraveTemplateURLServiceUtilTest, LocalizeEngineListGermany) {
+  std::vector<TemplateURLPrepopulateData::BravePrepopulatedEngineID>
+      list_with_yahoo = {
+        TemplateURLPrepopulateData::PREPOPULATED_ENGINE_ID_YAHOO,
+        TemplateURLPrepopulateData::PREPOPULATED_ENGINE_ID_QWANT,
+        TemplateURLPrepopulateData::PREPOPULATED_ENGINE_ID_STARTPAGE
+      };
+  TemplateURLPrepopulateData::LocalizeEngineList(list_with_yahoo,
+    country_codes::CountryCharsToCountryID('D', 'E'));
+  EXPECT_EQ(list_with_yahoo[0],
+      TemplateURLPrepopulateData::PREPOPULATED_ENGINE_ID_YAHOO_DE);
+}
+
+TEST_F(BraveTemplateURLServiceUtilTest, LocalizeEngineListUSA) {
+  std::vector<TemplateURLPrepopulateData::BravePrepopulatedEngineID>
+      list_with_yahoo = {
+        TemplateURLPrepopulateData::PREPOPULATED_ENGINE_ID_YAHOO,
+        TemplateURLPrepopulateData::PREPOPULATED_ENGINE_ID_QWANT,
+        TemplateURLPrepopulateData::PREPOPULATED_ENGINE_ID_STARTPAGE
+      };
+  TemplateURLPrepopulateData::LocalizeEngineList(list_with_yahoo,
+    country_codes::CountryCharsToCountryID('U', 'S'));
+  EXPECT_EQ(list_with_yahoo[0],
+      TemplateURLPrepopulateData::PREPOPULATED_ENGINE_ID_YAHOO);
+}
+
+TEST_F(BraveTemplateURLServiceUtilTest, LocalizeEngineListUnsupported) {
+  std::vector<TemplateURLPrepopulateData::BravePrepopulatedEngineID>
+      list_with_yahoo = {
+        TemplateURLPrepopulateData::PREPOPULATED_ENGINE_ID_YAHOO,
+        TemplateURLPrepopulateData::PREPOPULATED_ENGINE_ID_QWANT,
+        TemplateURLPrepopulateData::PREPOPULATED_ENGINE_ID_STARTPAGE
+      };
+  TemplateURLPrepopulateData::LocalizeEngineList(list_with_yahoo,
+    country_codes::CountryCharsToCountryID('J', 'P'));
+  EXPECT_EQ(list_with_yahoo[0],
+      TemplateURLPrepopulateData::PREPOPULATED_ENGINE_ID_YAHOO);
 }
