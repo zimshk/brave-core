@@ -60,14 +60,6 @@ class LedgerClientMojoBridge :
 
   void PublisherListNormalized(ledger::PublisherInfoList list) override;
 
-  void SaveState(const std::string& name,
-                              const std::string& value,
-                              SaveStateCallback callback) override;
-  void LoadState(const std::string& name,
-                              LoadStateCallback callback) override;
-  void ResetState(
-      const std::string& name,
-      ResetStateCallback callback) override;
   void SetBooleanState(const std::string& name, bool value) override;
   void GetBooleanState(const std::string& name,
                        GetBooleanStateCallback callback) override;
@@ -107,10 +99,6 @@ class LedgerClientMojoBridge :
   void GetUint64Option(
       const std::string& name,
       GetUint64OptionCallback callback) override;
-
-  void SetConfirmationsIsReady(const bool is_ready) override;
-
-  void ConfirmationsTransactionHistoryDidChange() override;
 
   void OnContributeUnverifiedPublishers(
       const ledger::Result result,
@@ -204,19 +192,6 @@ class LedgerClientMojoBridge :
   static void OnLoadURL(
       CallbackHolder<LoadURLCallback>* holder,
       const ledger::UrlResponse& response);
-
-  static void OnSaveState(
-      CallbackHolder<SaveStateCallback>* holder,
-      ledger::Result result);
-
-  static void OnLoadState(
-      CallbackHolder<LoadStateCallback>* holder,
-      ledger::Result result,
-      const std::string& value);
-
-  static void OnResetState(
-      CallbackHolder<ResetStateCallback>* holder,
-      ledger::Result result);
 
   static void OnShowNotification(
     CallbackHolder<ShowNotificationCallback>* holder,

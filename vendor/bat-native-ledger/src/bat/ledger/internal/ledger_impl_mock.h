@@ -82,8 +82,6 @@ class MockLedgerImpl : public LedgerImpl {
 
   MOCK_METHOD1(SetAutoContributeEnabled, void(bool));
 
-  MOCK_METHOD1(UpdateAdsRewards, void(const bool));
-
   MOCK_METHOD2(SavePendingContribution,
       void(ledger::PendingContributionList,
           ledger::ResultCallback));
@@ -116,9 +114,6 @@ class MockLedgerImpl : public LedgerImpl {
       ledger::AutoContributePropertiesPtr());
 
   MOCK_METHOD1(LoadNicewareList, void(ledger::GetNicewareListCallback));
-
-  MOCK_METHOD1(SetConfirmationsWalletInfo,
-      void(const ledger::WalletInfoProperties&));
 
   MOCK_METHOD1(LoadLedgerState, void(ledger::OnLoadCallback));
 
@@ -241,10 +236,6 @@ class MockLedgerImpl : public LedgerImpl {
 
   MOCK_METHOD0(GetPaymentId, std::string());
 
-  MOCK_METHOD1(GetConfirmationsWalletInfo,
-      const confirmations::WalletInfo(
-          const ledger::WalletInfoProperties&));
-
   MOCK_METHOD0(GetCreationStamp, uint64_t());
 
   MOCK_METHOD1(SetCreationStamp, void(uint64_t));
@@ -268,21 +259,6 @@ class MockLedgerImpl : public LedgerImpl {
       void(ledger::HasSufficientBalanceToReconcileCallback));
 
   MOCK_METHOD1(SaveNormalizedPublisherList, void(ledger::PublisherInfoList));
-
-  MOCK_METHOD1(SetCatalogIssuers, void(
-      const std::string&));
-
-  MOCK_METHOD2(ConfirmAd, void(
-      const std::string&,
-      const std::string&));
-
-  MOCK_METHOD3(ConfirmAction, void(
-      const std::string&,
-      const std::string&,
-      const std::string&));
-
-  MOCK_METHOD1(GetTransactionHistory,
-      void(ledger::GetTransactionHistoryCallback));
 
   MOCK_METHOD0(GetTaskRunner, scoped_refptr<base::SequencedTaskRunner>());
 
